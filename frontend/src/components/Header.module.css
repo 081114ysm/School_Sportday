@@ -1,0 +1,182 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: saturate(180%) blur(10px);
+}
+.inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+.logoImg {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.logoTextWrap {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.school {
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.event {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+}
+.nav {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+  align-items: center;
+}
+.navItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  color: var(--text2);
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+.navItem:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+.navItemActive {
+  background: var(--green);
+  color: #fff;
+}
+.navItemActive:hover {
+  background: var(--green-dark);
+  color: #fff;
+}
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 8px;
+}
+.userName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.iconBtn {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  color: var(--text2);
+  transition: all 0.15s;
+}
+.iconBtn:hover {
+  background: var(--bg);
+  color: var(--green);
+}
+.loginBtn,
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.loginBtn:hover,
+.logoutBtn:hover {
+  background: var(--green-dark);
+}
+.logoutBtn {
+  background: transparent;
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.logoutBtn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+@media (max-width: 960px) {
+  .inner {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+  .nav {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    flex-wrap: nowrap;
+  }
+  .navItem {
+    flex-shrink: 0;
+    min-height: 40px;
+  }
+}
+@media (max-width: 640px) {
+  .inner {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+  .school {
+    display: none;
+  }
+  .event {
+    font-size: 14px;
+  }
+  .logoImg {
+    width: 34px;
+    height: 34px;
+  }
+  .navItem {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .userName {
+    display: none;
+  }
+  .loginBtn,
+  .logoutBtn {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .right {
+    gap: 6px;
+    margin-left: 0;
+  }
+}

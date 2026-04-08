@@ -1,7 +1,0 @@
-{
-  "tool_name": "Grep",
-  "tool_input_preview": "{\"pattern\":\"dQw4w9WgXcQ\",\"output_mode\":\"files_with_matches\"}",
-  "error": "Ripgrep search timed out after 20 seconds. The search may have matched files but did not complete in time. Try searching a more specific path or pattern.",
-  "timestamp": "2026-04-08T04:43:32.951Z",
-  "retry_count": 1
-}

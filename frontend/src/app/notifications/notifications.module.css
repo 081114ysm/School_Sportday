@@ -1,0 +1,152 @@
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.col {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px;
+}
+.colTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.teamList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.teamRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.teamRow:hover {
+  border-color: var(--green);
+}
+.teamRowActive {
+  background: rgba(43, 191, 126, 0.08);
+  border-color: var(--green);
+}
+.teamMeta {
+  text-align: left;
+}
+.teamName {
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--text);
+}
+.teamSub {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+.toggle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.teamRowActive .toggle {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+}
+.notiList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.notiItem {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  background: var(--bg);
+  border-radius: 10px;
+}
+.notiItem svg {
+  margin-top: 2px;
+  color: var(--green);
+}
+.notiTitle {
+  font-weight: 800;
+  font-size: 13px;
+}
+.notiBody {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+.notiAt {
+  font-size: 10px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+.emptyNoti {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px;
+  color: var(--text3);
+}
+.loginPrompt {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 60px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--text2);
+}
+.loginPrompt h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+}
+.loginPrompt p {
+  font-size: 13px;
+}
+@media (max-width: 960px) {
+  .cols {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+@media (max-width: 640px) {
+  .col {
+    padding: 16px;
+    border-radius: 14px;
+  }
+  .colTitle {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  .teamRow {
+    padding: 12px 14px;
+    min-height: 56px;
+  }
+  .teamList {
+    max-height: none;
+  }
+}

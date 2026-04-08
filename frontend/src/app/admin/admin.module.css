@@ -1,0 +1,767 @@
+/* ===== ADMIN LIGHT THEME (matches user pages) ===== */
+.adminPage {
+  --bg: #f6f8fa;
+  --bg2: #ffffff;
+  --bg3: #f0f2f5;
+  --bg4: #e5e7eb;
+  --accent: #2bbf7e;
+  --accent2: #1d9a63;
+  --text: #1f2937;
+  --text2: #6b7280;
+  --text3: #9ca3af;
+  --border: #e5e7eb;
+  --green: #2bbf7e;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --radius: 12px;
+
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* ===== ADMIN HEADER ===== */
+.adminHeader {
+  background: var(--bg2);
+  border-bottom: 2px solid var(--accent);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.adminLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adminLogoIcon {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #fff;
+  font-weight: 900;
+}
+
+.adminLogoText {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.3px;
+}
+
+.adminHomeLink {
+  font-size: 13px;
+  color: var(--text2);
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.adminHomeLink:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ===== ADMIN NAV TABS ===== */
+.adminNav {
+  display: flex;
+  gap: 4px;
+  padding: 16px 24px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+
+.adminNavBtn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  transition: all 0.2s;
+}
+
+.adminNavBtn:hover {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+.adminNavBtnActive {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.adminNavBtnActive:hover {
+  background: var(--accent2);
+  color: #fff;
+}
+
+/* ===== ADMIN CONTAINER ===== */
+.adminContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* ===== SECTION TITLE ===== */
+.adminSectionTitle {
+  font-size: 18px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== LIVE SCORING TAB ===== */
+.matchSelector {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg3);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 24px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a1a1aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+.matchSelector:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.scoreBoard {
+  background: var(--bg2);
+  border-radius: var(--radius);
+  padding: 32px;
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.scoreBoardHeader {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.scoreBoardSport {
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.scoreBoardStatus {
+  font-size: 12px;
+  color: var(--text3);
+}
+
+.scoreArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.scoreTeam {
+  text-align: center;
+  flex: 1;
+}
+
+.scoreTeamName {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.scoreNum {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 80px;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+.scoreButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.scoreBtnPlus {
+  width: 56px;
+  height: 56px;
+  background: var(--green);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.scoreBtnPlus:hover {
+  transform: scale(1.1);
+  background: #00c978;
+}
+
+.scoreBtnPlus:active {
+  transform: scale(0.95);
+}
+
+.scoreBtnMinus {
+  width: 56px;
+  height: 56px;
+  background: var(--red);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 24px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.scoreBtnMinus:hover {
+  transform: scale(1.1);
+}
+
+.scoreBtnMinus:active {
+  transform: scale(0.95);
+}
+
+.scoreVs {
+  font-size: 20px;
+  color: var(--text3);
+  font-weight: 300;
+}
+
+.actionRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.btnUndo {
+  background: var(--bg4);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+
+.btnUndo:hover {
+  background: var(--bg3);
+  border-color: var(--text3);
+}
+
+.btnSave {
+  background: var(--green);
+  color: #fff;
+}
+
+.btnSave:hover {
+  background: #00c978;
+}
+
+.btnEnd {
+  background: var(--red);
+  color: #fff;
+}
+
+.btnEnd:hover {
+  background: #dc2626;
+}
+
+.btnStart {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btnStart:hover {
+  background: var(--accent2);
+}
+
+/* ===== RESULTS TAB ===== */
+.filterRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  transition: all 0.2s;
+}
+
+.filterBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.filterBtnActive {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.resultCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.resultCard {
+  background: var(--bg2);
+  border-radius: var(--radius);
+  padding: 20px;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s;
+}
+
+.resultCard:hover {
+  border-color: var(--accent);
+}
+
+.resultCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.resultSport {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.resultBadge {
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.resultBadgeDone {
+  background: var(--bg4);
+  color: var(--text3);
+}
+
+.resultBadgeLive {
+  background: var(--red);
+  color: #fff;
+}
+
+.resultBadgeScheduled {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--blue);
+}
+
+.resultScoreRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.resultTeamName {
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.resultTeamNameRight {
+  text-align: right;
+}
+
+.resultScore {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 32px;
+  color: var(--accent);
+  min-width: 40px;
+  text-align: center;
+}
+
+.resultDash {
+  color: var(--text3);
+  font-size: 18px;
+}
+
+.resultMeta {
+  font-size: 11px;
+  color: var(--text3);
+  text-align: center;
+}
+
+/* ===== SCHEDULE MANAGEMENT TAB ===== */
+.formCard {
+  background: var(--bg2);
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.formTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.formLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formInput {
+  padding: 10px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+
+.formInput:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.formSelect {
+  padding: 10px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a1a1aa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.formSelect:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.formSubmitBtn {
+  padding: 12px 32px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.formSubmitBtn:hover {
+  background: var(--accent2);
+}
+
+.matchList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dateGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.dateGroupHeader {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent2);
+  background: var(--bg3);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+}
+
+.matchListItem {
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s;
+}
+
+.matchListItem:hover {
+  border-color: var(--accent);
+}
+
+.matchListLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.matchListSport {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.matchListTeams {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.matchListTime {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.matchListActions {
+  display: flex;
+  gap: 8px;
+}
+
+.deleteBtn {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--red);
+  color: var(--red);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  background: var(--red);
+  color: #fff;
+}
+
+/* ===== TEAM MANAGEMENT TAB ===== */
+.teamFormCard {
+  background: var(--bg2);
+  border-radius: var(--radius);
+  padding: 24px;
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.teamList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.teamListItem {
+  background: var(--bg2);
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.2s;
+}
+
+.teamListItem:hover {
+  border-color: var(--accent);
+}
+
+.teamListInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.teamListAvatar {
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 16px;
+  color: #fff;
+}
+
+.teamListName {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.teamListGrade {
+  font-size: 11px;
+  color: var(--text3);
+}
+
+/* ===== NO DATA ===== */
+.noData {
+  text-align: center;
+  padding: 48px;
+  color: var(--text3);
+  font-size: 14px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 960px) {
+  .adminNav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 16px;
+  }
+  .adminNavBtn {
+    flex-shrink: 0;
+    min-height: 40px;
+  }
+  .matchListItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .matchListActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .matchListLeft {
+    flex-wrap: wrap;
+  }
+  .formGrid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+@media (max-width: 640px) {
+  .adminHeader {
+    padding: 0 14px;
+    height: 54px;
+  }
+  .adminLogoText {
+    font-size: 13px;
+  }
+  .adminNavBtn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  .adminContainer {
+    padding: 14px;
+  }
+  .adminSectionTitle {
+    font-size: 16px;
+  }
+  .scoreBoard {
+    padding: 18px 14px;
+  }
+  .scoreArea {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .scoreNum {
+    font-size: 56px;
+  }
+  .scoreBtnPlus,
+  .scoreBtnMinus {
+    width: 52px;
+    height: 52px;
+  }
+  .actionBtn {
+    padding: 12px 18px;
+    font-size: 13px;
+    flex: 1 1 140px;
+    min-height: 44px;
+  }
+  .resultCards {
+    grid-template-columns: 1fr;
+  }
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .formCard,
+  .teamFormCard {
+    padding: 16px;
+  }
+  .formInput,
+  .formSelect,
+  .matchSelector {
+    min-height: 44px;
+  }
+  .formSubmitBtn {
+    width: 100%;
+    padding: 14px 20px;
+    min-height: 48px;
+  }
+  .teamList {
+    grid-template-columns: 1fr;
+  }
+  .matchListActions input.formInput {
+    width: 100%;
+    min-width: 0 !important;
+  }
+}

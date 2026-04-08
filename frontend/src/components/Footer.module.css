@@ -1,0 +1,36 @@
+.footer {
+  margin-top: 80px;
+  border-top: 1px solid var(--border);
+  background: #fff;
+}
+.inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--text2);
+}
+.links {
+  display: flex;
+  gap: 16px;
+}
+.links a {
+  color: var(--green);
+  font-weight: 600;
+}
+@media (max-width: 640px) {
+  .footer {
+    margin-top: 48px;
+  }
+  .inner {
+    padding: 18px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12px;
+  }
+}
