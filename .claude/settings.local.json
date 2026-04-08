@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls D:/sportday/backend/src/**/*.spec.ts)",
+      "Bash(ls D:/sportday/frontend/next.config* D:/sportday/frontend/tsconfig.json D:/sportday/frontend/eslint.config*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(npm test:*)",
+      "Bash(python -c ':*)",
+      "Bash(python _find_emoji.py)",
+      "Bash(ls D:/sportday/frontend/next.config*)",
+      "Bash(ls next.config*)",
+      "Bash(node -e ':*)",
+      "Bash(ls D:/sportday/backend/database.sqlite*)",
+      "Bash(node scripts/reseed.js)",
+      "Bash(node:*)",
+      "Bash(npx jest:*)",
+      "Bash(netstat -ano)",
+      "Bash(curl -s http://localhost:3000/ -o /tmp/idx.html -w \"IDX %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:3000/schedule -o /tmp/sch.html -w \"SCH %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:3000/today -o /tmp/tod.html -w \"TOD %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:3000/rankings -o /tmp/rk.html -w \"RK %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:3000/youtube -o /tmp/yt.html -w \"YT %{http_code}\\\\n\")",
+      "Bash(taskkill //PID 40204 //F)",
+      "Bash(npx tsc:*)",
+      "Bash(curl -s http://localhost:4001/api/notifications/push/public-key)",
+      "Bash(curl:*)",
+      "Bash(taskkill:*)",
+      "Bash(ls -la D:/sportday/backend/.env*)",
+      "Bash(python -c \"import sys,json; ms=json.load\\(sys.stdin\\); vb=[m for m in ms if m['sport']=='빅발리볼']; print\\('count',len\\(vb\\)\\); print\\(vb[0] if vb else 'none'\\)\")"
+    ]
+  }
+}
