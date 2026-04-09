@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Calendar, Trophy, Radio, Tv, ArrowRight, Swords } from 'lucide-react';
+import { Calendar, Trophy, Radio, Tv, ArrowRight, Swords, Settings } from 'lucide-react';
 import styles from './home.module.css';
 import PhotoCarousel from '@/components/main/PhotoCarousel';
 import { fetchMatches, fetchTeams, fetchLiveMatches } from '@/services/api';
@@ -81,6 +81,7 @@ export default function HomePage() {
         <Shortcut href="/tournament" icon={<Swords size={16} />} label="토너먼트" />
         <Shortcut href="/rankings" icon={<Trophy size={16} />} label="랭킹표" />
         <Shortcut href="/youtube" icon={<Tv size={16} />} label="유튜브 중계" />
+        <Shortcut href="/admin" icon={<Settings size={16} />} label="관리자" />
       </nav>
     </div>
   );
