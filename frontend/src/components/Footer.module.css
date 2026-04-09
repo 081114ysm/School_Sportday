@@ -6,31 +6,90 @@
 .inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
+  padding: 40px 24px 28px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 32px;
+  color: var(--text2);
   font-size: 13px;
+}
+.brand {
+  max-width: 360px;
+}
+.brandTitle {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.brandSub {
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green);
+}
+.brandDesc {
+  margin: 12px 0 0;
+  line-height: 1.6;
   color: var(--text2);
 }
-.links {
+.col {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
 }
-.links a {
+.colTitle {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.list a {
+  color: var(--text2);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.list a:hover {
   color: var(--green);
-  font-weight: 600;
 }
-@media (max-width: 640px) {
+.copy {
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text2);
+}
+@media (max-width: 860px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 32px 20px 20px;
+  }
+  .brand {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+}
+@media (max-width: 520px) {
   .footer {
     margin-top: 48px;
   }
   .inner {
-    padding: 18px 16px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    font-size: 12px;
+    grid-template-columns: 1fr;
+    padding: 28px 16px 16px;
+    gap: 22px;
+  }
+  .copy {
+    padding: 14px 16px;
+    font-size: 11px;
   }
 }
