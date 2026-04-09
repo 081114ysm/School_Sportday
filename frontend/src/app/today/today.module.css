@@ -174,16 +174,17 @@
   background: linear-gradient(160deg, #0e3d27 0%, #1a5e3e 100%);
   color: #fff;
   border-radius: 16px;
-  padding: 28px 24px;
+  padding: clamp(16px, 4vw, 28px) clamp(14px, 4vw, 24px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: clamp(8px, 2vw, 14px);
+  container-type: inline-size;
 }
 .sportRow {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: clamp(10px, 2.2vw, 12px);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -193,18 +194,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: clamp(8px, 2vw, 16px);
+  min-width: 0;
 }
 .teamName {
-  font-size: 18px;
+  font-size: clamp(13px, 3.8vw, 18px);
   font-weight: 800;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
 }
 .bigScore {
-  font-size: 56px;
+  font-size: clamp(32px, 11vw, 56px);
   font-weight: 900;
   font-family: 'Bebas Neue', sans-serif;
   color: var(--green-light);
   line-height: 1;
+  flex-shrink: 0;
 }
 .divider {
   text-align: center;
