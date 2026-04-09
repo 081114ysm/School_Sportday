@@ -23,17 +23,26 @@ function getAllowedOrigins(): string[] {
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const origins = getAllowedOrigins();
+
   app.enableCors({
     origin: origins,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-admin-token', // 🔥 이거 추가
+    ],
     credentials: true,
   });
+
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
   const port = parseInt(process.env.PORT || '4001', 10);
-  // '0.0.0.0' 바인딩: Railway 컨테이너 환경에서 필수
   await app.listen(port, '0.0.0.0');
-  console.log(`Backend running on port ${port} (origins: ${origins.join(', ')})`);
+
+  console.log(
+    `Backend running on port ${port} (origins: ${origins.join(', ')})`,
+  );
 }
 bootstrap();
