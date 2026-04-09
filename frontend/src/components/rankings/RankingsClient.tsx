@@ -35,10 +35,6 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
   }, [initial, tab]);
 
   const topThree = useMemo(() => filtered.slice(0, 3), [filtered]);
-  const clubChampion = useMemo(
-    () => initial.find((r) => r.team.category === 'CLUB'),
-    [initial],
-  );
 
   const PODIUM_META = [
     { label: '1위', accent: styles.gold, rank: 1 },
@@ -52,7 +48,7 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
         <h1>순위</h1>
       </div>
 
-      {tab !== 'CLUB' && topThree.length > 0 && (
+      {topThree.length > 0 && (
         <div className={styles.podiumGrid}>
           {topThree.map((r, i) => (
             <div
@@ -73,22 +69,6 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
         </div>
       )}
 
-      {tab === 'CLUB' && clubChampion && (
-        <div className={styles.podiumGrid}>
-          <div className={`${styles.podiumCard} ${styles.gold} ${styles.podiumCardSolo}`}>
-            <div className={styles.podiumRank}>
-              <Star size={16} fill="currentColor" stroke="currentColor" />
-              클럽 1위
-            </div>
-            <div className={styles.podiumName}>{clubChampion.team.name}</div>
-            <div className={styles.podiumPts}>
-              <span className={styles.podiumPtsNum}>{clubChampion.points}</span>
-              <span className={styles.podiumPtsLabel}>승점</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className={styles.tabs}>
         {TABS.map((t) => (
           <button
@@ -102,7 +82,6 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
         ))}
       </div>
 
-      {tab !== 'CLUB' && (
       <section className={styles.section}>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
@@ -204,7 +183,6 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
           </table>
         </div>
       </section>
-      )}
     </div>
   );
 }
