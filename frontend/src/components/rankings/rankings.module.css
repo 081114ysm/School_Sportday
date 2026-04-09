@@ -404,3 +404,75 @@
     display: none;
   }
 }
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 15px;
+  }
+  .podiumCard {
+    padding: 14px 14px;
+    border-radius: 12px;
+  }
+  .podiumName {
+    font-size: 16px;
+  }
+  .podiumPtsNum {
+    font-size: 22px;
+  }
+  .tab {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-height: 36px;
+  }
+  .tableWrap {
+    border-radius: 12px;
+  }
+  .table {
+    font-size: 10px;
+    min-width: 680px;
+  }
+  .table th,
+  .table td {
+    padding: 8px 5px;
+  }
+  .pos {
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+  }
+}
+@media (max-width: 360px) {
+  .header h1 {
+    font-size: 14px;
+  }
+  .podiumGrid {
+    gap: 10px;
+  }
+  .podiumCard {
+    padding: 12px 12px;
+    gap: 6px;
+  }
+  .podiumName {
+    font-size: 14px;
+  }
+  .podiumPtsNum {
+    font-size: 20px;
+  }
+  .tabs {
+    gap: 6px;
+  }
+  .tab {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  .table {
+    font-size: 9px;
+    min-width: 580px;
+  }
+  .table th,
+  .table td {
+    padding: 6px 4px;
+  }
+  .teamName {
+    font-size: 11px;
+  }
+}
