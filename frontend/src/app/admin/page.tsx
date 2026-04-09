@@ -12,6 +12,7 @@ import { ScheduleMgmtTab } from '@/components/admin/ScheduleMgmtTab';
 import { TeamMgmtTab } from '@/components/admin/TeamMgmtTab';
 import { YoutubeMgmtTab } from '@/components/admin/YoutubeMgmtTab';
 import { SportMgmtTab } from '@/components/admin/SportMgmtTab';
+import { TournamentMgmtTab } from '@/components/admin/TournamentMgmtTab';
 
 export default function AdminPage() {
   const {
@@ -46,6 +47,7 @@ export default function AdminPage() {
     handleDeleteTeam,
     handleSetMatchYoutube,
     handleYoutubeMatchStatusChange,
+    handleCreateTournamentMatch,
   } = useAdminData();
 
   const [activeTab, setActiveTab] = useState<AdminTab>('live-input');
@@ -168,6 +170,7 @@ export default function AdminPage() {
           { key: 'team-mgmt' as AdminTab, label: '\uD83D\uDC65 팀 관리' },
           { key: 'youtube-mgmt' as AdminTab, label: '\uD83D\uDCFA 유튜브 관리' },
           { key: 'sport-mgmt' as AdminTab, label: '\uD83C\uDFC5 종목 관리' },
+          { key: 'tournament-mgmt' as AdminTab, label: '\uD83C\uDFC6 토너먼트 일정' },
         ]).map(tab => (
           <button
             key={tab.key}
@@ -247,6 +250,16 @@ export default function AdminPage() {
         )}
 
         {activeTab === 'sport-mgmt' && <SportMgmtTab />}
+
+        {activeTab === 'tournament-mgmt' && (
+          <TournamentMgmtTab
+            matches={matches}
+            teams={teams}
+            loading={loading}
+            onCreateTournamentMatch={handleCreateTournamentMatch}
+            onDeleteMatch={handleDeleteMatch}
+          />
+        )}
       </div>
     </div>
   );

@@ -375,6 +375,30 @@ export function useAdminData() {
     }
   };
 
+  const handleCreateTournamentMatch = async (draft: {
+    sport: string;
+    matchDate: string;
+    timeSlot: string;
+    teamAId: number;
+    teamBId: number;
+    bracketStage: string;
+  }) => {
+    try {
+      setLoading(true);
+      const created = await createMatch({
+        ...draft,
+        category: 'GRADE',
+        day: dayLabelFromDate(draft.matchDate),
+      });
+      setMatches(prev => [...prev, created]);
+    } catch (err) {
+      console.error('Tournament match creation failed:', err);
+      alert('경기 생성에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleYoutubeMatchStatusChange = async (matchId: number) => {
     try {
       const updated = await updateMatchStatus(matchId, 'DONE');
@@ -430,5 +454,7 @@ export function useAdminData() {
     // 유튜브 관리
     handleSetMatchYoutube,
     handleYoutubeMatchStatusChange,
+    // 토너먼트 일정
+    handleCreateTournamentMatch,
   };
 }
