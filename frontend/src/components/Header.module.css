@@ -243,3 +243,10 @@
     font-size: 12px;
   }
 }
+
+/* Hide global header on admin route (mobile only) */
+@media (max-width: 768px) {
+  .adminHidden {
+    display: none;
+  }
+}

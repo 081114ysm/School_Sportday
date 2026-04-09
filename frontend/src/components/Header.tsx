@@ -37,8 +37,10 @@ export default function Header() {
     setMenuOpen(false);
   }, [pathname]);
 
+  const isAdmin = pathname?.startsWith('/admin');
+
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header}${isAdmin ? ` ${styles.adminHidden}` : ''}`}>
       <div className={styles.inner}>
         <Link href="/" className={styles.logo}>
           <Image

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import styles from './admin.module.css';
 import { useAdminData } from '@/hooks/admin/useAdminData';
@@ -54,6 +55,7 @@ export default function AdminPage() {
   } = useAdminData();
 
   const [activeTab, setActiveTab] = useState<AdminTab>('live-input');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sportFilter, setSportFilter] = useState<string>('');
   const [resultsStatusFilter, setResultsStatusFilter] = useState<'' | 'LIVE' | 'SCHEDULED' | 'DONE'>('');
   const [scheduleSportFilter, setScheduleSportFilter] = useState<string>('');
@@ -142,15 +144,65 @@ export default function AdminPage() {
     );
   }
 
+  const TABS: { key: AdminTab; label: string }[] = [
+    { key: 'live-input', label: '🎮 실시간 입력' },
+    { key: 'results', label: '📋 결과 입력' },
+    { key: 'schedule-mgmt', label: '📅 일정 관리' },
+    { key: 'team-mgmt', label: '👥 팀 관리' },
+    { key: 'youtube-mgmt', label: '📺 유튜브 관리' },
+    { key: 'sport-mgmt', label: '🏅 종목 관리' },
+    { key: 'tournament-mgmt', label: '🏆 토너먼트 일정' },
+    { key: 'points-mgmt', label: '🎯 승점 관리' },
+  ];
+
   return (
     <div className={styles.adminPage}>
+      {/* 햄버거 오버레이 (모바일) */}
+      {mobileMenuOpen && (
+        <div
+          className={styles.mobileOverlay}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* 모바일 사이드 패널 */}
+      <nav className={`${styles.mobileSidePanel} ${mobileMenuOpen ? styles.mobileSidePanelOpen : ''}`}>
+        <div className={styles.mobileSidePanelHeader}>
+          <span className={styles.mobileSidePanelTitle}>메뉴</span>
+          <button
+            className={styles.mobileSidePanelClose}
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="닫기"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        {TABS.map(tab => (
+          <button
+            key={tab.key}
+            className={`${styles.mobileSideNavBtn} ${activeTab === tab.key ? styles.adminNavBtnActive : ''}`}
+            onClick={() => { setActiveTab(tab.key); setMobileMenuOpen(false); }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
       {/* 헤더 */}
       <header className={styles.adminHeader}>
         <div className={styles.adminLogo}>
           <div className={styles.adminLogoIcon}>{'\u2699'}</div>
           <span className={styles.adminLogoText}>ADMIN PANEL</span>
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div className={styles.adminHeaderRight}>
+          {/* 햄버거 버튼 (모바일 전용) */}
+          <button
+            className={`${styles.adminHomeLink} ${styles.hamburgerBtn}`}
+            onClick={() => setMobileMenuOpen(prev => !prev)}
+            aria-label="메뉴"
+          >
+            <Menu size={18} />
+          </button>
           <button
             className={styles.adminHomeLink}
             onClick={async () => {
@@ -181,18 +233,9 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* 내비게이션 탭 */}
+      {/* 내비게이션 탭 (데스크톱) */}
       <nav className={styles.adminNav}>
-        {([
-          { key: 'live-input' as AdminTab, label: '\uD83C\uDFAE 실시간 입력' },
-          { key: 'results' as AdminTab, label: '\uD83D\uDCCB 결과 입력' },
-          { key: 'schedule-mgmt' as AdminTab, label: '\uD83D\uDCC5 일정 관리' },
-          { key: 'team-mgmt' as AdminTab, label: '\uD83D\uDC65 팀 관리' },
-          { key: 'youtube-mgmt' as AdminTab, label: '\uD83D\uDCFA 유튜브 관리' },
-          { key: 'sport-mgmt' as AdminTab, label: '\uD83C\uDFC5 종목 관리' },
-          { key: 'tournament-mgmt' as AdminTab, label: '\uD83C\uDFC6 토너먼트 일정' },
-          { key: 'points-mgmt' as AdminTab, label: '🎯 승점 관리' },
-        ]).map(tab => (
+        {TABS.map(tab => (
           <button
             key={tab.key}
             className={`${styles.adminNavBtn} ${activeTab === tab.key ? styles.adminNavBtnActive : ''}`}
