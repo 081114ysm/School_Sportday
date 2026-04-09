@@ -41,9 +41,34 @@ export class SeedService implements OnModuleInit {
     }
   }
 
+  async backfillMatchDates() {
+    // 기존 시드에서 matchDate를 저장하지 않아 "날짜미정"으로 보이는 경기 보정.
+    // day(MON..FRI) + 이번 주 월요일 기준으로 YYYY-MM-DD 생성.
+    const DAYS2: Day[] = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
+    const now = new Date();
+    const monday = new Date(now);
+    const dow = now.getDay();
+    const offset = dow === 0 ? -6 : 1 - dow;
+    monday.setDate(now.getDate() + offset);
+    monday.setHours(0, 0, 0, 0);
+    const all = await this.matchRepo.find();
+    for (const m of all) {
+      if (m.matchDate) continue;
+      const idx = DAYS2.indexOf(m.day as Day);
+      if (idx < 0) continue;
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + idx);
+      const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      m.matchDate = ymd;
+      await this.matchRepo.save(m);
+    }
+  }
+
   async onModuleInit() {
     // 여자연합 AC/BD는 빅발리볼·피구 전용 합동 클럽팀. 멱등 추가.
     await this.ensureWomensUnionTeams();
+    // matchDate 누락 경기 백필 (기존 DB 보정).
+    await this.backfillMatchDates();
 
     const teamCount = await this.teamRepo.count();
     if (teamCount > 2) return;
@@ -230,9 +255,12 @@ export class SeedService implements OnModuleInit {
     for (const p of plans) {
       let status = decideStatus(p.day, p.slot);
       if (i === forcedLiveIdx) status = 'LIVE';
+      const dt = dateOf(p.day, p.slot);
+      const ymd = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
       const data: Partial<Match> = {
         sport: p.sport,
         day: p.day,
+        matchDate: ymd,
         timeSlot: p.slot,
         teamAId: p.a.id,
         teamBId: p.b.id,
