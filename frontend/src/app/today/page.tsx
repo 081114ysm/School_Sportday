@@ -5,6 +5,8 @@ import { Trophy, Radio, Clock } from 'lucide-react';
 import { fetchMatches, fetchLiveMatches } from '@/services/api';
 import { getSocket, disconnectSocket } from '@/services/socket';
 import { displayScore, type Match } from '@/types';
+import { isQuarterSport } from '@/lib/matchScore';
+import { QuarterClock } from '@/components/QuarterClock';
 import styles from './today.module.css';
 
 const DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
@@ -172,6 +174,9 @@ export default function TodayPage() {
                 <span>·</span>
                 <span>{live.timeSlot === 'LUNCH' ? '점심 라운드' : '저녁 라운드'}</span>
               </div>
+              {isQuarterSport(live.sport) && (
+                <QuarterClock match={live} />
+              )}
             </div>
           ) : (
             <div className={styles.noLive}>
