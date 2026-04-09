@@ -1,3 +1,38 @@
+.pageWrap {
+  max-width: 1100px;
+  height: calc(100vh - 72px);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pageWrap .layout {
+  flex: 1;
+  min-height: 0;
+}
+.pageWrap .tableSection,
+.pageWrap .liveSection {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.pageWrap .tableWrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+  min-height: 0;
+}
+@media (max-width: 960px) {
+  .pageWrap {
+    height: auto;
+    overflow: visible;
+  }
+  .pageWrap .tableWrap {
+    overflow-y: visible;
+  }
+}
+
 .heading {
   display: flex;
   align-items: center;

@@ -78,7 +78,7 @@ export default function TodayPage() {
   const dateLabel = `${today.getMonth() + 1}/${today.getDate()} (${DAY_KO[today.getDay()]})`;
 
   return (
-    <div className="page-container">
+    <div className={`page-container ${styles.pageWrap}`}>
       <div className={styles.heading}>
         <h1 className={styles.bigTitle}>오늘 경기</h1>
         <span className={styles.dateBadge}>
