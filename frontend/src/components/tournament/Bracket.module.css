@@ -217,18 +217,19 @@
 
   .semis {
     display: flex;
-    flex-direction: column;
-    gap: 0;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    align-items: stretch;
+  }
+  .semis > .card {
+    flex: 1 1 0;
+    min-width: 0;
   }
 
-  /* Vertical connector between semi cards */
-  .semis > *:not(:last-child)::after {
-    content: '';
-    display: block;
-    width: 2px;
-    height: 20px;
-    background: #e5e7eb;
-    margin: 0 auto;
+  /* 준결승 내부에 있던 세로 커넥터는 가로 배치에서 숨김 */
+  .semis > .mobileConnector {
+    display: none;
   }
 
   /* Mobile vertical connector divs injected between sections */
