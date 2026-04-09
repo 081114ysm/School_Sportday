@@ -29,9 +29,8 @@ export default function Footer() {
         <div className={styles.col}>
           <div className={styles.colTitle}>학교 정보</div>
           <ul className={styles.list}>
-            <li>경상북도 경주시</li>
-            <li>경북소프트웨어마이스터고</li>
-            <li>학생자치회 주관</li>
+            <li>경상북도 의성군</li>
+            <li>경북소프트웨어마이스터고등학교</li>
           </ul>
         </div>
       </div>
