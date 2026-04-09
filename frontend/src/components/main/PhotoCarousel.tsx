@@ -6,9 +6,9 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './PhotoCarousel.module.css';
 
 const IMAGES = [
-  { src: '/carousel/1.jpg', alt: '체육대회 사진 1' },
-  { src: '/carousel/2.jpg', alt: '체육대회 사진 2' },
-  { src: '/carousel/3.jpg', alt: '체육대회 사진 3' },
+  { src: '/carousel/mainImg1.png', alt: '체육대회 사진 1' },
+  { src: '/carousel/mainImg2.png', alt: '체육대회 사진 2' },
+  { src: '/carousel/mainImg3.png', alt: '체육대회 사진 3' },
 ];
 
 const INTERVAL = 4000;
