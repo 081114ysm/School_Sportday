@@ -34,10 +34,17 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
     }
   }, [initial, tab]);
 
-  const top = useMemo(
-    () => initial.find((r) => r.team.category !== 'CLUB'),
+  const topThree = useMemo(() => filtered.slice(0, 3), [filtered]);
+  const clubChampion = useMemo(
+    () => initial.find((r) => r.team.category === 'CLUB'),
     [initial],
   );
+
+  const PODIUM_META = [
+    { label: '1위', accent: styles.gold, rank: 1 },
+    { label: '2위', accent: styles.silver, rank: 2 },
+    { label: '3위', accent: styles.bronze, rank: 3 },
+  ];
 
   return (
     <div className="page-container">
@@ -45,16 +52,39 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
         <h1>순위</h1>
       </div>
 
-      {top && (
-        <div className={styles.topBanner}>
-          <Star size={18} fill="#fde047" stroke="#fde047" />
-          <div className={styles.topInfo}>
-            <span className={styles.topLabel}>현재 종합 1위</span>
-            <span className={styles.topName}>{top.team.name}</span>
-          </div>
-          <div className={styles.topPts}>
-            <span className={styles.topPtsNum}>{top.points}</span>
-            <span className={styles.topPtsLabel}>승점</span>
+      {tab !== 'CLUB' && topThree.length > 0 && (
+        <div className={styles.podiumGrid}>
+          {topThree.map((r, i) => (
+            <div
+              key={r.team.id}
+              className={`${styles.podiumCard} ${PODIUM_META[i].accent}`}
+            >
+              <div className={styles.podiumRank}>
+                <Star size={16} fill="currentColor" stroke="currentColor" />
+                {PODIUM_META[i].label}
+              </div>
+              <div className={styles.podiumName}>{r.team.name}</div>
+              <div className={styles.podiumPts}>
+                <span className={styles.podiumPtsNum}>{r.points}</span>
+                <span className={styles.podiumPtsLabel}>승점</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {tab === 'CLUB' && clubChampion && (
+        <div className={styles.podiumGrid}>
+          <div className={`${styles.podiumCard} ${styles.gold} ${styles.podiumCardSolo}`}>
+            <div className={styles.podiumRank}>
+              <Star size={16} fill="currentColor" stroke="currentColor" />
+              클럽 1위
+            </div>
+            <div className={styles.podiumName}>{clubChampion.team.name}</div>
+            <div className={styles.podiumPts}>
+              <span className={styles.podiumPtsNum}>{clubChampion.points}</span>
+              <span className={styles.podiumPtsLabel}>승점</span>
+            </div>
           </div>
         </div>
       )}
@@ -72,6 +102,7 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
         ))}
       </div>
 
+      {tab !== 'CLUB' && (
       <section className={styles.section}>
         <div className={styles.tableWrap}>
           <table className={styles.table}>
@@ -173,6 +204,7 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
           </table>
         </div>
       </section>
+      )}
     </div>
   );
 }

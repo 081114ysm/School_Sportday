@@ -10,6 +10,7 @@ import {
   deleteMatch,
   createTeam,
   deleteTeam,
+  updateMatch,
   updateScore,
   updateSetScore,
   updateMatchStatus,
@@ -248,6 +249,22 @@ export function useAdminData() {
     }
   };
 
+  const handleEditResult = async (
+    id: number,
+    data: { scoreA: number; scoreB: number; status: 'SCHEDULED' | 'LIVE' | 'DONE' },
+  ) => {
+    try {
+      setLoading(true);
+      const updated = await updateMatch(id, data);
+      setMatches(prev => prev.map(m => (m.id === updated.id ? updated : m)));
+    } catch (err) {
+      console.error('Result edit failed:', err);
+      alert('결과 수정에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteMatch = async (id: number) => {
     if (!confirm('이 경기를 삭제하시겠습니까?')) return;
     try {
@@ -349,6 +366,7 @@ export function useAdminData() {
     setNewMatch,
     handleCreateMatch,
     handleDeleteMatch,
+    handleEditResult,
     // 팀 관리
     newTeam,
     setNewTeam,

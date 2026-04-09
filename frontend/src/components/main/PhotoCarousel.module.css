@@ -1,0 +1,80 @@
+.carousel {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f1f5f9;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+.slideActive {
+  opacity: 1;
+}
+.image {
+  object-fit: cover;
+}
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  display: grid;
+  place-items: center;
+  color: #111827;
+  cursor: pointer;
+  transition: background 0.15s;
+  z-index: 2;
+}
+.arrow:hover {
+  background: #fff;
+}
+.arrowPrev {
+  left: 12px;
+}
+.arrowNext {
+  right: 12px;
+}
+.dots {
+  position: absolute;
+  bottom: 14px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  z-index: 2;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, transform 0.15s;
+}
+.dotActive {
+  background: #fff;
+  transform: scale(1.25);
+}
+@media (max-width: 640px) {
+  .carousel {
+    max-width: 100%;
+  }
+}

@@ -21,6 +21,84 @@
   }
 }
 
+.podiumGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.podiumCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  border-top: 4px solid var(--border);
+}
+.podiumCardSolo {
+  grid-column: 1 / -1;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.podiumCard.gold {
+  border-top-color: #f5b301;
+  background: linear-gradient(180deg, #fffbeb 0%, #fff 60%);
+}
+.podiumCard.silver {
+  border-top-color: #9ca3af;
+  background: linear-gradient(180deg, #f3f4f6 0%, #fff 60%);
+}
+.podiumCard.bronze {
+  border-top-color: #d97706;
+  background: linear-gradient(180deg, #fff7ed 0%, #fff 60%);
+}
+.podiumRank {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+  text-transform: uppercase;
+}
+.podiumCard.gold .podiumRank { color: #b45309; }
+.podiumCard.silver .podiumRank { color: #4b5563; }
+.podiumCard.bronze .podiumRank { color: #9a3412; }
+.podiumName {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.podiumPts {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-top: auto;
+}
+.podiumPtsNum {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--green-dark);
+  font-family: 'Bebas Neue', sans-serif;
+}
+.podiumPtsLabel {
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 700;
+}
+@media (max-width: 640px) {
+  .podiumGrid {
+    grid-template-columns: 1fr;
+  }
+  .podiumCardSolo {
+    max-width: none;
+  }
+}
+
 .topBanner {
   display: flex;
   align-items: center;

@@ -8,7 +8,7 @@ import type { Match } from '@/types';
 import styles from './youtube.module.css';
 
 interface YtVideo {
-  id: string;
+  id: string | null;
   title: string;
   category: string;
   date: string;
@@ -16,6 +16,7 @@ interface YtVideo {
   badge?: 'LIVE' | 'UPCOMING';
   matchId?: number;
   done?: boolean;
+  youtubeUrl?: string | null;
 }
 
 const SPORT_LABELS: Record<string, string> = {
@@ -95,6 +96,26 @@ function matchToVideo(m: Match): YtVideo | null {
     badge: m.status === 'LIVE' ? 'LIVE' : 'UPCOMING',
     matchId: m.id,
     done: m.status === 'DONE',
+    youtubeUrl: m.youtubeUrl ?? null,
+  };
+}
+
+// 링크 유무와 관계없이 모든 경기를 카드로 변환 (다가오는/지난 섹션용).
+function matchToCard(m: Match): YtVideo {
+  const id = extractYoutubeId(m.youtubeUrl);
+  const teamA = m.teamA?.name ?? '미정';
+  const teamB = m.teamB?.name ?? '미정';
+  const sport = SPORT_LABELS[m.sport] ?? m.sport;
+  return {
+    id,
+    title: `${sport} · ${teamA} vs ${teamB}`,
+    category: m.category === 'CLUB' ? '클럽 리그' : '학년 리그',
+    date: DAY_LABELS[m.day] ?? m.day,
+    time: SLOT_TIME[m.timeSlot] ?? m.timeSlot,
+    badge: m.status === 'LIVE' ? 'LIVE' : 'UPCOMING',
+    matchId: m.id,
+    done: m.status === 'DONE',
+    youtubeUrl: m.youtubeUrl ?? null,
   };
 }
 
@@ -160,19 +181,11 @@ export default function YoutubePage() {
     [matches],
   );
   const upcoming = useMemo(
-    () =>
-      matches
-        .filter((m) => m.status === 'SCHEDULED' || m.status === 'LIVE')
-        .map(matchToVideo)
-        .filter((v): v is YtVideo => v !== null),
+    () => matches.filter((m) => m.status === 'SCHEDULED').map(matchToCard),
     [matches],
   );
   const past = useMemo(
-    () =>
-      matches
-        .filter((m) => m.status === 'DONE')
-        .map(matchToVideo)
-        .filter((v): v is YtVideo => v !== null),
+    () => matches.filter((m) => m.status === 'DONE').map(matchToCard),
     [matches],
   );
 
@@ -218,7 +231,7 @@ export default function YoutubePage() {
 
       <div className={styles.layout}>
         <div className={styles.player}>
-          {active ? (
+          {active && active.id ? (
             <>
               <div className={styles.playerTags}>
                 <span className={styles.tagOn}>한국어</span>
@@ -263,11 +276,19 @@ export default function YoutubePage() {
             )}
             {upcoming.map((v) => {
               const subscribed = v.matchId != null && notifs.has(v.matchId);
+              const hasLink = !!v.id;
               return (
-                <div key={`u-${v.matchId}`} className={styles.cardWrap}>
+                <div
+                  key={`u-${v.matchId}`}
+                  className={styles.cardWrap}
+                  style={!hasLink ? { opacity: 0.6 } : undefined}
+                >
                   <button
                     className={`${styles.card} ${active?.matchId === v.matchId ? styles.cardActive : ''}`}
-                    onClick={() => setActive(v)}
+                    onClick={() => {
+                      if (hasLink) setActive(v);
+                    }}
+                    disabled={!hasLink}
                   >
                     <div className={styles.cardTime}>
                       <span className={styles.cardTimeHour}>{v.time}</span>
@@ -279,16 +300,22 @@ export default function YoutubePage() {
                     </div>
                     <ChevronRight size={14} className={styles.cardArrow} />
                   </button>
-                  {v.matchId != null && (
-                    <button
-                      type="button"
-                      className={`${styles.notifBtn} ${subscribed ? styles.notifBtnOn : ''}`}
-                      onClick={() => toggleNotif(v.matchId!)}
-                      aria-pressed={subscribed}
-                    >
-                      {subscribed ? <BellRing size={12} /> : <Bell size={12} />}
-                      {subscribed ? '알림 설정됨' : '알림 받기'}
-                    </button>
+                  {!hasLink ? (
+                    <span className={`${styles.notifBtn} ${styles.notifBtnDone}`}>
+                      중계 링크 미등록
+                    </span>
+                  ) : (
+                    v.matchId != null && (
+                      <button
+                        type="button"
+                        className={`${styles.notifBtn} ${subscribed ? styles.notifBtnOn : ''}`}
+                        onClick={() => toggleNotif(v.matchId!)}
+                        aria-pressed={subscribed}
+                      >
+                        {subscribed ? <BellRing size={12} /> : <Bell size={12} />}
+                        {subscribed ? '알림 설정됨' : '알림 받기'}
+                      </button>
+                    )
                   )}
                 </div>
               );
@@ -304,31 +331,39 @@ export default function YoutubePage() {
             {past.length === 0 && (
               <div className={styles.emptyHint}>아직 종료된 경기가 없습니다.</div>
             )}
-            {past.map((v) => (
-              <div key={`p-${v.matchId}`} className={styles.cardWrap}>
-                <button
-                  className={`${styles.card} ${active?.matchId === v.matchId ? styles.cardActive : ''}`}
-                  onClick={() => setActive(v)}
+            {past.map((v) => {
+              const hasLink = !!v.youtubeUrl;
+              return (
+                <div
+                  key={`p-${v.matchId}`}
+                  className={styles.cardWrap}
+                  style={!hasLink ? { opacity: 0.6 } : undefined}
                 >
-                  <div className={styles.cardTime}>
-                    <span className={styles.cardTimeHour}>{v.time}</span>
-                    <span className={styles.cardTimeDate}>{v.date.slice(0, 5)}</span>
-                  </div>
-                  <div className={styles.cardBody}>
-                    <div className={styles.cardTitle}>{v.title}</div>
-                    <div className={styles.cardCategory}>{v.category}</div>
-                  </div>
-                  <ChevronRight size={14} className={styles.cardArrow} />
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.notifBtn} ${styles.notifBtnDone}`}
-                  disabled
-                >
-                  종료
-                </button>
-              </div>
-            ))}
+                  <button
+                    className={styles.card}
+                    disabled={!hasLink}
+                    onClick={() => {
+                      if (hasLink && v.youtubeUrl) {
+                        window.open(v.youtubeUrl, '_blank', 'noopener,noreferrer');
+                      }
+                    }}
+                  >
+                    <div className={styles.cardTime}>
+                      <span className={styles.cardTimeHour}>{v.time}</span>
+                      <span className={styles.cardTimeDate}>{v.date.slice(0, 5)}</span>
+                    </div>
+                    <div className={styles.cardBody}>
+                      <div className={styles.cardTitle}>{v.title}</div>
+                      <div className={styles.cardCategory}>{v.category}</div>
+                    </div>
+                    <ChevronRight size={14} className={styles.cardArrow} />
+                  </button>
+                  <span className={`${styles.notifBtn} ${styles.notifBtnDone}`}>
+                    {hasLink ? '다시보기' : '다시보기 없음'}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </aside>
       </div>

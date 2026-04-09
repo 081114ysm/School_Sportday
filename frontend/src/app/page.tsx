@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Calendar, Trophy, Radio, Tv, ArrowRight } from 'lucide-react';
 import styles from './home.module.css';
-import Image from 'next/image';
+import PhotoCarousel from '@/components/main/PhotoCarousel';
 import { fetchMatches, fetchTeams, fetchLiveMatches } from '@/services/api';
 
 export default function HomePage() {
@@ -50,28 +50,29 @@ export default function HomePage() {
 
           <dl className={styles.stats}>
             <div className={styles.stat}>
-              <dt>총 경기</dt>
+              <dt className={styles.statLabel}>총 경기</dt>
               <dd>{stats.total}</dd>
             </div>
             <div className={styles.stat}>
-              <dt>완료</dt>
+              <dt className={styles.statLabel}>완료</dt>
               <dd>{stats.done}</dd>
             </div>
             <div className={styles.stat}>
-              <dt>진행 중</dt>
+              <dt className={styles.statLabel}>진행 중</dt>
               <dd>
                 {stats.live}
                 {stats.live > 0 && <span className={styles.liveDot} aria-hidden />}
               </dd>
             </div>
             <div className={styles.stat}>
-              <dt>참가팀</dt>
+              <dt className={styles.statLabel}>참가팀</dt>
               <dd>{stats.teams}</dd>
             </div>
           </dl>
         </div>
-        <Image src="/image.png" alt="" width={520} height={520} className={styles.heroImage} priority/>
-        <div className={styles.heroRight} aria-hidden />
+        <div className={styles.heroRight}>
+          <PhotoCarousel />
+        </div>
       </section>
 
       <nav className={styles.shortcuts} aria-label="바로가기">

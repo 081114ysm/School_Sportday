@@ -1,8 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Match, Team } from '@/types';
 import { effectiveStatus, filterTeamsForSport, sportRestrictionLabel, slotLabel } from './adminUtils';
-import { SPORTS, TIME_SLOTS, CATEGORIES } from './adminConstants';
+import { getSports, TIME_SLOTS, CATEGORIES } from './adminConstants';
 import { StatusBadge } from './StatusBadge';
 import styles from '@/app/admin/admin.module.css';
 
@@ -44,6 +45,13 @@ export function ScheduleMgmtTab({
   scheduleDateFilter,
   setScheduleDateFilter,
 }: ScheduleMgmtTabProps) {
+  const [sports, setSports] = useState<string[]>([]);
+  useEffect(() => {
+    setSports(getSports());
+    const onChange = () => setSports(getSports());
+    window.addEventListener('sportday:customSportsChanged', onChange);
+    return () => window.removeEventListener('sportday:customSportsChanged', onChange);
+  }, []);
   const selectable = filterTeamsForSport(teams, newMatch.sport);
   const label = sportRestrictionLabel(newMatch.sport);
   const suffix = label ? ` (${label})` : '';
@@ -77,7 +85,7 @@ export function ScheduleMgmtTab({
                 }))
               }
             >
-              {SPORTS.map(s => (
+              {sports.map(s => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
@@ -155,7 +163,7 @@ export function ScheduleMgmtTab({
         >
           전체 종목
         </button>
-        {SPORTS.map(s => (
+        {sports.map(s => (
           <button
             key={s}
             className={`${styles.filterBtn} ${scheduleSportFilter === s ? styles.filterBtnActive : ''}`}

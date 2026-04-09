@@ -11,6 +11,7 @@ import { ResultsTab } from '@/components/admin/ResultsTab';
 import { ScheduleMgmtTab } from '@/components/admin/ScheduleMgmtTab';
 import { TeamMgmtTab } from '@/components/admin/TeamMgmtTab';
 import { YoutubeMgmtTab } from '@/components/admin/YoutubeMgmtTab';
+import { SportMgmtTab } from '@/components/admin/SportMgmtTab';
 
 export default function AdminPage() {
   const {
@@ -36,6 +37,7 @@ export default function AdminPage() {
     setNewMatch,
     handleCreateMatch,
     handleDeleteMatch,
+    handleEditResult,
     newTeam,
     setNewTeam,
     handleCreateTeam,
@@ -163,6 +165,7 @@ export default function AdminPage() {
           { key: 'schedule-mgmt' as AdminTab, label: '\uD83D\uDCC5 일정 관리' },
           { key: 'team-mgmt' as AdminTab, label: '\uD83D\uDC65 팀 관리' },
           { key: 'youtube-mgmt' as AdminTab, label: '\uD83D\uDCFA 유튜브 관리' },
+          { key: 'sport-mgmt' as AdminTab, label: '\uD83C\uDFC5 종목 관리' },
         ]).map(tab => (
           <button
             key={tab.key}
@@ -198,6 +201,8 @@ export default function AdminPage() {
             setSportFilter={setSportFilter}
             resultsStatusFilter={resultsStatusFilter}
             setResultsStatusFilter={setResultsStatusFilter}
+            onEditResult={handleEditResult}
+            onDeleteResult={handleDeleteMatch}
           />
         )}
 
@@ -236,6 +241,8 @@ export default function AdminPage() {
             onMatchStatusChange={handleYoutubeMatchStatusChange}
           />
         )}
+
+        {activeTab === 'sport-mgmt' && <SportMgmtTab />}
       </div>
     </div>
   );
