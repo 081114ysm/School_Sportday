@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Calendar, Radio, Tv, Trophy, Bell, Swords, Menu, X } from 'lucide-react';
+import { Calendar, Radio, Tv, Trophy, Bell, Swords, Menu, X, ShieldCheck } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import styles from './Header.module.css';
 
@@ -79,12 +79,18 @@ export default function Header() {
           <Link href="/notifications" className={styles.iconBtn} title="알림">
             <Bell size={18} />
           </Link>
+          <Link href="/admin" className={styles.iconBtn} title="관리자">
+            <ShieldCheck size={18} />
+          </Link>
         </div>
 
         {/* Mobile right group */}
         <div className={`${styles.right} ${styles.rightMobile}`} ref={menuRef}>
           <Link href="/notifications" className={styles.iconBtn} title="알림">
             <Bell size={18} />
+          </Link>
+          <Link href="/admin" className={styles.iconBtn} title="관리자">
+            <ShieldCheck size={18} />
           </Link>
           <button
             className={styles.iconBtn}
