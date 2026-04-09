@@ -10,7 +10,11 @@ import { TeamsModule } from '../teams/teams.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Match, ScoreLog, Team]), TeamsModule, NotificationsModule],
+  imports: [
+    TypeOrmModule.forFeature([Match, ScoreLog, Team]),
+    TeamsModule,
+    NotificationsModule,
+  ],
   controllers: [MatchesController],
   providers: [MatchesService, MatchesGateway],
   exports: [MatchesService],

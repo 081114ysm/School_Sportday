@@ -9,7 +9,13 @@ import { NotificationsGateway } from './notifications.gateway';
 import { PushService } from './push.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TeamSubscription, NotificationRecord, PushSubscription])],
+  imports: [
+    TypeOrmModule.forFeature([
+      TeamSubscription,
+      NotificationRecord,
+      PushSubscription,
+    ]),
+  ],
   controllers: [NotificationsController],
   providers: [NotificationsService, NotificationsGateway, PushService],
   exports: [NotificationsService, NotificationsGateway, PushService],

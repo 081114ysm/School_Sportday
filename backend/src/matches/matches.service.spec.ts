@@ -47,8 +47,22 @@ describe('MatchesService (unit)', () => {
       emitMatchLive: jest.fn(),
     };
     const pushService: any = { sendToAll: jest.fn(), sendToTeam: jest.fn() };
-    const svc = new MatchesService(matchRepo, logRepo, gateway, notiGateway, pushService);
-    return { svc, matchRepo, gateway, notiGateway, get current() { return current; } };
+    const svc = new MatchesService(
+      matchRepo,
+      logRepo,
+      gateway,
+      notiGateway,
+      pushService,
+    );
+    return {
+      svc,
+      matchRepo,
+      gateway,
+      notiGateway,
+      get current() {
+        return current;
+      },
+    };
   }
 
   it('setScore updates both scores and emits update', async () => {

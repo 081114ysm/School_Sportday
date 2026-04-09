@@ -2,7 +2,16 @@ import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { NotificationRecord } from './notification.entity';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+// FRONTEND_URL 환경변수(콤마 구분)가 없으면 로컬 개발 기본값 사용
+function getGatewayOrigins(): string | string[] {
+  const envVal = process.env.FRONTEND_URL;
+  if (envVal) {
+    return envVal.split(',').map((u) => u.trim()).filter(Boolean);
+  }
+  return ['http://localhost:3000', 'http://localhost:3001'];
+}
+
+@WebSocketGateway({ cors: { origin: getGatewayOrigins() } })
 export class NotificationsGateway {
   @WebSocketServer()
   server: Server;

@@ -7,7 +7,9 @@ import * as webpush from 'web-push';
 import { PushSubscription } from './push-subscription.entity';
 
 const VAPID_FILE = path.resolve(process.cwd(), '.vapid.json');
-const SUBJECT = 'mailto:admin@sportday.local';
+// VAPID_SUBJECT 환경변수가 없으면 기본값 사용
+const SUBJECT =
+  process.env.VAPID_SUBJECT || 'mailto:admin@sportday.local';
 
 export interface PushPayload {
   title: string;
@@ -30,7 +32,9 @@ export class PushService implements OnModuleInit {
   onModuleInit() {
     this.loadOrGenerateVapid();
     webpush.setVapidDetails(SUBJECT, this.publicKey, this.privateKey);
-    this.logger.log(`Web Push ready. VAPID public key: ${this.publicKey.slice(0, 16)}…`);
+    this.logger.log(
+      `Web Push ready. VAPID public key: ${this.publicKey.slice(0, 16)}…`,
+    );
   }
 
   getPublicKey(): string {
@@ -38,6 +42,14 @@ export class PushService implements OnModuleInit {
   }
 
   private loadOrGenerateVapid() {
+    // Railway 등 환경변수로 VAPID 키를 주입한 경우 우선 사용
+    if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+      this.publicKey = process.env.VAPID_PUBLIC_KEY;
+      this.privateKey = process.env.VAPID_PRIVATE_KEY;
+      this.logger.log('VAPID keys loaded from environment variables');
+      return;
+    }
+    // 로컬 개발: .vapid.json 파일에서 로드하거나 새로 생성
     if (fs.existsSync(VAPID_FILE)) {
       try {
         const j = JSON.parse(fs.readFileSync(VAPID_FILE, 'utf8'));
@@ -80,7 +92,9 @@ export class PushService implements OnModuleInit {
     return this.repo.find();
   }
 
-  async sendToAll(payload: PushPayload): Promise<{ sent: number; failed: number }> {
+  async sendToAll(
+    payload: PushPayload,
+  ): Promise<{ sent: number; failed: number }> {
     const subs = await this.repo.find();
     return this.sendToList(subs, payload);
   }
@@ -117,9 +131,13 @@ export class PushService implements OnModuleInit {
           // 404/410 = 구독 만료됨; 삭제 처리.
           if (err?.statusCode === 404 || err?.statusCode === 410) {
             await this.deleteByEndpoint(s.endpoint);
-            this.logger.warn(`Pruned dead subscription ${s.endpoint.slice(0, 40)}…`);
+            this.logger.warn(
+              `Pruned dead subscription ${s.endpoint.slice(0, 40)}…`,
+            );
           } else {
-            this.logger.error(`Push send failed: ${err?.statusCode ?? ''} ${err?.message ?? err}`);
+            this.logger.error(
+              `Push send failed: ${err?.statusCode ?? ''} ${err?.message ?? err}`,
+            );
           }
         }
       }),

@@ -114,24 +114,95 @@ export class SeedService implements OnModuleInit {
 
     const plans: Plan[] = [
       // 월요일
-      { day: 'MON', slot: 'LUNCH',  sport: 'FUTSAL',         a: g(1,1), b: g(1,2), category: 'GRADE' },
-      { day: 'MON', slot: 'DINNER', sport: 'BASKETBALL',     a: c('A'), b: c('B'), category: 'CLUB'  },
+      {
+        day: 'MON',
+        slot: 'LUNCH',
+        sport: 'FUTSAL',
+        a: g(1, 1),
+        b: g(1, 2),
+        category: 'GRADE',
+      },
+      {
+        day: 'MON',
+        slot: 'DINNER',
+        sport: 'BASKETBALL',
+        a: c('A'),
+        b: c('B'),
+        category: 'CLUB',
+      },
       // 화요일
-      { day: 'TUE', slot: 'LUNCH',  sport: 'DODGEBALL',      a: g(2,1), b: g(2,2), category: 'GRADE' },
-      { day: 'TUE', slot: 'DINNER', sport: 'SOCCER',         a: g(3,1), b: g(3,2), category: 'GRADE' },
+      {
+        day: 'TUE',
+        slot: 'LUNCH',
+        sport: 'DODGEBALL',
+        a: g(2, 1),
+        b: g(2, 2),
+        category: 'GRADE',
+      },
+      {
+        day: 'TUE',
+        slot: 'DINNER',
+        sport: 'SOCCER',
+        a: g(3, 1),
+        b: g(3, 2),
+        category: 'GRADE',
+      },
       // 수요일
-      { day: 'WED', slot: 'LUNCH',  sport: 'BIG_VOLLEYBALL', a: g(3,3), b: g(3,4), category: 'GRADE' },
-      { day: 'WED', slot: 'DINNER', sport: 'BASKETBALL',     a: c('C'), b: c('D'), category: 'CLUB'  },
+      {
+        day: 'WED',
+        slot: 'LUNCH',
+        sport: 'BIG_VOLLEYBALL',
+        a: g(3, 3),
+        b: g(3, 4),
+        category: 'GRADE',
+      },
+      {
+        day: 'WED',
+        slot: 'DINNER',
+        sport: 'BASKETBALL',
+        a: c('C'),
+        b: c('D'),
+        category: 'CLUB',
+      },
       // 목요일
-      { day: 'THU', slot: 'LUNCH',  sport: 'BADMINTON',      a: g(2,3), b: g(2,4), category: 'GRADE' },
-      { day: 'THU', slot: 'DINNER', sport: 'RELAY',          a: c('A'), b: c('C'), category: 'CLUB'  },
+      {
+        day: 'THU',
+        slot: 'LUNCH',
+        sport: 'BADMINTON',
+        a: g(2, 3),
+        b: g(2, 4),
+        category: 'GRADE',
+      },
+      {
+        day: 'THU',
+        slot: 'DINNER',
+        sport: 'RELAY',
+        a: c('A'),
+        b: c('C'),
+        category: 'CLUB',
+      },
       // 금요일 (점심만)
-      { day: 'FRI', slot: 'LUNCH',  sport: 'JUMP_ROPE',      a: g(1,3), b: g(1,4), category: 'GRADE' },
+      {
+        day: 'FRI',
+        slot: 'LUNCH',
+        sport: 'JUMP_ROPE',
+        a: g(1, 3),
+        b: g(1, 4),
+        category: 'GRADE',
+      },
     ];
 
     // 점수 풀: 결정적 분배로 랭킹이 다양하게 나오도록
     const scorePool: Array<[number, number]> = [
-      [3, 1], [2, 2], [4, 0], [1, 2], [0, 3], [2, 1], [3, 3], [1, 0], [2, 0],
+      [3, 1],
+      [2, 2],
+      [4, 0],
+      [1, 2],
+      [0, 3],
+      [2, 1],
+      [3, 3],
+      [1, 0],
+      [2, 0],
     ];
 
     // 강제 LIVE 매치 (시연용): 첫 번째 플랜은 항상 LIVE
@@ -154,8 +225,16 @@ export class SeedService implements OnModuleInit {
           // 빅발리볼: 실제 세트 스코어로 저장 (best-of-3)
           const sets =
             i % 2 === 0
-              ? [{ a: 25, b: 20 }, { a: 23, b: 25 }, { a: 25, b: 18 }]
-              : [{ a: 22, b: 25 }, { a: 25, b: 23 }, { a: 19, b: 25 }];
+              ? [
+                  { a: 25, b: 20 },
+                  { a: 23, b: 25 },
+                  { a: 25, b: 18 },
+                ]
+              : [
+                  { a: 22, b: 25 },
+                  { a: 25, b: 23 },
+                  { a: 19, b: 25 },
+                ];
           data.setsJson = JSON.stringify(sets);
           data.scoreA = sets.reduce((s, x) => s + x.a, 0);
           data.scoreB = sets.reduce((s, x) => s + x.b, 0);
@@ -166,7 +245,8 @@ export class SeedService implements OnModuleInit {
           const [sa, sb] = scorePool[i % scorePool.length];
           data.scoreA = sa;
           data.scoreB = sb;
-          data.result = sa > sb ? `${p.a.name} 승` : sb > sa ? `${p.b.name} 승` : '무승부';
+          data.result =
+            sa > sb ? `${p.a.name} 승` : sb > sa ? `${p.b.name} 승` : '무승부';
         }
       } else if (status === 'LIVE') {
         data.scoreA = 1;

@@ -1,4 +1,10 @@
-import { Injectable, NotFoundException, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan, Not, IsNull } from 'typeorm';
 import { Match } from './match.entity';
@@ -38,9 +44,12 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     void this.backfillCategories();
     void this.backfillVolleyballSets();
     void this.autoFinalizePastMatches();
-    this.autoTimer = setInterval(() => {
-      void this.autoFinalizePastMatches();
-    }, 10 * 60 * 1000);
+    this.autoTimer = setInterval(
+      () => {
+        void this.autoFinalizePastMatches();
+      },
+      10 * 60 * 1000,
+    );
   }
 
   onModuleDestroy() {
@@ -72,21 +81,36 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  findAll(filters: { day?: string; status?: string; sport?: string; matchDate?: string }): Promise<Match[]> {
+  findAll(filters: {
+    day?: string;
+    status?: string;
+    sport?: string;
+    matchDate?: string;
+  }): Promise<Match[]> {
     const where: any = {};
     if (filters.day) where.day = filters.day;
     if (filters.status) where.status = filters.status;
     if (filters.sport) where.sport = filters.sport;
     if (filters.matchDate) where.matchDate = filters.matchDate;
-    return this.matchRepo.find({ where, relations: ['teamA', 'teamB'], order: { day: 'ASC', timeSlot: 'ASC' } });
+    return this.matchRepo.find({
+      where,
+      relations: ['teamA', 'teamB'],
+      order: { day: 'ASC', timeSlot: 'ASC' },
+    });
   }
 
   findLive(): Promise<Match[]> {
-    return this.matchRepo.find({ where: { status: 'LIVE' }, relations: ['teamA', 'teamB'] });
+    return this.matchRepo.find({
+      where: { status: 'LIVE' },
+      relations: ['teamA', 'teamB'],
+    });
   }
 
   async findOneOrFail(id: number): Promise<Match> {
-    const match = await this.matchRepo.findOne({ where: { id }, relations: ['teamA', 'teamB'] });
+    const match = await this.matchRepo.findOne({
+      where: { id },
+      relations: ['teamA', 'teamB'],
+    });
     if (!match) throw new NotFoundException('Match not found');
     return match;
   }
@@ -105,7 +129,11 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
   }
 
   async create(dto: CreateMatchDto): Promise<Match> {
-    const category = await this.deriveCategory(dto.teamAId, dto.teamBId, dto.category);
+    const category = await this.deriveCategory(
+      dto.teamAId,
+      dto.teamBId,
+      dto.category,
+    );
     const match = this.matchRepo.create({ ...dto, category });
     const saved = await this.matchRepo.save(match);
     return this.findOneOrFail(saved.id);
@@ -117,7 +145,11 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     const teamBId = data.teamBId ?? current.teamBId;
     const next: Partial<Match> = { ...data };
     if (data.category !== 'ALL_UNION') {
-      next.category = await this.deriveCategory(teamAId, teamBId, data.category);
+      next.category = await this.deriveCategory(
+        teamAId,
+        teamBId,
+        data.category,
+      );
     }
     await this.matchRepo.update(id, next);
     const match = await this.findOneOrFail(id);
@@ -129,24 +161,33 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
   // 그럴듯한 세트 스코어를 생성해 채워 넣는다. 경기 전이면 빈 세트로 초기화.
   private async backfillVolleyballSets(): Promise<void> {
     try {
-      const vbs = await this.matchRepo.find({ where: { sport: 'BIG_VOLLEYBALL' }, relations: ['teamA', 'teamB'] });
+      const vbs = await this.matchRepo.find({
+        where: { sport: 'BIG_VOLLEYBALL' },
+        relations: ['teamA', 'teamB'],
+      });
       let fixed = 0;
       for (const m of vbs) {
         // setsJson 있으면: 2세트 선취 시 status=DONE으로 자동 승격
         if (m.setsJson) {
           try {
             const sets = JSON.parse(m.setsJson) as { a: number; b: number }[];
-            let aw = 0, bw = 0;
+            let aw = 0,
+              bw = 0;
             for (const s of sets) {
               if (s.a >= 25 && s.a > s.b) aw++;
               else if (s.b >= 25 && s.b > s.a) bw++;
             }
             if ((aw >= 2 || bw >= 2) && m.status !== 'DONE') {
-              const result = aw > bw ? `${m.teamA?.name ?? 'Team A'} 승` : `${m.teamB?.name ?? 'Team B'} 승`;
+              const result =
+                aw > bw
+                  ? `${m.teamA?.name ?? 'Team A'} 승`
+                  : `${m.teamB?.name ?? 'Team B'} 승`;
               await this.matchRepo.update(m.id, { status: 'DONE', result });
               fixed++;
             }
-          } catch { /* ignore */ }
+          } catch {
+            /* ignore */
+          }
           continue;
         }
         let sets: Array<{ a: number; b: number }>;
@@ -154,10 +195,22 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
           // 승자 추정 후 2-0 또는 2-1 세트 배분
           const aWin = m.scoreA >= m.scoreB;
           sets = aWin
-            ? [{ a: 25, b: 20 }, { a: 25, b: 22 }, { a: 0, b: 0 }]
-            : [{ a: 20, b: 25 }, { a: 22, b: 25 }, { a: 0, b: 0 }];
+            ? [
+                { a: 25, b: 20 },
+                { a: 25, b: 22 },
+                { a: 0, b: 0 },
+              ]
+            : [
+                { a: 20, b: 25 },
+                { a: 22, b: 25 },
+                { a: 0, b: 0 },
+              ];
         } else {
-          sets = [{ a: 0, b: 0 }, { a: 0, b: 0 }, { a: 0, b: 0 }];
+          sets = [
+            { a: 0, b: 0 },
+            { a: 0, b: 0 },
+            { a: 0, b: 0 },
+          ];
         }
         const scoreA = sets.reduce((s, x) => s + x.a, 0);
         const scoreB = sets.reduce((s, x) => s + x.b, 0);
@@ -168,7 +221,10 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
         });
         fixed++;
       }
-      if (fixed > 0) this.logger.log(`Backfilled setsJson for ${fixed} volleyball match(es)`);
+      if (fixed > 0)
+        this.logger.log(
+          `Backfilled setsJson for ${fixed} volleyball match(es)`,
+        );
     } catch (err) {
       this.logger.error('backfillVolleyballSets failed', err as Error);
     }
@@ -181,14 +237,16 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
       let fixed = 0;
       for (const m of all) {
         if (m.category === 'ALL_UNION') continue;
-        const anyClub = m.teamA?.category === 'CLUB' || m.teamB?.category === 'CLUB';
+        const anyClub =
+          m.teamA?.category === 'CLUB' || m.teamB?.category === 'CLUB';
         const want = anyClub ? 'CLUB' : 'GRADE';
         if (m.category !== want) {
           await this.matchRepo.update(m.id, { category: want });
           fixed++;
         }
       }
-      if (fixed > 0) this.logger.log(`Backfilled category for ${fixed} match(es)`);
+      if (fixed > 0)
+        this.logger.log(`Backfilled category for ${fixed} match(es)`);
     } catch (err) {
       this.logger.error('backfillCategories failed', err as Error);
     }

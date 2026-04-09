@@ -13,14 +13,17 @@ describe('NotificationsService', () => {
   const subRepo = {
     findOne: jest.fn(({ where }) =>
       Promise.resolve(
-        subs.find((s) => s.userSub === where.userSub && s.teamId === where.teamId) ??
-          null,
+        subs.find(
+          (s) => s.userSub === where.userSub && s.teamId === where.teamId,
+        ) ?? null,
       ),
     ),
     find: jest.fn(({ where }) =>
       Promise.resolve(subs.filter((s) => s.teamId === where.teamId)),
     ),
-    create: jest.fn((dto: Partial<TeamSubscription>) => ({ ...dto }) as TeamSubscription),
+    create: jest.fn(
+      (dto: Partial<TeamSubscription>) => ({ ...dto }) as TeamSubscription,
+    ),
     save: jest.fn((s: TeamSubscription) => {
       const saved = { ...s, id: subs.length + 1 } as TeamSubscription;
       subs.push(saved);
@@ -36,7 +39,9 @@ describe('NotificationsService', () => {
   };
 
   const notiRepo = {
-    create: jest.fn((dto: Partial<NotificationRecord>) => ({ ...dto }) as NotificationRecord),
+    create: jest.fn(
+      (dto: Partial<NotificationRecord>) => ({ ...dto }) as NotificationRecord,
+    ),
     save: jest.fn((n: NotificationRecord) => {
       const saved = { ...n, id: notis.length + 1 } as NotificationRecord;
       notis.push(saved);
@@ -47,7 +52,9 @@ describe('NotificationsService', () => {
     ),
   };
 
-  const gateway = { emitNotification: jest.fn() } as unknown as NotificationsGateway;
+  const gateway = {
+    emitNotification: jest.fn(),
+  } as unknown as NotificationsGateway;
 
   beforeEach(async () => {
     subs.length = 0;

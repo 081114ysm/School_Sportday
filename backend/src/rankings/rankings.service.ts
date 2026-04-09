@@ -25,7 +25,11 @@ export class RankingsService {
         (m) => m.teamAId === team.id || m.teamBId === team.id,
       );
 
-      let wins = 0, draws = 0, losses = 0, goalsFor = 0, goalsAgainst = 0;
+      let wins = 0,
+        draws = 0,
+        losses = 0,
+        goalsFor = 0,
+        goalsAgainst = 0;
 
       teamMatches.forEach((m) => {
         const isA = m.teamAId === team.id;
@@ -42,7 +46,7 @@ export class RankingsService {
         const isA = m.teamAId === team.id;
         const myScore = isA ? m.scoreA : m.scoreB;
         const opScore = isA ? m.scoreB : m.scoreA;
-        const opponent = isA ? m.teamB?.name ?? '' : m.teamA?.name ?? '';
+        const opponent = isA ? (m.teamB?.name ?? '') : (m.teamA?.name ?? '');
         const score = `${myScore}-${opScore}`;
         let result: 'W' | 'D' | 'L';
         if (myScore > opScore) result = 'W';

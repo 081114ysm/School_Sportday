@@ -27,7 +27,10 @@ export class NotificationsController {
   async pushSubscribe(
     @Body()
     body: {
-      subscription: { endpoint: string; keys: { p256dh: string; auth: string } };
+      subscription: {
+        endpoint: string;
+        keys: { p256dh: string; auth: string };
+      };
       userSub?: string | null;
       teamId?: number | null;
     },
@@ -51,7 +54,13 @@ export class NotificationsController {
   @Post('push/test')
   async pushTest(
     @Body()
-    body: { title?: string; body?: string; url?: string; tag?: string; endpoint: string },
+    body: {
+      title?: string;
+      body?: string;
+      url?: string;
+      tag?: string;
+      endpoint: string;
+    },
   ) {
     if (!body?.endpoint) {
       return { sent: 0, failed: 0, error: 'endpoint required' };

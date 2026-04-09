@@ -1,4 +1,15 @@
-import { Controller, Get, Patch, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { MatchesService } from './matches.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateScoreDto } from './dto/update-score.dto';
@@ -77,7 +88,13 @@ export class MatchesController {
   @Patch(':id/score')
   setScore(
     @Param('id') id: string,
-    @Body() body: { homeScore?: number; awayScore?: number; scoreA?: number; scoreB?: number },
+    @Body()
+    body: {
+      homeScore?: number;
+      awayScore?: number;
+      scoreA?: number;
+      scoreB?: number;
+    },
   ) {
     const a = body.homeScore ?? body.scoreA ?? 0;
     const b = body.awayScore ?? body.scoreB ?? 0;
@@ -86,7 +103,13 @@ export class MatchesController {
 
   @UseGuards(AdminGuard)
   @Put(':id/youtube')
-  setYoutube(@Param('id') id: string, @Body() body: { youtubeUrl: string | null }) {
-    return this.matchesService.setYoutubeUrl(parseInt(id), body.youtubeUrl ?? null);
+  setYoutube(
+    @Param('id') id: string,
+    @Body() body: { youtubeUrl: string | null },
+  ) {
+    return this.matchesService.setYoutubeUrl(
+      parseInt(id),
+      body.youtubeUrl ?? null,
+    );
   }
 }
