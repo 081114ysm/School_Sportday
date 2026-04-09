@@ -1,0 +1,194 @@
+.desc {
+  font-size: 13px;
+  color: var(--text2);
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+.gradeSection {
+  margin-bottom: 28px;
+}
+.gradeHeader {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 4px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 16px 14px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.card:hover {
+  border-color: #2bbf7e55;
+  box-shadow: 0 6px 18px -10px rgba(43, 191, 126, 0.35);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.teamBadge {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2bbf7e, #0f6d44);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.teamName {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+.valueLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.04em;
+}
+.valueNum {
+  font-size: 22px;
+  font-weight: 900;
+  font-family: 'Bebas Neue', sans-serif;
+  line-height: 1;
+}
+.valuePos { color: #16a34a; }
+.valueNeg { color: #dc2626; }
+.valueZero { color: #94a3b8; }
+
+.stepRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.stepBtn {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 0;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.15s;
+}
+.stepBtn:active {
+  transform: scale(0.96);
+}
+.stepBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.stepMinus {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+.stepMinus:hover:not(:disabled) {
+  background: #fecaca;
+}
+.stepPlus {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #bbf7d0;
+}
+.stepPlus:hover:not(:disabled) {
+  background: #bbf7d0;
+}
+
+.directRow {
+  display: flex;
+  gap: 6px;
+}
+.directInput {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.directInput:focus {
+  border-color: #2bbf7e;
+}
+.saveBtn {
+  background: #0f172a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.saveBtn:hover:not(:disabled) {
+  background: #1e293b;
+}
+.saveBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.resetBtn {
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 7px 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.resetBtn:hover:not(:disabled) {
+  color: var(--text);
+  border-color: var(--text2);
+}
+.resetBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 14px;
+  }
+}
