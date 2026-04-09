@@ -1,11 +1,20 @@
 import { Match, Team } from '@/types';
-import { SPORT_RULES, MULTI_SET_SPORTS } from './adminConstants';
+import {
+  SPORT_RULES,
+  MULTI_SET_SPORTS,
+  WOMENS_UNION_A,
+  WOMENS_UNION_B,
+} from './adminConstants';
 
-// 팀 필터: 종목 규칙에 맞는 팀만 반환
+// 팀 필터: 종목 규칙에 맞는 팀만 반환.
+// 여자연합 AC/BD는 빅발리볼·피구에서만 노출한다.
 export function filterTeamsForSport(teams: Team[], sport: string): Team[] {
   const rule = SPORT_RULES[sport] ?? {};
   const hasGradeFilter = Array.isArray(rule.grades) && rule.grades.length > 0;
+  const womensAllowed = sport === '빅발리볼' || sport === '피구';
   return teams.filter(t => {
+    const isWomens = t.name === WOMENS_UNION_A || t.name === WOMENS_UNION_B;
+    if (isWomens) return womensAllowed;
     const isClub = t.category === 'CLUB' || t.grade == null;
     if (isClub) return rule.allowClub === true;
     if (!hasGradeFilter) return true;

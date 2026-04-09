@@ -55,6 +55,19 @@ export class Match {
   @Column({ nullable: true, type: 'text' })
   setsJson: string | null;
 
+  // 쿼터제 종목(농구·풋살) 설정/상태. 비-쿼터 종목은 모두 null.
+  @Column({ nullable: true, type: 'int' })
+  quarterCount: number | null;
+
+  @Column({ nullable: true, type: 'int' })
+  quarterMinutes: number | null;
+
+  @Column({ nullable: true, type: 'int' })
+  currentQuarter: number | null;
+
+  @Column({ nullable: true, type: 'varchar' })
+  quarterStartedAt: string | null;
+
   @ManyToOne(() => Team, { eager: true })
   @JoinColumn({ name: 'teamAId' })
   teamA: Team;

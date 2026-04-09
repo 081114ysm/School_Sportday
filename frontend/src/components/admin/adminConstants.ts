@@ -67,6 +67,17 @@ export const TIME_SLOTS = [
 export const CATEGORIES = ['예선', '본선', '결승', '3/4위전'];
 
 // 단일 점수 대신 3세트 스코어보드를 사용하는 종목.
-export const MULTI_SET_SPORTS = new Set(['빅발리볼']);
+export const MULTI_SET_SPORTS = new Set(['빅발리볼', '배드민턴']);
+
+// 쿼터제를 사용하는 종목.
+export const QUARTER_SPORTS = new Set(['농구', '풋살']);
+
+// 빅발리볼·피구에서만 선택 가능한 여자연합 합동팀.
+export const WOMENS_UNION_TEAMS: Record<string, string> = {
+  '빅발리볼': '여자연합',
+  '피구': '여자연합',
+};
+export const WOMENS_UNION_A = '여자연합 AC';
+export const WOMENS_UNION_B = '여자연합 BD';
 
 export type AdminTab = 'live-input' | 'results' | 'schedule-mgmt' | 'team-mgmt' | 'youtube-mgmt' | 'sport-mgmt';

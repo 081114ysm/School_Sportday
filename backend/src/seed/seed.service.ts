@@ -25,9 +25,28 @@ export class SeedService implements OnModuleInit {
     private matchRepo: Repository<Match>,
   ) {}
 
+  async ensureWomensUnionTeams() {
+    for (const name of ['여자연합 AC', '여자연합 BD']) {
+      const exists = await this.teamRepo.findOne({ where: { name } });
+      if (!exists) {
+        await this.teamRepo.save(
+          this.teamRepo.create({
+            name,
+            grade: null,
+            classNumber: null,
+            category: 'CLUB',
+          }),
+        );
+      }
+    }
+  }
+
   async onModuleInit() {
+    // 여자연합 AC/BD는 빅발리볼·피구 전용 합동 클럽팀. 멱등 추가.
+    await this.ensureWomensUnionTeams();
+
     const teamCount = await this.teamRepo.count();
-    if (teamCount > 0) return;
+    if (teamCount > 2) return;
 
     console.log('Seeding database...');
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Match, Team } from '@/types';
 import { effectiveStatus, filterTeamsForSport, sportRestrictionLabel, slotLabel } from './adminUtils';
-import { getSports, TIME_SLOTS, CATEGORIES } from './adminConstants';
+import { getSports, TIME_SLOTS, CATEGORIES, QUARTER_SPORTS } from './adminConstants';
 import { StatusBadge } from './StatusBadge';
 import styles from '@/app/admin/admin.module.css';
 
@@ -14,6 +14,8 @@ interface NewMatchForm {
   teamAId: number;
   teamBId: number;
   category: string;
+  quarterCount?: number;
+  quarterMinutes?: number;
 }
 
 interface ScheduleMgmtTabProps {
@@ -123,6 +125,30 @@ export function ScheduleMgmtTab({
               ))}
             </select>
           </div>
+          {QUARTER_SPORTS.has(newMatch.sport) && (
+            <>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>쿼터 수</label>
+                <input
+                  className={styles.formInput}
+                  type="number"
+                  min={1}
+                  value={newMatch.quarterCount ?? 4}
+                  onChange={e => setNewMatch(prev => ({ ...prev, quarterCount: Number(e.target.value) || 4 }))}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>쿼터 시간(분)</label>
+                <input
+                  className={styles.formInput}
+                  type="number"
+                  min={1}
+                  value={newMatch.quarterMinutes ?? 10}
+                  onChange={e => setNewMatch(prev => ({ ...prev, quarterMinutes: Number(e.target.value) || 10 }))}
+                />
+              </div>
+            </>
+          )}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>팀 A{suffix}</label>
             <select

@@ -26,4 +26,12 @@ export class CreateMatchDto {
   @IsString()
   @IsOptional()
   matchDate?: string;
+
+  @IsNumber()
+  @IsOptional()
+  quarterCount?: number;
+
+  @IsNumber()
+  @IsOptional()
+  quarterMinutes?: number;
 }

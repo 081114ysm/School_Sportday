@@ -33,6 +33,8 @@ export default function AdminPage() {
     handleScoreUpdate,
     handleUndo,
     handleStatusChange,
+    handleNextQuarter,
+    handlePauseQuarter,
     newMatch,
     setNewMatch,
     handleCreateMatch,
@@ -191,6 +193,8 @@ export default function AdminPage() {
             onScoreUpdate={handleScoreUpdate}
             onUndo={handleUndo}
             onStatusChange={handleStatusChange}
+            onNextQuarter={handleNextQuarter}
+            onPauseQuarter={handlePauseQuarter}
           />
         )}
 

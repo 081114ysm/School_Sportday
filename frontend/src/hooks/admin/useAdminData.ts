@@ -17,6 +17,7 @@ import {
   undoScore,
   setMatchYoutube,
   verifyAdminToken,
+  updateQuarter,
 } from '@/services/api';
 import { getSocket, disconnectSocket } from '@/services/socket';
 import {
@@ -145,13 +146,20 @@ export function useAdminData() {
 
   const selectedMatch = matches.find(m => m.id === selectedMatchId) || null;
 
-  // 배구: 선택된 경기의 점수가 업데이트될 때마다 활성 세트 표시자를
-  // 첫 번째 미완료 세트로 자동 이동한다. 한 팀이 25점에 도달하면 세트 완료.
+  // 배구·배드민턴: 선택된 경기의 점수가 업데이트될 때마다 활성 세트 표시자를
+  // 첫 번째 미완료 세트로 자동 이동한다. 듀스 규칙을 포함해 판정한다.
   useEffect(() => {
     if (!selectedMatch || !isMultiSet(selectedMatch.sport)) return;
     const sets = parseSets(selectedMatch.setsJson);
-    const SET_TARGET = 25;
-    const idx = sets.findIndex(s => !(s.a >= SET_TARGET || s.b >= SET_TARGET));
+    const sport = selectedMatch.sport;
+    const isVb = sport === 'BIG_VOLLEYBALL' || sport === '빅발리볼';
+    const isBd = sport === 'BADMINTON' || sport === '배드민턴';
+    const done = (a: number, b: number): boolean => {
+      if (isVb) return (a >= 25 && a - b >= 2) || (b >= 25 && b - a >= 2);
+      if (isBd) return a >= 30 || b >= 30 || (a >= 21 && a - b >= 2) || (b >= 21 && b - a >= 2);
+      return false;
+    };
+    const idx = sets.findIndex(s => !done(s.a, s.b));
     setActiveSet(idx === -1 ? 2 : idx);
   }, [selectedMatch?.id, selectedMatch?.setsJson]);
 
@@ -186,6 +194,42 @@ export function useAdminData() {
     }
   };
 
+  const handleNextQuarter = async () => {
+    if (!selectedMatchId || !selectedMatch) return;
+    const total = selectedMatch.quarterCount ?? 4;
+    const cur = selectedMatch.currentQuarter ?? 0;
+    const next = Math.min(total, cur + 1);
+    try {
+      setLoading(true);
+      const updated = await updateQuarter(selectedMatchId, next, new Date().toISOString());
+      setMatches(prev => prev.map(m => m.id === updated.id ? updated : m));
+    } catch (err) {
+      console.error('Quarter update failed:', err);
+      alert('쿼터 변경에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePauseQuarter = async () => {
+    if (!selectedMatchId || !selectedMatch) return;
+    try {
+      setLoading(true);
+      // 재개: quarterStartedAt이 null이면 다시 지금 시각으로, 아니면 null로 일시정지.
+      const pausing = selectedMatch.quarterStartedAt != null;
+      const updated = await updateQuarter(
+        selectedMatchId,
+        selectedMatch.currentQuarter ?? 1,
+        pausing ? null : new Date().toISOString(),
+      );
+      setMatches(prev => prev.map(m => m.id === updated.id ? updated : m));
+    } catch (err) {
+      console.error('Quarter pause failed:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleStatusChange = async (status: 'SCHEDULED' | 'LIVE' | 'DONE') => {
     if (!selectedMatchId) return;
     try {
@@ -208,6 +252,8 @@ export function useAdminData() {
     teamAId: number;
     teamBId: number;
     category: string;
+    quarterCount?: number;
+    quarterMinutes?: number;
   }>({
     sport: SPORTS[0],
     matchDate: todayYmd(),
@@ -215,6 +261,8 @@ export function useAdminData() {
     teamAId: 0,
     teamBId: 0,
     category: CATEGORIES[0],
+    quarterCount: 4,
+    quarterMinutes: 10,
   });
 
   const handleCreateMatch = async () => {
@@ -240,6 +288,8 @@ export function useAdminData() {
         teamAId: 0,
         teamBId: 0,
         category: CATEGORIES[0],
+        quarterCount: 4,
+        quarterMinutes: 10,
       });
     } catch (err) {
       console.error('Match creation failed:', err);
@@ -361,6 +411,8 @@ export function useAdminData() {
     handleScoreUpdate,
     handleUndo,
     handleStatusChange,
+    handleNextQuarter,
+    handlePauseQuarter,
     // 일정 관리
     newMatch,
     setNewMatch,

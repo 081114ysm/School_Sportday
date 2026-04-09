@@ -5,6 +5,8 @@ import { ChevronRight, Calendar, Bell, BellRing, History } from 'lucide-react';
 import { fetchMatches } from '@/services/api';
 import { getSocket, disconnectSocket } from '@/services/socket';
 import type { Match } from '@/types';
+import { formatMatchScore, isQuarterSport } from '@/lib/matchScore';
+import { QuarterClock } from '@/components/QuarterClock';
 import styles from './youtube.module.css';
 
 interface YtVideo {
@@ -251,6 +253,20 @@ export default function YoutubePage() {
                 <div className={styles.playerMeta}>
                   {active.category} · {active.date} · {active.time}
                 </div>
+                {(() => {
+                  const m = matches.find((mm) => mm.id === active.matchId);
+                  if (!m) return null;
+                  return (
+                    <>
+                      <div style={{ marginTop: 8, fontSize: 18, fontWeight: 800 }}>
+                        {formatMatchScore(m)}
+                      </div>
+                      {m.status === 'LIVE' && isQuarterSport(m.sport) && (
+                        <QuarterClock match={m} />
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </>
           ) : (

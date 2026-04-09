@@ -2,6 +2,7 @@
 
 import { Match } from '@/types';
 import { effectiveStatus, isMultiSet, parseSets, slotLabel } from './adminUtils';
+import { QUARTER_SPORTS } from './adminConstants';
 import styles from '@/app/admin/admin.module.css';
 
 interface LiveInputTabProps {
@@ -15,6 +16,15 @@ interface LiveInputTabProps {
   onScoreUpdate: (team: 'A' | 'B', delta: number) => void;
   onUndo: () => void;
   onStatusChange: (status: 'SCHEDULED' | 'LIVE' | 'DONE') => void;
+  onNextQuarter?: () => void;
+  onPauseQuarter?: () => void;
+}
+
+function isVolleyballSport(s: string) {
+  return s === 'BIG_VOLLEYBALL' || s === '빅발리볼';
+}
+function isBadmintonSport(s: string) {
+  return s === 'BADMINTON' || s === '배드민턴';
 }
 
 export function LiveInputTab({
@@ -28,7 +38,19 @@ export function LiveInputTab({
   onScoreUpdate,
   onUndo,
   onStatusChange,
+  onNextQuarter,
+  onPauseQuarter,
 }: LiveInputTabProps) {
+  const showDeuce = (() => {
+    if (!selectedMatch || !isMultiSet(selectedMatch.sport)) return false;
+    const sets = parseSets(selectedMatch.setsJson);
+    const cur = sets[activeSet];
+    if (!cur) return false;
+    if (isVolleyballSport(selectedMatch.sport)) return cur.a >= 24 && cur.b >= 24;
+    if (isBadmintonSport(selectedMatch.sport)) return cur.a >= 20 && cur.b >= 20;
+    return false;
+  })();
+  const isQuarter = selectedMatch ? QUARTER_SPORTS.has(selectedMatch.sport) : false;
   return (
     <div>
       <h2 className={styles.adminSectionTitle}>{'\uD83C\uDFAE'} 실시간 점수 입력</h2>
@@ -59,17 +81,49 @@ export function LiveInputTab({
           </div>
 
           {isMultiSet(selectedMatch.sport) && (
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
-              {parseSets(selectedMatch.setsJson).map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveSet(i)}
-                  className={`${styles.filterBtn} ${activeSet === i ? styles.filterBtnActive : ''}`}
-                  style={{ minWidth: 110 }}
-                >
-                  {i + 1}세트 &nbsp; <strong>{s.a} : {s.b}</strong>
-                </button>
-              ))}
+            <>
+              <div style={{ textAlign: 'center', marginBottom: 8, fontSize: 13, fontWeight: 600 }}>
+                현재 {activeSet + 1}세트
+                {showDeuce && (
+                  <span style={{ marginLeft: 10, padding: '2px 10px', borderRadius: 10, background: '#fef3c7', color: '#b45309', fontSize: 12 }}>
+                    DEUCE
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 18, flexWrap: 'wrap' }}>
+                {parseSets(selectedMatch.setsJson).map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveSet(i)}
+                    className={`${styles.filterBtn} ${activeSet === i ? styles.filterBtnActive : ''}`}
+                    style={{ minWidth: 110 }}
+                  >
+                    {i + 1}세트 &nbsp; <strong>{s.a} : {s.b}</strong>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
+          {isQuarter && (
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 13, fontWeight: 600 }}>
+                {selectedMatch.currentQuarter ?? 0}쿼터 / 총 {selectedMatch.quarterCount ?? 4}쿼터
+              </span>
+              <button
+                className={`${styles.actionBtn} ${styles.btnStart}`}
+                onClick={() => onNextQuarter?.()}
+                disabled={loading || selectedMatch.status !== 'LIVE'}
+              >
+                다음 쿼터 시작
+              </button>
+              <button
+                className={`${styles.actionBtn} ${styles.btnUndo}`}
+                onClick={() => onPauseQuarter?.()}
+                disabled={loading || selectedMatch.status !== 'LIVE'}
+              >
+                {selectedMatch.quarterStartedAt ? '일시정지' : '재개'}
+              </button>
             </div>
           )}
 

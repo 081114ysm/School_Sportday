@@ -149,6 +149,17 @@ export async function updateSetScore(
   });
 }
 
+export async function updateQuarter(
+  id: number,
+  currentQuarter: number | null,
+  quarterStartedAt: string | null,
+): Promise<Match> {
+  return request<Match>(`/api/matches/${id}/quarter`, {
+    method: 'PUT',
+    body: JSON.stringify({ currentQuarter, quarterStartedAt }),
+  });
+}
+
 export async function undoScore(id: number): Promise<Match> {
   return request<Match>(`/api/matches/${id}/undo`, {
     method: 'PUT',

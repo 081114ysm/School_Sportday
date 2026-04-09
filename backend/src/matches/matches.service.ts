@@ -15,6 +15,35 @@ import { MatchesGateway } from './matches.gateway';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 import { PushService } from '../notifications/push.service';
 
+// 종목 키 정규화: 프론트는 한국어('빅발리볼') 백엔드 시드는 영문 상수('BIG_VOLLEYBALL') 혼재.
+function isVolleyball(sport: string): boolean {
+  return sport === 'BIG_VOLLEYBALL' || sport === '빅발리볼';
+}
+function isBadminton(sport: string): boolean {
+  return sport === 'BADMINTON' || sport === '배드민턴';
+}
+export function isMultiSetSport(sport: string): boolean {
+  return isVolleyball(sport) || isBadminton(sport);
+}
+// 세트 완료 판정: 듀스 규칙 포함.
+export function isSetComplete(sport: string, a: number, b: number): boolean {
+  if (isVolleyball(sport)) {
+    if (a >= 25 && a - b >= 2) return true;
+    if (b >= 25 && b - a >= 2) return true;
+    return false;
+  }
+  if (isBadminton(sport)) {
+    if (a >= 30 || b >= 30) return true;
+    if (a >= 21 && a - b >= 2) return true;
+    if (b >= 21 && b - a >= 2) return true;
+    return false;
+  }
+  return false;
+}
+function setsToWin(sport: string): number {
+  return isBadminton(sport) ? 2 : 2; // best-of-3 for both
+}
+
 function ymd(d: Date): string {
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
@@ -360,9 +389,9 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     team: 'A' | 'B',
     delta: number,
   ): Promise<Match> {
-    const SET_TARGET = 25;
-    const SETS_TO_WIN = 2;
     const match = await this.findOneOrFail(id);
+    const sport = match.sport;
+    const SETS_TO_WIN = setsToWin(sport);
     let sets: Array<{ a: number; b: number }> = [];
     try {
       sets = match.setsJson ? JSON.parse(match.setsJson) : [];
@@ -372,9 +401,8 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     while (sets.length < 3) sets.push({ a: 0, b: 0 });
 
     const setWinner = (s: { a: number; b: number }): 'A' | 'B' | null => {
-      if (s.a >= SET_TARGET && s.a > s.b) return 'A';
-      if (s.b >= SET_TARGET && s.b > s.a) return 'B';
-      return null;
+      if (!isSetComplete(sport, s.a, s.b)) return null;
+      return s.a > s.b ? 'A' : 'B';
     };
     const countWins = () => {
       let aw = 0,
@@ -398,10 +426,6 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
 
       if (team === 'A') sets[active].a = Math.max(0, sets[active].a + delta);
       else sets[active].b = Math.max(0, sets[active].b + delta);
-
-      // SET_TARGET 이상으로 올라가지 않도록 상한을 적용한다.
-      if (sets[active].a > SET_TARGET) sets[active].a = SET_TARGET;
-      if (sets[active].b > SET_TARGET) sets[active].b = SET_TARGET;
     }
 
     match.setsJson = JSON.stringify(sets);
@@ -438,6 +462,21 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     if (updated.status === 'DONE') {
       this.gateway.emitMatchStatusChange(updated);
     }
+    return updated;
+  }
+
+  // 쿼터 상태 갱신 (농구·풋살). currentQuarter와 quarterStartedAt만 갱신한다.
+  async updateQuarter(
+    id: number,
+    currentQuarter: number | null,
+    quarterStartedAt: string | null,
+  ): Promise<Match> {
+    const match = await this.findOneOrFail(id);
+    match.currentQuarter = currentQuarter;
+    match.quarterStartedAt = quarterStartedAt;
+    await this.matchRepo.save(match);
+    const updated = await this.findOneOrFail(id);
+    this.gateway.emitMatchUpdate(updated);
     return updated;
   }
 

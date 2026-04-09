@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Match } from '@/types';
 import { effectiveStatus, slotLabel } from './adminUtils';
+import { getMatchScorePair } from '@/lib/matchScore';
 import { getSports } from './adminConstants';
 import styles from '@/app/admin/admin.module.css';
 
@@ -172,9 +173,9 @@ export function ResultsTab({
                       <span className={styles.resultTeamName}>
                         {match.teamA?.name || 'Team A'}
                       </span>
-                      <span className={styles.resultScore}>{match.scoreA}</span>
+                      <span className={styles.resultScore}>{getMatchScorePair(match).a}</span>
                       <span className={styles.resultDash}>:</span>
-                      <span className={styles.resultScore}>{match.scoreB}</span>
+                      <span className={styles.resultScore}>{getMatchScorePair(match).b}</span>
                       <span className={`${styles.resultTeamName} ${styles.resultTeamNameRight}`}>
                         {match.teamB?.name || 'Team B'}
                       </span>

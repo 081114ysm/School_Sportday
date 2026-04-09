@@ -23,6 +23,10 @@ export interface Match {
   category: string;
   youtubeUrl?: string | null;
   setsJson?: string | null;
+  quarterCount?: number | null;
+  quarterMinutes?: number | null;
+  currentQuarter?: number | null;
+  quarterStartedAt?: string | null;
 }
 
 export interface RankingEntry {
@@ -38,31 +42,41 @@ export interface RankingEntry {
   recentForm: { result: 'W' | 'D' | 'L'; opponent: string; score: string }[];
 }
 
-// 빅발리볼은 점수 합계 대신 세트 스코어로 표시한다.
+// 빅발리볼·배드민턴은 점수 합계 대신 세트 스코어로 표시한다.
+// 공용 구현은 lib/matchScore.ts. 여기서는 하위호환 래퍼만 유지한다.
+export interface Match_ForDisplay extends Match {}
 export function displayScore(m: Match): { a: number; b: number } {
-  if (m.sport === 'BIG_VOLLEYBALL') {
-    const SET_TARGET = 25;
-    if (m.setsJson) {
-      try {
-        const sets = JSON.parse(m.setsJson) as { a: number; b: number }[];
-        let aw = 0;
-        let bw = 0;
-        for (const s of sets) {
-          if (s.a >= SET_TARGET && s.a > s.b) aw += 1;
-          else if (s.b >= SET_TARGET && s.b > s.a) bw += 1;
-        }
-        return { a: aw, b: bw };
-      } catch {
-        /* fall through */
+  // 동적 임포트 대신 로컬 복사로 순환 참조를 피한다.
+  const sport = m.sport;
+  const isVolleyball = sport === 'BIG_VOLLEYBALL' || sport === '빅발리볼';
+  const isBadminton = sport === 'BADMINTON' || sport === '배드민턴';
+  if (!isVolleyball && !isBadminton) return { a: m.scoreA, b: m.scoreB };
+  if (!m.setsJson) return { a: 0, b: 0 };
+  try {
+    const sets = JSON.parse(m.setsJson) as { a: number; b: number }[];
+    let aw = 0;
+    let bw = 0;
+    const complete = (a: number, b: number): boolean => {
+      if (isVolleyball) {
+        if (a >= 25 && a - b >= 2) return true;
+        if (b >= 25 && b - a >= 2) return true;
+        return false;
       }
-    }
-    // setsJson이 없으면 총점에서 세트 수를 추정한다 (25점 = 1세트).
-    return {
-      a: Math.min(3, Math.floor(m.scoreA / SET_TARGET)),
-      b: Math.min(3, Math.floor(m.scoreB / SET_TARGET)),
+      // 배드민턴
+      if (a >= 30 || b >= 30) return true;
+      if (a >= 21 && a - b >= 2) return true;
+      if (b >= 21 && b - a >= 2) return true;
+      return false;
     };
+    for (const s of sets) {
+      if (!complete(s.a, s.b)) continue;
+      if (s.a > s.b) aw += 1;
+      else if (s.b > s.a) bw += 1;
+    }
+    return { a: aw, b: bw };
+  } catch {
+    return { a: 0, b: 0 };
   }
-  return { a: m.scoreA, b: m.scoreB };
 }
 
 export interface ScoreLog {

@@ -79,6 +79,20 @@ export class MatchesController {
   }
 
   @UseGuards(AdminGuard)
+  @Put(':id/quarter')
+  updateQuarter(
+    @Param('id') id: string,
+    @Body()
+    body: { currentQuarter: number | null; quarterStartedAt: string | null },
+  ) {
+    return this.matchesService.updateQuarter(
+      parseInt(id),
+      body.currentQuarter,
+      body.quarterStartedAt,
+    );
+  }
+
+  @UseGuards(AdminGuard)
   @Put(':id/undo')
   undoScore(@Param('id') id: string) {
     return this.matchesService.undoScore(parseInt(id));
