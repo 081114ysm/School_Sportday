@@ -202,6 +202,13 @@
     gap: 0;
   }
 
+  /* 모바일: 챔피언 → 결승 → 준결승 순으로 역방향 배치 */
+  .grid > :nth-child(7) { order: 1; } /* championCol */
+  .grid > :nth-child(6) { order: 2; } /* mobileConnector (final→champion) */
+  .grid > :nth-child(4) { order: 3; } /* finalCol */
+  .grid > :nth-child(3) { order: 4; } /* mobileConnector (semi→final) */
+  .grid > :nth-child(1) { order: 5; } /* semis */
+
   /* Hide desktop absolute-positioned connectors */
   .connector,
   .connectorFinal {
