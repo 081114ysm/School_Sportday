@@ -295,10 +295,10 @@
   justify-content: center;
 }
 .formItem {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   white-space: nowrap;
 }
 .formCol {
@@ -307,10 +307,6 @@
   gap: 8px;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
-}
-.formItem {
-  min-width: 42px;
 }
 .formDetail {
   font-size: 10px;
