@@ -13,7 +13,24 @@ export class RankingsService {
   ) {}
 
   async getRankings(grade?: number, category?: string) {
-    const teams = await this.teamsService.findAll(grade, category);
+    // 여자연합 AC/BD는 순위표에서 제외되지만, 경기 결과는 구성 팀(A/C, B/D)에 귀속.
+    const allTeams = await this.teamsService.findAll();
+    const womensAC = allTeams.find((t) => t.name === '여자연합 AC');
+    const womensBD = allTeams.find((t) => t.name === '여자연합 BD');
+    const A = allTeams.find((t) => t.name === 'A팀');
+    const B = allTeams.find((t) => t.name === 'B팀');
+    const C = allTeams.find((t) => t.name === 'C팀');
+    const D = allTeams.find((t) => t.name === 'D팀');
+    const unionMap = new Map<number, number[]>();
+    if (womensAC && A && C) unionMap.set(womensAC.id, [A.id, C.id]);
+    if (womensBD && B && D) unionMap.set(womensBD.id, [B.id, D.id]);
+    const unionIds = new Set(unionMap.keys());
+    const effectiveIds = (tid: number): number[] =>
+      unionMap.get(tid) ?? [tid];
+
+    const requested = await this.teamsService.findAll(grade, category);
+    // 연합팀은 결과 반영 용도로만 사용하므로 출력에서 제외.
+    const teams = requested.filter((t) => !unionIds.has(t.id));
     const doneMatches = await this.matchRepo.find({
       where: { status: 'DONE' },
       relations: ['teamA', 'teamB'],
@@ -22,7 +39,9 @@ export class RankingsService {
 
     const rankings = teams.map((team) => {
       const teamMatches = doneMatches.filter(
-        (m) => m.teamAId === team.id || m.teamBId === team.id,
+        (m) =>
+          effectiveIds(m.teamAId).includes(team.id) ||
+          effectiveIds(m.teamBId).includes(team.id),
       );
 
       let wins = 0,
@@ -32,7 +51,7 @@ export class RankingsService {
         goalsAgainst = 0;
 
       teamMatches.forEach((m) => {
-        const isA = m.teamAId === team.id;
+        const isA = effectiveIds(m.teamAId).includes(team.id);
         const myScore = isA ? m.scoreA : m.scoreB;
         const opScore = isA ? m.scoreB : m.scoreA;
         goalsFor += myScore;
@@ -43,7 +62,7 @@ export class RankingsService {
       });
 
       const recentForm = teamMatches.slice(0, 5).map((m) => {
-        const isA = m.teamAId === team.id;
+        const isA = effectiveIds(m.teamAId).includes(team.id);
         const myScore = isA ? m.scoreA : m.scoreB;
         const opScore = isA ? m.scoreB : m.scoreA;
         const opponent = isA ? (m.teamB?.name ?? '') : (m.teamA?.name ?? '');
