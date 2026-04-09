@@ -12,7 +12,7 @@ export class Match {
   @Column()
   day: string;
 
-  // ISO date 'YYYY-MM-DD'. Source of truth for "is this match in the past?".
+  // ISO 날짜 'YYYY-MM-DD'. "이 경기가 과거인가?"를 판단하는 기준값.
   @Column({ nullable: true, type: 'varchar' })
   matchDate: string | null;
 
@@ -43,8 +43,8 @@ export class Match {
   @Column({ nullable: true, type: 'varchar' })
   youtubeUrl: string | null;
 
-  // Optional per-set scoreboard for multi-set sports (volleyball). Stored as
-  // JSON: [{a:25,b:20},{a:23,b:25},{a:15,b:11}]. Null for single-score sports.
+  // 다중 세트 종목(배구 등)의 세트별 스코어. JSON 형식으로 저장:
+  // [{a:25,b:20},{a:23,b:25},{a:15,b:11}]. 단일 점수 종목은 null.
   @Column({ nullable: true, type: 'text' })
   setsJson: string | null;
 

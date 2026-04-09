@@ -1,10 +1,10 @@
-import { Team, Match, RankingEntry } from './types';
+import { Team, Match, RankingEntry } from '@/types';
 import { BASE_URL } from './config';
 
-// Works in both server and client components. We disable Next's fetch cache
-// so SSR always sees fresh data — for realtime features this is required.
-// Non-GET requests auto-attach the admin token from localStorage so admin
-// actions don't need to plumb headers through every callsite.
+// 서버·클라이언트 컴포넌트 모두에서 동작한다. Next의 fetch 캐시를 비활성화해
+// SSR이 항상 최신 데이터를 조회하도록 한다 — 실시간 기능에 필수.
+// GET 이외 요청은 localStorage의 관리자 토큰을 자동으로 첨부하므로
+// 각 호출부에서 헤더를 별도로 전달할 필요가 없다.
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const method = (options?.method ?? 'GET').toUpperCase();
   const adminHeaders: Record<string, string> = {};
@@ -23,15 +23,15 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   });
   if (!res.ok) {
     const errorBody = await res.text().catch(() => '');
-    // 401 on an admin-gated route → stored token is stale/wrong. Clear it and
-    // notify the UI so the admin page can re-prompt without a page reload.
+    // 관리자 전용 라우트에서 401 → 저장된 토큰이 만료되거나 잘못됨. 토큰을 삭제하고
+    // 이벤트를 발행해 페이지 리로드 없이 관리자 페이지가 재인증을 유도하게 한다.
     if (res.status === 401 && typeof window !== 'undefined') {
       window.localStorage.removeItem('sportday.adminToken');
       window.dispatchEvent(new Event('sportday:admin-unauthorized'));
     }
     throw new Error(`API error ${res.status}: ${errorBody}`);
   }
-  // 204 No Content or empty body (e.g. DELETE) → return undefined cast as T.
+  // 204 No Content 또는 빈 응답(예: DELETE) → undefined를 T로 캐스팅해 반환.
   if (res.status === 204) return undefined as T;
   const text = await res.text();
   if (!text) return undefined as T;
@@ -51,7 +51,7 @@ export async function verifyAdminToken(token: string): Promise<boolean> {
   }
 }
 
-// Teams
+// 팀
 export async function fetchTeams(grade?: number): Promise<Team[]> {
   const query = grade ? `?grade=${grade}` : '';
   return request<Team[]>(`/api/teams${query}`);
@@ -68,7 +68,7 @@ export async function deleteTeam(id: number): Promise<void> {
   await request<void>(`/api/teams/${id}`, { method: 'DELETE' });
 }
 
-// Matches
+// 경기
 export async function fetchMatches(filters?: {
   sport?: string;
   day?: string;
@@ -173,7 +173,7 @@ export async function setMatchYoutube(id: number, youtubeUrl: string | null): Pr
   });
 }
 
-// Rankings
+// 랭킹
 export async function fetchRankings(grade?: number): Promise<RankingEntry[]> {
   const query = grade ? `?grade=${grade}` : '';
   return request<RankingEntry[]>(`/api/rankings${query}`);

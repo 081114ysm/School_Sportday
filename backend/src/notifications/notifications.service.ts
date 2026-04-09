@@ -37,7 +37,7 @@ export class NotificationsService {
     return this.subRepo.find({ where: { userSub } });
   }
 
-  /** Notify all subscribers of a team about a match event. */
+  /** 팀의 모든 구독자에게 경기 이벤트를 알린다. */
   async notifyTeam(
     teamId: number,
     title: string,

@@ -1,7 +1,6 @@
-// Server component: fetches match list on the server and passes it to the
-// interactive day-tab UI on the client.
-import { fetchMatches } from '@/lib/api';
-import ScheduleClient from './ScheduleClient';
+// 서버 컴포넌트: 서버에서 경기 목록을 가져와 클라이언트의 요일 탭 UI에 전달한다.
+import { fetchMatches } from '@/services/api';
+import ScheduleClient from '@/components/schedule/ScheduleClient';
 
 export const dynamic = 'force-dynamic';
 

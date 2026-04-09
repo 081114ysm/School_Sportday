@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { Trophy, Radio, Clock } from 'lucide-react';
-import { fetchMatches, fetchLiveMatches } from '@/lib/api';
-import { getSocket, disconnectSocket } from '@/lib/socket';
-import { displayScore, type Match } from '@/lib/types';
+import { fetchMatches, fetchLiveMatches } from '@/services/api';
+import { getSocket, disconnectSocket } from '@/services/socket';
+import { displayScore, type Match } from '@/types';
 import styles from './today.module.css';
 
 const DAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
@@ -87,7 +87,7 @@ export default function TodayPage() {
       </div>
 
       <div className={styles.layout}>
-        {/* LEFT: Table from todayMatch2 */}
+        {/* 왼쪽: 오늘 경기 일정표 */}
         <section className={styles.tableSection}>
           <div className={styles.sectionHead}>
             <h2 className={styles.sectionTitle}>
@@ -139,7 +139,7 @@ export default function TodayPage() {
           </div>
         </section>
 
-        {/* RIGHT: Live scoreboard / element from todayMatch1 */}
+        {/* 오른쪽: 실시간 스코어보드 */}
         <section className={styles.liveSection}>
           <div className={styles.sectionHead}>
             <h2 className={styles.sectionTitle}>
@@ -168,7 +168,7 @@ export default function TodayPage() {
                 <div className={styles.bigScore}>{displayScore(live).b}</div>
               </div>
               <div className={styles.metaRow}>
-                <span>{live.category === 'ALL_UNION' ? '연합전' : '학년전'}</span>
+                <span>{live.category === 'ALL_UNION' ? '연합전' : live.category === 'CLUB' ? '팀전' : '학년전'}</span>
                 <span>·</span>
                 <span>{live.timeSlot === 'LUNCH' ? '점심 라운드' : '저녁 라운드'}</span>
               </div>

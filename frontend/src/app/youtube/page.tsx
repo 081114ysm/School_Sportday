@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronRight, Calendar, Bell, BellRing, History } from 'lucide-react';
-import { fetchMatches } from '@/lib/api';
-import { getSocket, disconnectSocket } from '@/lib/socket';
-import type { Match } from '@/lib/types';
+import { fetchMatches } from '@/services/api';
+import { getSocket, disconnectSocket } from '@/services/socket';
+import type { Match } from '@/types';
 import styles from './youtube.module.css';
 
 interface YtVideo {
@@ -176,8 +176,8 @@ export default function YoutubePage() {
     [matches],
   );
 
-  // Pick the first LIVE match on initial load so the player has something to
-  // show. After that we only reset to null when nothing is live anymore.
+  // 초기 로드 시 첫 번째 LIVE 경기를 플레이어에 표시한다.
+  // 이후에는 라이브 경기가 없어질 때만 null로 초기화한다.
   useEffect(() => {
     setActive((cur) => {
       if (cur == null) return liveVideos[0] ?? null;

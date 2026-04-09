@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Star } from 'lucide-react';
-import type { RankingEntry } from '@/lib/types';
+import type { RankingEntry } from '@/types';
 import styles from './rankings.module.css';
 
 type TabKey = 'ALL' | 'G1' | 'G2' | 'G3' | 'CLUB';

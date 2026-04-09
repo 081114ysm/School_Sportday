@@ -17,7 +17,7 @@ export class NotificationsController {
     private readonly push: PushService,
   ) {}
 
-  // ===== Web Push (PWA) =====
+  // ===== 웹 푸시 (PWA) =====
   @Get('push/public-key')
   publicKey() {
     return { key: this.push.getPublicKey() };
@@ -46,9 +46,8 @@ export class NotificationsController {
     return { ok: true };
   }
 
-  // User self-test: sends a single push to the browser's own subscription
-  // (identified by its endpoint). Does NOT broadcast — that would let any
-  // visitor spam every device.
+  // 사용자 자체 테스트: 브라우저 자신의 구독(endpoint로 식별)에만 푸시를 전송한다.
+  // 브로드캐스트하지 않는다 — 그렇게 하면 임의 방문자가 모든 기기에 스팸을 보낼 수 있다.
   @Post('push/test')
   async pushTest(
     @Body()

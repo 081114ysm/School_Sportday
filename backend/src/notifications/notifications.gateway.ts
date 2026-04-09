@@ -8,9 +8,9 @@ export class NotificationsGateway {
   server: Server;
 
   emitNotification(userSub: string, rec: NotificationRecord) {
-    // Broadcast on a room keyed by userSub. Clients should join on connect.
+    // userSub를 키로 하는 룸에 브로드캐스트한다. 클라이언트는 연결 시 룸에 참가해야 한다.
     this.server.to(`user:${userSub}`).emit('notification', rec);
-    // Also fire a global event so unauthenticated clients see test traffic.
+    // 미인증 클라이언트도 테스트 트래픽을 볼 수 있도록 전역 이벤트도 발행한다.
     this.server.emit('notification:global', { userSub, rec });
   }
 

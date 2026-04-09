@@ -1,5 +1,5 @@
-// Client-side Web Push helpers. Subscribes the browser to the backend's VAPID
-// push channel and mirrors the subscription to `/api/notifications/push/*`.
+// 클라이언트 측 Web Push 헬퍼. 브라우저를 백엔드 VAPID 푸시 채널에 구독하고
+// 구독 정보를 `/api/notifications/push/*`에 동기화한다.
 
 import { BASE_URL } from './config';
 

@@ -10,7 +10,7 @@ type Status = 'SCHEDULED' | 'LIVE' | 'DONE';
 
 const DAYS: Day[] = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
 
-// JS Date.getDay() -> Day key (Sat/Sun fallback to FRI)
+// JS Date.getDay() -> Day 키 (토/일은 FRI로 대체)
 const TODAY_KEY: Day = (() => {
   const d = new Date().getDay();
   return (['MON', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'FRI'] as Day[])[d];
@@ -31,7 +31,7 @@ export class SeedService implements OnModuleInit {
 
     console.log('Seeding database...');
 
-    // ── Teams: 8 학년 팀 + 4 클럽 팀 = 12 ─────────────────────────────────
+    // ── 팀: 학년 팀 12개 + 클럽 팀 4개 = 16 ────────────────────────────────
     const teams: Team[] = [];
     for (let grade = 1; grade <= 3; grade++) {
       for (let cls = 1; cls <= 4; cls++) {
@@ -150,10 +150,24 @@ export class SeedService implements OnModuleInit {
         status,
       };
       if (status === 'DONE') {
-        const [sa, sb] = scorePool[i % scorePool.length];
-        data.scoreA = sa;
-        data.scoreB = sb;
-        data.result = sa > sb ? `${p.a.name} 승` : sb > sa ? `${p.b.name} 승` : '무승부';
+        if (p.sport === 'BIG_VOLLEYBALL') {
+          // 빅발리볼: 실제 세트 스코어로 저장 (best-of-3)
+          const sets =
+            i % 2 === 0
+              ? [{ a: 25, b: 20 }, { a: 23, b: 25 }, { a: 25, b: 18 }]
+              : [{ a: 22, b: 25 }, { a: 25, b: 23 }, { a: 19, b: 25 }];
+          data.setsJson = JSON.stringify(sets);
+          data.scoreA = sets.reduce((s, x) => s + x.a, 0);
+          data.scoreB = sets.reduce((s, x) => s + x.b, 0);
+          const aw = sets.filter((s) => s.a > s.b).length;
+          const bw = sets.filter((s) => s.b > s.a).length;
+          data.result = aw > bw ? `${p.a.name} 승` : `${p.b.name} 승`;
+        } else {
+          const [sa, sb] = scorePool[i % scorePool.length];
+          data.scoreA = sa;
+          data.scoreB = sb;
+          data.result = sa > sb ? `${p.a.name} 승` : sb > sa ? `${p.b.name} 승` : '무승부';
+        }
       } else if (status === 'LIVE') {
         data.scoreA = 1;
         data.scoreB = 1;

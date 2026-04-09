@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import { MapPin, Clock, Trophy, Flag, Medal, Play } from 'lucide-react';
-import { displayScore, type Match } from '@/lib/types';
-import { getEventWeekShortDates } from '@/lib/eventWeek';
+import { displayScore, type Match } from '@/types';
+import { getEventWeekShortDates } from '@/services/eventWeek';
 import styles from './schedule.module.css';
 
 const WEEK_DATES = getEventWeekShortDates();
@@ -19,9 +19,15 @@ const DAYS = [
 ];
 
 const SLOT_META: Record<string, { label: string; time: string; place: string }> = {
-  LUNCH: { label: '점심 경기', time: '12:50', place: '중앙 운동장' },
-  DINNER: { label: '저녁 경기', time: '18:30', place: '체육관 A' },
+  LUNCH: { label: '점심 경기', time: '12:50', place: '강당' },
+  DINNER: { label: '저녁 경기', time: '18:30', place: '강당' },
 };
+
+function getCategoryLabel(category: string): string {
+  if (category === 'ALL_UNION') return '연합전';
+  if (category === 'CLUB') return '팀전';
+  return '학년전';
+}
 
 const SPORT_LABELS: Record<string, string> = {
   BASKETBALL: '농구',
@@ -178,7 +184,7 @@ export default function ScheduleClient({ initial }: { initial: Match[] }) {
                         </span>
                         <span className={styles.footItem}>
                           <Clock size={11} />
-                          {m.category === 'ALL_UNION' ? '연합전' : '학년전'}
+                          {getCategoryLabel(m.category)}
                         </span>
                       </div>
                     </div>

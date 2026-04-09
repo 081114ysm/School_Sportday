@@ -40,20 +40,27 @@ export interface RankingEntry {
 
 // 빅발리볼은 점수 합계 대신 세트 스코어로 표시한다.
 export function displayScore(m: Match): { a: number; b: number } {
-  if (m.sport === 'BIG_VOLLEYBALL' && m.setsJson) {
-    try {
-      const sets = JSON.parse(m.setsJson) as { a: number; b: number }[];
-      let aw = 0;
-      let bw = 0;
-      const SET_TARGET = 25;
-      for (const s of sets) {
-        if (s.a >= SET_TARGET && s.a > s.b) aw += 1;
-        else if (s.b >= SET_TARGET && s.b > s.a) bw += 1;
+  if (m.sport === 'BIG_VOLLEYBALL') {
+    const SET_TARGET = 25;
+    if (m.setsJson) {
+      try {
+        const sets = JSON.parse(m.setsJson) as { a: number; b: number }[];
+        let aw = 0;
+        let bw = 0;
+        for (const s of sets) {
+          if (s.a >= SET_TARGET && s.a > s.b) aw += 1;
+          else if (s.b >= SET_TARGET && s.b > s.a) bw += 1;
+        }
+        return { a: aw, b: bw };
+      } catch {
+        /* fall through */
       }
-      return { a: aw, b: bw };
-    } catch {
-      /* fall through */
     }
+    // setsJson이 없으면 총점에서 세트 수를 추정한다 (25점 = 1세트).
+    return {
+      a: Math.min(3, Math.floor(m.scoreA / SET_TARGET)),
+      b: Math.min(3, Math.floor(m.scoreB / SET_TARGET)),
+    };
   }
   return { a: m.scoreA, b: m.scoreB };
 }

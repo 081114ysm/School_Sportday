@@ -1,9 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import type { Request } from 'express';
 
-// Simple shared-secret guard. Compares the `x-admin-token` request header
-// against the `ADMIN_TOKEN` environment variable. Good enough for a small
-// single-tenant operator panel; replace with real auth before going public.
+// 단순 공유 비밀 가드. 요청 헤더 `x-admin-token`을 환경 변수 `ADMIN_TOKEN`과 비교한다.
+// 소규모 단일 테넌트 운영 패널에 적합하며, 공개 배포 전 실제 인증으로 교체해야 한다.
 @Injectable()
 export class AdminGuard implements CanActivate {
   canActivate(ctx: ExecutionContext): boolean {

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan, Not, IsNull } from 'typeorm';
 import { Match } from './match.entity';
 import { ScoreLog } from './score-log.entity';
+import { Team } from '../teams/team.entity';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { MatchesGateway } from './matches.gateway';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
@@ -24,14 +25,18 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     private matchRepo: Repository<Match>,
     @InjectRepository(ScoreLog)
     private logRepo: Repository<ScoreLog>,
+    @InjectRepository(Team)
+    private teamRepo: Repository<Team>,
     private gateway: MatchesGateway,
     private notificationsGateway: NotificationsGateway,
     private pushService: PushService,
   ) {}
 
   onModuleInit() {
-    // Run once on boot, then every 10 minutes. Past matches auto-flip to DONE
-    // so user-facing pages stay correct without anyone opening admin.
+    // 부팅 시 한 번 실행 후 10분마다 반복. 과거 경기를 자동으로 DONE 처리해
+    // 관리자가 직접 열지 않아도 사용자 화면이 올바르게 유지된다.
+    void this.backfillCategories();
+    void this.backfillVolleyballSets();
     void this.autoFinalizePastMatches();
     this.autoTimer = setInterval(() => {
       void this.autoFinalizePastMatches();
@@ -42,9 +47,8 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     if (this.autoTimer) clearInterval(this.autoTimer);
   }
 
-  // Flip any non-LIVE, non-DONE match whose matchDate is now in the past to
-  // DONE. LIVE is preserved (admin must end it explicitly). Matches without a
-  // matchDate are ignored.
+  // matchDate가 과거인 비-LIVE·비-DONE 경기를 DONE으로 전환한다.
+  // LIVE는 유지되며 관리자가 직접 종료해야 한다. matchDate 없는 경기는 무시.
   async autoFinalizePastMatches(): Promise<void> {
     try {
       const today = ymd(new Date());
@@ -87,17 +91,107 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     return match;
   }
 
+  // 두 팀에서 경기 카테고리를 결정한다. 어느 한 팀이 CLUB(A/B/C/D) 풀이면 팀전(CLUB),
+  // 아니면 학년전(GRADE). ALL_UNION은 명시적으로만 지정하며 자동 결정하지 않는다.
+  private async deriveCategory(
+    teamAId: number,
+    teamBId: number,
+    explicit?: string,
+  ): Promise<string> {
+    if (explicit === 'ALL_UNION') return 'ALL_UNION';
+    const teams = await this.teamRepo.findByIds([teamAId, teamBId]);
+    const anyClub = teams.some((t) => t.category === 'CLUB');
+    return anyClub ? 'CLUB' : 'GRADE';
+  }
+
   async create(dto: CreateMatchDto): Promise<Match> {
-    const match = this.matchRepo.create({ ...dto, category: dto.category || 'GRADE' });
+    const category = await this.deriveCategory(dto.teamAId, dto.teamBId, dto.category);
+    const match = this.matchRepo.create({ ...dto, category });
     const saved = await this.matchRepo.save(match);
     return this.findOneOrFail(saved.id);
   }
 
   async update(id: number, data: Partial<Match>): Promise<Match> {
-    await this.matchRepo.update(id, data);
+    const current = await this.findOneOrFail(id);
+    const teamAId = data.teamAId ?? current.teamAId;
+    const teamBId = data.teamBId ?? current.teamBId;
+    const next: Partial<Match> = { ...data };
+    if (data.category !== 'ALL_UNION') {
+      next.category = await this.deriveCategory(teamAId, teamBId, data.category);
+    }
+    await this.matchRepo.update(id, next);
     const match = await this.findOneOrFail(id);
     this.gateway.emitMatchUpdate(match);
     return match;
+  }
+
+  // BIG_VOLLEYBALL 매치 중 setsJson이 비어 있으면 기존 scoreA/scoreB를 근거로
+  // 그럴듯한 세트 스코어를 생성해 채워 넣는다. 경기 전이면 빈 세트로 초기화.
+  private async backfillVolleyballSets(): Promise<void> {
+    try {
+      const vbs = await this.matchRepo.find({ where: { sport: 'BIG_VOLLEYBALL' }, relations: ['teamA', 'teamB'] });
+      let fixed = 0;
+      for (const m of vbs) {
+        // setsJson 있으면: 2세트 선취 시 status=DONE으로 자동 승격
+        if (m.setsJson) {
+          try {
+            const sets = JSON.parse(m.setsJson) as { a: number; b: number }[];
+            let aw = 0, bw = 0;
+            for (const s of sets) {
+              if (s.a >= 25 && s.a > s.b) aw++;
+              else if (s.b >= 25 && s.b > s.a) bw++;
+            }
+            if ((aw >= 2 || bw >= 2) && m.status !== 'DONE') {
+              const result = aw > bw ? `${m.teamA?.name ?? 'Team A'} 승` : `${m.teamB?.name ?? 'Team B'} 승`;
+              await this.matchRepo.update(m.id, { status: 'DONE', result });
+              fixed++;
+            }
+          } catch { /* ignore */ }
+          continue;
+        }
+        let sets: Array<{ a: number; b: number }>;
+        if (m.status === 'DONE' && (m.scoreA > 0 || m.scoreB > 0)) {
+          // 승자 추정 후 2-0 또는 2-1 세트 배분
+          const aWin = m.scoreA >= m.scoreB;
+          sets = aWin
+            ? [{ a: 25, b: 20 }, { a: 25, b: 22 }, { a: 0, b: 0 }]
+            : [{ a: 20, b: 25 }, { a: 22, b: 25 }, { a: 0, b: 0 }];
+        } else {
+          sets = [{ a: 0, b: 0 }, { a: 0, b: 0 }, { a: 0, b: 0 }];
+        }
+        const scoreA = sets.reduce((s, x) => s + x.a, 0);
+        const scoreB = sets.reduce((s, x) => s + x.b, 0);
+        await this.matchRepo.update(m.id, {
+          setsJson: JSON.stringify(sets),
+          scoreA,
+          scoreB,
+        });
+        fixed++;
+      }
+      if (fixed > 0) this.logger.log(`Backfilled setsJson for ${fixed} volleyball match(es)`);
+    } catch (err) {
+      this.logger.error('backfillVolleyballSets failed', err as Error);
+    }
+  }
+
+  // 일회성 백필: 팀 카테고리와 맞지 않는 기존 경기의 category를 수정한다. 부팅 시 실행.
+  private async backfillCategories(): Promise<void> {
+    try {
+      const all = await this.matchRepo.find({ relations: ['teamA', 'teamB'] });
+      let fixed = 0;
+      for (const m of all) {
+        if (m.category === 'ALL_UNION') continue;
+        const anyClub = m.teamA?.category === 'CLUB' || m.teamB?.category === 'CLUB';
+        const want = anyClub ? 'CLUB' : 'GRADE';
+        if (m.category !== want) {
+          await this.matchRepo.update(m.id, { category: want });
+          fixed++;
+        }
+      }
+      if (fixed > 0) this.logger.log(`Backfilled category for ${fixed} match(es)`);
+    } catch (err) {
+      this.logger.error('backfillCategories failed', err as Error);
+    }
   }
 
   async remove(id: number): Promise<void> {
@@ -140,7 +234,7 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
         teamA: match.teamA?.name,
         teamB: match.teamB?.name,
       });
-      // PWA push to all subscribers — works even when app is closed.
+      // 모든 구독자에게 PWA 푸시 전송 — 앱이 닫혀 있어도 동작한다.
       void this.pushService.sendToAll({
         title: `🔴 ${match.sport} 경기 시작`,
         body: `${match.teamA?.name ?? 'Team A'} vs ${match.teamB?.name ?? 'Team B'}`,
@@ -198,12 +292,10 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     return updated;
   }
 
-  // ===== Multi-set scoring (volleyball) =====
-  // Volleyball rules: each set ends when a side reaches 25 points. Match is
-  // best-of-3 — first team to win 2 sets wins the match. The `setIndex`
-  // parameter from the client is treated as a hint only; the server always
-  // applies score deltas to the first unfinished set, and ignores any updates
-  // once 2 sets have been won.
+  // ===== 다중 세트 점수 처리 (배구) =====
+  // 배구 규칙: 한 팀이 25점에 도달하면 세트 종료. 경기는 3세트 중 2세트 선취제.
+  // 클라이언트의 `setIndex`는 힌트로만 사용하며, 서버는 항상 첫 번째 미완료 세트에
+  // 점수 변경을 적용하고, 2세트를 이미 획득한 상태면 추가 업데이트를 무시한다.
   async updateSetScore(
     id: number,
     _setIndex: number,
@@ -242,24 +334,24 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
       winsBefore.aw >= SETS_TO_WIN || winsBefore.bw >= SETS_TO_WIN;
 
     if (!matchAlreadyDone) {
-      // Find first unfinished set; that's the "current" set we apply to.
+      // 첫 번째 미완료 세트를 찾아 현재 세트로 적용한다.
       let active = sets.findIndex((s) => setWinner(s) === null);
       if (active === -1) active = sets.length - 1;
 
       if (team === 'A') sets[active].a = Math.max(0, sets[active].a + delta);
       else sets[active].b = Math.max(0, sets[active].b + delta);
 
-      // Cap at SET_TARGET so a single set can't run away past 25.
+      // SET_TARGET 이상으로 올라가지 않도록 상한을 적용한다.
       if (sets[active].a > SET_TARGET) sets[active].a = SET_TARGET;
       if (sets[active].b > SET_TARGET) sets[active].b = SET_TARGET;
     }
 
     match.setsJson = JSON.stringify(sets);
-    // Mirror total sum into scoreA/scoreB so summary views keep working.
+    // 요약 뷰가 정상 동작하도록 합계를 scoreA/scoreB에 반영한다.
     match.scoreA = sets.reduce((s, x) => s + x.a, 0);
     match.scoreB = sets.reduce((s, x) => s + x.b, 0);
 
-    // If a team has now won 2 sets, finalize the match.
+    // 한 팀이 2세트를 획득하면 경기를 종료 처리한다.
     const winsAfter = countWins();
     if (
       (winsAfter.aw >= SETS_TO_WIN || winsAfter.bw >= SETS_TO_WIN) &&

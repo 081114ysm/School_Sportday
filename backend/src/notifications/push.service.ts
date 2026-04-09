@@ -114,7 +114,7 @@ export class PushService implements OnModuleInit {
           sent++;
         } catch (err: any) {
           failed++;
-          // 404/410 = subscription gone; clean it up.
+          // 404/410 = 구독 만료됨; 삭제 처리.
           if (err?.statusCode === 404 || err?.statusCode === 410) {
             await this.deleteByEndpoint(s.endpoint);
             this.logger.warn(`Pruned dead subscription ${s.endpoint.slice(0, 40)}…`);

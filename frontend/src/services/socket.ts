@@ -16,19 +16,19 @@ export function getSocket(): Socket {
     });
 
     socket.on('connect', () => {
-      console.log('[Socket] Connected:', socket?.id);
+      console.log('[소켓] 연결됨:', socket?.id);
     });
 
     socket.on('disconnect', (reason) => {
-      console.log('[Socket] Disconnected:', reason);
+      console.log('[소켓] 연결 해제:', reason);
     });
 
     socket.on('connect_error', (err) => {
-      console.warn('[Socket] Connection error:', err.message);
+      console.warn('[소켓] 연결 오류:', err.message);
     });
 
     socket.on('reconnect', (attemptNumber) => {
-      console.log('[Socket] Reconnected after', attemptNumber, 'attempts');
+      console.log('[소켓] 재연결 완료, 시도 횟수:', attemptNumber);
     });
   }
 

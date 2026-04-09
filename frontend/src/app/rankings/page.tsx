@@ -1,8 +1,7 @@
-// Server component: fetches rankings during SSR and hands the data to the
-// client-side filter/tab UI. No hooks here — keeps the network call off the
-// browser's critical path.
-import { fetchRankings } from '@/lib/api';
-import RankingsClient from './RankingsClient';
+// 서버 컴포넌트: SSR 시 랭킹 데이터를 가져와 클라이언트 필터/탭 UI에 전달한다.
+// 훅 없음 — 네트워크 요청을 브라우저 크리티컬 패스에서 제외한다.
+import { fetchRankings } from '@/services/api';
+import RankingsClient from '@/components/rankings/RankingsClient';
 
 export const dynamic = 'force-dynamic';
 

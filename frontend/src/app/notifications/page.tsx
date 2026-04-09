@@ -8,7 +8,7 @@ import {
   disablePush,
   currentPushSubscription,
   sendTestPush,
-} from '@/lib/push';
+} from '@/services/push';
 
 const btnStyle: CSSProperties = {
   padding: '8px 14px',

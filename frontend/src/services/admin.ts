@@ -1,6 +1,5 @@
-// Tiny client-side admin token store. Paired with the backend AdminGuard
-// (x-admin-token header). Lives in localStorage so a single prompt on
-// /admin unlocks the panel for subsequent visits on the same device.
+// 클라이언트 측 관리자 토큰 저장소. 백엔드 AdminGuard(x-admin-token 헤더)와 연동한다.
+// localStorage에 저장하여 같은 기기에서 재방문 시 재인증 없이 패널에 접근할 수 있다.
 
 const KEY = 'sportday.adminToken';
 

@@ -1,8 +1,8 @@
-// Load .env (Node 21.7+). Falls back gracefully if missing.
+// .env 로드 (Node 21.7+). 파일이 없으면 기본값으로 동작한다.
 try {
   (process as unknown as { loadEnvFile?: (p?: string) => void }).loadEnvFile?.('.env');
 } catch {
-  /* .env missing — use defaults */
+  /* .env 없음 — 기본값 사용 */
 }
 
 import { NestFactory } from '@nestjs/core';
