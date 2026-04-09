@@ -300,6 +300,47 @@
   align-items: center;
   gap: 4px;
   white-space: nowrap;
+  position: relative;
+  cursor: default;
+}
+.formItem::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #0f172a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.35);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 10;
+}
+.formItem::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #0f172a;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+.formItem:hover::after,
+.formItem:hover::before {
+  opacity: 1;
+}
+.formItem:hover::after {
+  transform: translateX(-50%) translateY(0);
 }
 .formCol {
   display: flex;

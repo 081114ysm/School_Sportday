@@ -157,7 +157,7 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
                         <div
                           key={idx}
                           className={styles.formItem}
-                          title={`vs ${f.opponent}`}
+                          data-tooltip={`vs ${f.opponent}`}
                         >
                           <span
                             className={`${styles.formChip} ${
