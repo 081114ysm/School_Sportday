@@ -146,30 +146,39 @@ export default function NotificationsPage() {
           }}
         >
           <li>
-            <strong>사이트 접속</strong> — 반드시 <code>http://localhost</code> 또는{' '}
-            <strong>HTTPS</strong>로 접속하세요. Push API는 보안 컨텍스트에서만 동작합니다.
+            위 <strong>"알림 켜기"</strong> 버튼을 누르고 브라우저 권한 팝업에서{' '}
+            <strong>허용</strong>을 선택하세요.
           </li>
           <li>
-            위 <strong>"알림 켜기"</strong> 버튼 클릭 → 브라우저 상단의 권한 팝업에서{' '}
-            <strong>허용</strong>을 눌러주세요.
+            옆의 <strong>"테스트 전송"</strong> 버튼으로 알림이 정상적으로 뜨는지 바로
+            확인할 수 있습니다.
           </li>
           <li>
-            바로 옆 <strong>"테스트 전송"</strong> 버튼으로 시스템 알림이 실제로 뜨는지 확인할 수
-            있습니다.
+            사이트를 닫아도 경기가 <strong>LIVE</strong>로 전환되거나 유튜브 중계가
+            시작되면 자동으로 푸시 알림이 도착합니다 (🔴 경기 시작 / 📺 라이브 시작).
           </li>
           <li>
-            탭을 <strong>완전히 닫은 뒤</strong>에도 경기가 LIVE로 전환되거나 유튜브 URL이
-            등록되면 자동으로 푸시가 옵니다 (🔴 경기 시작 / 📺 라이브 시작).
+            알림을 클릭하면 해당 유튜브 중계 또는 <strong>오늘 경기</strong> 페이지로
+            바로 이동합니다.
           </li>
           <li>
-            알림을 클릭하면 해당 유튜브 영상이나 <code>/today</code> 페이지로 바로 이동합니다.
+            <strong>📱 아이폰 (iOS 16.4 이상)</strong> — Safari로 접속한 뒤 하단{' '}
+            <strong>공유</strong> 버튼 → <strong>"홈 화면에 추가"</strong>로 앱을 설치해
+            주세요. 홈 화면에서 앱을 열고 "알림 켜기"를 눌러야 푸시가 작동합니다.
           </li>
           <li>
-            <strong>iOS (아이폰)</strong>의 경우 iOS 16.4 이상 + Safari에서{' '}
-            <strong>홈 화면에 추가</strong>한 PWA 상태에서만 푸시가 동작합니다.
+            <strong>📱 안드로이드</strong> — Chrome으로 접속 후 주소창 우측의{' '}
+            <strong>"앱 설치"</strong> 또는 메뉴 → <strong>"홈 화면에 추가"</strong>를
+            누르면 앱처럼 사용할 수 있습니다. 일반 브라우저에서도 알림은 정상
+            동작합니다.
           </li>
           <li>
-            알림을 더 이상 원하지 않으면 <strong>"알림 끄기"</strong>로 언제든 해제할 수 있습니다.
+            <strong>💻 PC</strong> — Chrome / Edge / Firefox에서 바로 동작합니다. 브라우저를
+            닫아도 OS 알림 센터로 전달됩니다.
+          </li>
+          <li>
+            더 이상 알림을 받고 싶지 않다면 <strong>"알림 끄기"</strong>로 언제든 해제할
+            수 있습니다.
           </li>
         </ol>
       </details>
