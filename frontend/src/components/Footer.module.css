@@ -79,6 +79,11 @@
     max-width: none;
   }
 }
+@media (max-width: 768px) {
+  .footer {
+    display: none;
+  }
+}
 @media (max-width: 520px) {
   .footer {
     margin-top: 48px;

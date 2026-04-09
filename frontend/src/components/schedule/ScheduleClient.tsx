@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { MapPin, Clock, Trophy, Flag, Medal, Play } from 'lucide-react';
 import { displayScore, type Match } from '@/types';
 import { getEventWeekShortDates } from '@/services/eventWeek';
@@ -48,6 +48,20 @@ export default function ScheduleClient({ initial }: { initial: Match[] }) {
     return map[new Date().getDay()];
   });
 
+  const dayListRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const todayKey = (() => {
+      const map = ['월', '월', '화', '수', '목', '금', '금'];
+      return map[new Date().getDay()];
+    })();
+    const container = dayListRef.current;
+    if (!container) return;
+    const el = container.querySelector<HTMLElement>(`[data-day="${todayKey}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, []);
+
   const byDay = useMemo(() => {
     const map = new Map<string, Match[]>();
     DAYS.forEach((d) => map.set(d.key, []));
@@ -86,7 +100,7 @@ export default function ScheduleClient({ initial }: { initial: Match[] }) {
       </header>
 
       <div className={styles.layout}>
-        <aside className={styles.dayList} aria-label="요일 선택">
+        <aside ref={dayListRef} className={styles.dayList} aria-label="요일 선택">
           {DAYS.map((d) => {
             const count = byDay.get(d.key)?.length ?? 0;
             const live = byDay.get(d.key)?.some((m) => m.status === 'LIVE') ?? false;
@@ -94,6 +108,7 @@ export default function ScheduleClient({ initial }: { initial: Match[] }) {
             return (
               <button
                 key={d.key}
+                data-day={d.key}
                 onClick={() => setActiveDay(d.key)}
                 className={`${styles.dayItem} ${isActive ? styles.dayItemActive : ''}`}
               >
