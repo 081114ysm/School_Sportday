@@ -97,12 +97,13 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
                 <th>실점</th>
                 <th>득실차</th>
                 <th>승점</th>
+                <th className={styles.alignLeft}>최근 5경기</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={10} className={styles.emptyRow}>
+                  <td colSpan={11} className={styles.emptyRow}>
                     데이터 없음
                   </td>
                 </tr>
@@ -150,6 +151,21 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
                     {r.goalDiff > 0 ? `+${r.goalDiff}` : r.goalDiff}
                   </td>
                   <td className={styles.pts}>{r.points}</td>
+                  <td>
+                    <div className={styles.formCol}>
+                      {r.recentForm.slice(0, 5).map((f, idx) => (
+                        <div
+                          key={idx}
+                          className={styles.formItem}
+                          title={`vs ${f.opponent}`}
+                        >
+                          <span className={styles.formDetail}>
+                            vs {f.opponent}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
