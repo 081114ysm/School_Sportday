@@ -36,7 +36,7 @@ async function bootstrap() {
 
   const port = parseInt(process.env.PORT || '4001', 10);
   await app.listen(port, '0.0.0.0');
-
+console.log('CORS 설정 적용됨');
   console.log(
     `Backend running on port ${port} (origins: ${origins.join(', ')})`,
   );
