@@ -1,0 +1,212 @@
+.wrap {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 24px;
+}
+.title {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.titleBadge {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--green-dark);
+  background: rgba(43, 191, 126, 0.1);
+  border: 1px solid rgba(43, 191, 126, 0.3);
+  border-radius: 999px;
+  padding: 2px 10px;
+  letter-spacing: 0.04em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr 40px auto;
+  align-items: center;
+  gap: 12px;
+}
+.semis {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.connector {
+  position: relative;
+  height: 100%;
+  min-height: 140px;
+}
+.connector::before,
+.connector::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 50%;
+  height: 2px;
+  background: #e5e7eb;
+}
+.connector::before {
+  top: 25%;
+}
+.connector::after {
+  top: 75%;
+}
+.connector .vbar {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  bottom: 25%;
+  width: 2px;
+  background: #e5e7eb;
+}
+.connector .out {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  right: 0;
+  height: 2px;
+  background: #e5e7eb;
+  transform: translateY(-1px);
+}
+.connector.topGreen::before {
+  background: #2bbf7e;
+}
+.connector.botGreen::after {
+  background: #2bbf7e;
+}
+.connectorFinal {
+  position: relative;
+  height: 2px;
+  background: #e5e7eb;
+}
+.connectorFinal.green {
+  background: #2bbf7e;
+}
+
+.finalCol {
+  display: flex;
+  align-items: center;
+}
+.championCol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.cardStage {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.teamName {
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.teamName.loser {
+  color: #9ca3af;
+  font-weight: 500;
+}
+.teamName.tbd {
+  color: #9ca3af;
+  font-style: italic;
+  font-weight: 500;
+}
+.score {
+  font-weight: 800;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
+  text-align: right;
+}
+.score.loser {
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.champion {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(43, 191, 126, 0.12), rgba(43, 191, 126, 0.04));
+  border: 1.5px solid #2bbf7e;
+  border-radius: 12px;
+  color: var(--green-dark);
+}
+.championTrophy {
+  font-size: 26px;
+}
+.championLabel {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--green-dark);
+  text-transform: uppercase;
+}
+.championName {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--text);
+  text-align: center;
+}
+.championPlaceholder {
+  padding: 14px 16px;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 12px;
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  min-width: 100px;
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .connector,
+  .connectorFinal {
+    display: none;
+  }
+  .finalCol,
+  .championCol {
+    justify-content: stretch;
+  }
+  .championCol {
+    min-width: 0;
+  }
+  .champion {
+    width: 100%;
+  }
+}

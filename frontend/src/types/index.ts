@@ -27,6 +27,7 @@ export interface Match {
   quarterMinutes?: number | null;
   currentQuarter?: number | null;
   quarterStartedAt?: string | null;
+  bracketStage?: string | null;
 }
 
 export interface RankingEntry {

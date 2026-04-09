@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Calendar, Radio, Tv, Trophy, Bell } from 'lucide-react';
+import { Calendar, Radio, Tv, Trophy, Bell, Swords } from 'lucide-react';
 import styles from './Header.module.css';
 
 const NAV = [
   { href: '/schedule', label: '일정', icon: Calendar },
   { href: '/today', label: '실시간', icon: Radio },
+  { href: '/tournament', label: '토너먼트', icon: Swords },
   { href: '/youtube', label: '유튜브', icon: Tv },
   { href: '/rankings', label: '순위', icon: Trophy },
 ];

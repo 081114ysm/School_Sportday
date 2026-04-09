@@ -72,6 +72,20 @@ export const MULTI_SET_SPORTS = new Set(['빅발리볼', '배드민턴']);
 // 쿼터제를 사용하는 종목.
 export const QUARTER_SPORTS = new Set(['농구', '풋살']);
 
+// 토너먼트(준결승+결승) 대진을 사용하는 학년별 종목.
+// 탁구=3학년, 피구=2학년, 빅발리볼=1학년.
+export const TOURNAMENT_SPORTS = new Set(['탁구', '피구', '빅발리볼']);
+export const TOURNAMENT_GRADE: Record<string, number> = {
+  '탁구': 3,
+  '피구': 2,
+  '빅발리볼': 1,
+};
+export const BRACKET_STAGES = [
+  { value: 'SEMI1', label: '준결승 1' },
+  { value: 'SEMI2', label: '준결승 2' },
+  { value: 'FINAL', label: '결승' },
+] as const;
+
 // 빅발리볼·피구에서만 선택 가능한 여자연합 합동팀.
 export const WOMENS_UNION_TEAMS: Record<string, string> = {
   '빅발리볼': '여자연합',

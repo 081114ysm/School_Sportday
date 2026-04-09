@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Match, Team } from '@/types';
 import { effectiveStatus, filterTeamsForSport, sportRestrictionLabel, slotLabel } from './adminUtils';
-import { getSports, TIME_SLOTS, CATEGORIES, QUARTER_SPORTS } from './adminConstants';
+import { getSports, TIME_SLOTS, CATEGORIES, QUARTER_SPORTS, TOURNAMENT_SPORTS, BRACKET_STAGES } from './adminConstants';
 import { StatusBadge } from './StatusBadge';
 import styles from '@/app/admin/admin.module.css';
 
@@ -16,6 +16,7 @@ interface NewMatchForm {
   category: string;
   quarterCount?: number;
   quarterMinutes?: number;
+  bracketStage?: string | null;
 }
 
 interface ScheduleMgmtTabProps {
@@ -125,6 +126,26 @@ export function ScheduleMgmtTab({
               ))}
             </select>
           </div>
+          {TOURNAMENT_SPORTS.has(newMatch.sport) && (
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>대진</label>
+              <select
+                className={styles.formSelect}
+                value={newMatch.bracketStage ?? ''}
+                onChange={e =>
+                  setNewMatch(prev => ({
+                    ...prev,
+                    bracketStage: e.target.value || null,
+                  }))
+                }
+              >
+                <option value="">(없음)</option>
+                {BRACKET_STAGES.map(s => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
           {QUARTER_SPORTS.has(newMatch.sport) && (
             <>
               <div className={styles.formGroup}>

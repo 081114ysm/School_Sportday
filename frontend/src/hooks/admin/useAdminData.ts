@@ -254,6 +254,7 @@ export function useAdminData() {
     category: string;
     quarterCount?: number;
     quarterMinutes?: number;
+    bracketStage?: string | null;
   }>({
     sport: SPORTS[0],
     matchDate: todayYmd(),
@@ -263,6 +264,7 @@ export function useAdminData() {
     category: CATEGORIES[0],
     quarterCount: 4,
     quarterMinutes: 10,
+    bracketStage: null,
   });
 
   const handleCreateMatch = async () => {
@@ -290,6 +292,7 @@ export function useAdminData() {
         category: CATEGORIES[0],
         quarterCount: 4,
         quarterMinutes: 10,
+        bracketStage: null,
       });
     } catch (err) {
       console.error('Match creation failed:', err);

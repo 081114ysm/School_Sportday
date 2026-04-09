@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Calendar, Trophy, Radio, Tv, ArrowRight } from 'lucide-react';
+import { Calendar, Trophy, Radio, Tv, ArrowRight, Swords } from 'lucide-react';
 import styles from './home.module.css';
 import PhotoCarousel from '@/components/main/PhotoCarousel';
 import { fetchMatches, fetchTeams, fetchLiveMatches } from '@/services/api';
@@ -78,6 +78,7 @@ export default function HomePage() {
       <nav className={styles.shortcuts} aria-label="바로가기">
         <Shortcut href="/schedule" icon={<Calendar size={16} />} label="경기 일정" />
         <Shortcut href="/today" icon={<Radio size={16} />} label="오늘 경기" live={stats.live > 0} />
+        <Shortcut href="/tournament" icon={<Swords size={16} />} label="토너먼트" />
         <Shortcut href="/rankings" icon={<Trophy size={16} />} label="랭킹표" />
         <Shortcut href="/youtube" icon={<Tv size={16} />} label="유튜브 중계" />
       </nav>

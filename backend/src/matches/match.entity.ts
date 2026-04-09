@@ -68,6 +68,11 @@ export class Match {
   @Column({ nullable: true, type: 'varchar' })
   quarterStartedAt: string | null;
 
+  // 토너먼트 대진 단계. 'SEMI1' | 'SEMI2' | 'FINAL' | null.
+  // 탁구(3학년)·피구(2학년)·빅발리볼(1학년) 단일 토너먼트에서만 사용.
+  @Column({ nullable: true, type: 'varchar' })
+  bracketStage: string | null;
+
   @ManyToOne(() => Team, { eager: true })
   @JoinColumn({ name: 'teamAId' })
   teamA: Team;

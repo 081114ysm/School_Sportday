@@ -64,11 +64,73 @@ export class SeedService implements OnModuleInit {
     }
   }
 
+  // 토너먼트(준결승 2경기) 멱등 시드. 지정된 sport+grade 조합에 대해
+  // 해당 조합의 경기가 하나도 없을 때만 준결승 2개를 삽입한다.
+  // 결승은 관리자가 준결승 결과 확인 후 직접 추가한다.
+  async ensureTournamentSeed(sport: string, grade: number, day: Day) {
+    const existing = await this.matchRepo
+      .createQueryBuilder('m')
+      .leftJoin('m.teamA', 'ta')
+      .where('m.sport = :sport', { sport })
+      .andWhere('m.bracketStage IS NOT NULL')
+      .andWhere('ta.grade = :grade', { grade })
+      .getCount();
+    if (existing > 0) return;
+
+    const classTeams = await this.teamRepo.find({
+      where: { category: 'GRADE', grade },
+    });
+    if (classTeams.length < 4) return;
+    const byClass = (cls: number) =>
+      classTeams.find((t) => t.classNumber === cls);
+    const t1 = byClass(1);
+    const t2 = byClass(2);
+    const t3 = byClass(3);
+    const t4 = byClass(4);
+    if (!t1 || !t2 || !t3 || !t4) return;
+
+    const now = new Date();
+    const monday = new Date(now);
+    const dow = now.getDay();
+    const offset = dow === 0 ? -6 : 1 - dow;
+    monday.setDate(now.getDate() + offset);
+    monday.setHours(0, 0, 0, 0);
+    const idx = DAYS.indexOf(day);
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + idx);
+    const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    const mk = (stage: 'SEMI1' | 'SEMI2', a: Team, b: Team) =>
+      this.matchRepo.create({
+        sport,
+        day,
+        matchDate: ymd,
+        timeSlot: 'LUNCH',
+        teamAId: a.id,
+        teamBId: b.id,
+        category: 'GRADE',
+        status: 'SCHEDULED',
+        bracketStage: stage,
+      } as Partial<Match>);
+
+    await this.matchRepo.save(mk('SEMI1', t1, t2));
+    await this.matchRepo.save(mk('SEMI2', t3, t4));
+  }
+
   async onModuleInit() {
     // 여자연합 AC/BD는 빅발리볼·피구 전용 합동 클럽팀. 멱등 추가.
     await this.ensureWomensUnionTeams();
     // matchDate 누락 경기 백필 (기존 DB 보정).
     await this.backfillMatchDates();
+
+    // 토너먼트(탁구/피구/빅발리볼) 준결승 시드. 멱등.
+    try {
+      await this.ensureTournamentSeed('탁구', 3, 'MON');
+      await this.ensureTournamentSeed('피구', 2, 'TUE');
+      await this.ensureTournamentSeed('빅발리볼', 1, 'WED');
+    } catch (e) {
+      console.warn('ensureTournamentSeed failed', e);
+    }
 
     const teamCount = await this.teamRepo.count();
     if (teamCount > 2) return;

@@ -98,6 +98,9 @@ export async function createMatch(data: {
   teamAId: number;
   teamBId: number;
   category: string;
+  quarterCount?: number;
+  quarterMinutes?: number;
+  bracketStage?: string | null;
 }): Promise<Match> {
   return request<Match>('/api/matches', {
     method: 'POST',

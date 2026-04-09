@@ -34,4 +34,8 @@ export class CreateMatchDto {
   @IsNumber()
   @IsOptional()
   quarterMinutes?: number;
+
+  @IsString()
+  @IsOptional()
+  bracketStage?: string;
 }
