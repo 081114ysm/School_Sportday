@@ -68,6 +68,26 @@ export async function deleteTeam(id: number): Promise<void> {
   await request<void>(`/api/teams/${id}`, { method: 'DELETE' });
 }
 
+// 오늘 날짜(YYYY-MM-DD, 로컬).
+function todayYmdLocal(): string {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${m}-${day}`;
+}
+
+// matchDate가 오늘보다 과거이고 LIVE가 아닌 경기는 status를 DONE으로 정규화.
+// 백엔드 auto-finalize가 10분 간격으로 돌지만 프론트에서 즉시 반영되도록 한다.
+function normalizePastStatus(matches: Match[]): Match[] {
+  const today = todayYmdLocal();
+  return matches.map((m) => {
+    if (m.status === 'LIVE' || m.status === 'DONE') return m;
+    if (!m.matchDate) return m;
+    if (m.matchDate < today) return { ...m, status: 'DONE' };
+    return m;
+  });
+}
+
 // 경기
 export async function fetchMatches(filters?: {
   sport?: string;
@@ -83,7 +103,8 @@ export async function fetchMatches(filters?: {
     });
   }
   const query = params.toString() ? `?${params.toString()}` : '';
-  return request<Match[]>(`/api/matches${query}`);
+  const list = await request<Match[]>(`/api/matches${query}`);
+  return normalizePastStatus(list);
 }
 
 export async function fetchLiveMatches(): Promise<Match[]> {

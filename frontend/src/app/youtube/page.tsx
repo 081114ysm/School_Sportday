@@ -6,6 +6,7 @@ import { fetchMatches } from '@/services/api';
 import { getSocket, disconnectSocket } from '@/services/socket';
 import type { Match } from '@/types';
 import { formatMatchScore, isQuarterSport } from '@/lib/matchScore';
+import { effectiveStatus } from '@/components/admin/adminUtils';
 import { QuarterClock } from '@/components/QuarterClock';
 import styles from './youtube.module.css';
 
@@ -177,17 +178,17 @@ export default function YoutubePage() {
   const liveVideos = useMemo(
     () =>
       matches
-        .filter((m) => m.status === 'LIVE')
+        .filter((m) => effectiveStatus(m) === 'LIVE')
         .map(matchToVideo)
         .filter((v): v is YtVideo => v !== null),
     [matches],
   );
   const upcoming = useMemo(
-    () => matches.filter((m) => m.status === 'SCHEDULED').map(matchToCard),
+    () => matches.filter((m) => effectiveStatus(m) === 'SCHEDULED').map(matchToCard),
     [matches],
   );
   const past = useMemo(
-    () => matches.filter((m) => m.status === 'DONE').map(matchToCard),
+    () => matches.filter((m) => effectiveStatus(m) === 'DONE').map(matchToCard),
     [matches],
   );
 
