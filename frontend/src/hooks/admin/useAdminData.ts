@@ -322,9 +322,11 @@ export function useAdminData() {
     try {
       await deleteMatch(id);
       setMatches(prev => prev.filter(m => m.id !== id));
+      // 서버 상태와 재동기화 (websocket 갱신/경쟁 조건 대비).
+      await loadData();
     } catch (err) {
       console.error('Match deletion failed:', err);
-      alert('경기 삭제에 실패했습니다.');
+      alert('경기 삭제에 실패했습니다: ' + (err as Error).message);
     }
   };
 
