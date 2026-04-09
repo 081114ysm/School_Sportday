@@ -286,6 +286,12 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     await this.matchRepo.delete(id);
   }
 
+  async removeAll(): Promise<{ deleted: number }> {
+    await this.logRepo.createQueryBuilder().delete().execute();
+    const res = await this.matchRepo.createQueryBuilder().delete().execute();
+    return { deleted: res.affected ?? 0 };
+  }
+
   async updateScore(id: number, team: string, delta: number): Promise<Match> {
     const match = await this.findOneOrFail(id);
 

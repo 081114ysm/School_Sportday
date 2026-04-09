@@ -47,6 +47,12 @@ export class MatchesController {
   }
 
   @UseGuards(AdminGuard)
+  @Delete('all')
+  removeAll() {
+    return this.matchesService.removeAll();
+  }
+
+  @UseGuards(AdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.matchesService.remove(parseInt(id));

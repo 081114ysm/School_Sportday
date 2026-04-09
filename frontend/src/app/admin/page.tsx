@@ -14,6 +14,7 @@ import { YoutubeMgmtTab } from '@/components/admin/YoutubeMgmtTab';
 import { SportMgmtTab } from '@/components/admin/SportMgmtTab';
 import { TournamentMgmtTab } from '@/components/admin/TournamentMgmtTab';
 import { PointsMgmtTab } from '@/components/admin/PointsMgmtTab';
+import { deleteAllMatches } from '@/services/api';
 
 export default function AdminPage() {
   const {
@@ -150,6 +151,23 @@ export default function AdminPage() {
           <span className={styles.adminLogoText}>ADMIN PANEL</span>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button
+            className={styles.adminHomeLink}
+            onClick={async () => {
+              if (!confirm('정말 모든 경기를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+              if (!confirm('한 번 더 확인합니다. 모든 경기 결과와 일정이 사라집니다.')) return;
+              try {
+                const res = await deleteAllMatches();
+                alert(`${res.deleted}개의 경기가 삭제되었습니다.`);
+                await loadData();
+              } catch (err) {
+                alert('삭제 실패: ' + (err as Error).message);
+              }
+            }}
+            style={{ cursor: 'pointer', color: '#dc2626', borderColor: '#dc2626' }}
+          >
+            🗑 전체 삭제
+          </button>
           <button
             className={styles.adminHomeLink}
             onClick={handleLogout}

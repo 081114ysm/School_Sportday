@@ -68,6 +68,10 @@ export async function deleteTeam(id: number): Promise<void> {
   await request<void>(`/api/teams/${id}`, { method: 'DELETE' });
 }
 
+export async function deleteAllMatches(): Promise<{ deleted: number }> {
+  return request<{ deleted: number }>(`/api/matches/all`, { method: 'DELETE' });
+}
+
 export async function updateTeamPoints(id: number, pointsAdjustment: number): Promise<Team> {
   return request<Team>(`/api/teams/${id}/points`, {
     method: 'PUT',
