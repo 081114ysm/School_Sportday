@@ -798,6 +798,7 @@
     align-items: center;
     justify-content: center;
     padding: 6px 10px;
+    order: 999;
   }
   .adminNav {
     display: none;
