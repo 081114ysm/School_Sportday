@@ -33,4 +33,9 @@ export class TeamsService {
   async remove(id: number): Promise<void> {
     await this.teamRepo.delete(id);
   }
+
+  async updatePointsAdjustment(id: number, pointsAdjustment: number): Promise<Team> {
+    await this.teamRepo.update(id, { pointsAdjustment });
+    return this.teamRepo.findOneByOrFail({ id });
+  }
 }

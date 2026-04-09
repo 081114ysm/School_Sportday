@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Delete,
   Body,
   Param,
@@ -31,6 +32,15 @@ export class TeamsController {
   @Post()
   create(@Body() dto: CreateTeamDto) {
     return this.teamsService.create(dto);
+  }
+
+  @UseGuards(AdminGuard)
+  @Put(':id/points')
+  updatePoints(
+    @Param('id') id: string,
+    @Body() body: { pointsAdjustment: number },
+  ) {
+    return this.teamsService.updatePointsAdjustment(parseInt(id), body.pointsAdjustment);
   }
 
   @UseGuards(AdminGuard)

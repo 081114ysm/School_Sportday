@@ -159,6 +159,17 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
                           className={styles.formItem}
                           title={`vs ${f.opponent}`}
                         >
+                          <span
+                            className={`${styles.formChip} ${
+                              f.result === 'W'
+                                ? styles.formW
+                                : f.result === 'D'
+                                ? styles.formD
+                                : styles.formL
+                            }`}
+                          >
+                            {f.result === 'W' ? '승' : f.result === 'D' ? '무' : '패'}
+                          </span>
                           <span className={styles.formDetail}>
                             vs {f.opponent}
                           </span>

@@ -22,6 +22,9 @@ export class Team {
   @Column({ default: 'GRADE' })
   category: string;
 
+  @Column({ default: 0, type: 'int', nullable: true })
+  pointsAdjustment: number;
+
   @CreateDateColumn()
   createdAt: Date;
 }

@@ -94,4 +94,4 @@ export const WOMENS_UNION_TEAMS: Record<string, string> = {
 export const WOMENS_UNION_A = '여자연합 AC';
 export const WOMENS_UNION_B = '여자연합 BD';
 
-export type AdminTab = 'live-input' | 'results' | 'schedule-mgmt' | 'team-mgmt' | 'youtube-mgmt' | 'sport-mgmt' | 'tournament-mgmt';
+export type AdminTab = 'live-input' | 'results' | 'schedule-mgmt' | 'team-mgmt' | 'youtube-mgmt' | 'sport-mgmt' | 'tournament-mgmt' | 'points-mgmt';

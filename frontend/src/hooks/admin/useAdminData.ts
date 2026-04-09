@@ -455,5 +455,7 @@ export function useAdminData() {
     handleYoutubeMatchStatusChange,
     // 토너먼트 일정
     handleCreateTournamentMatch,
+    // 데이터 새로고침
+    loadData,
   };
 }

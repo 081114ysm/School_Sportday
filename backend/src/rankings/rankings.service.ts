@@ -83,7 +83,7 @@ export class RankingsService {
         goalsFor,
         goalsAgainst,
         goalDiff: goalsFor - goalsAgainst,
-        points: wins * 3 + draws,
+        points: wins * 3 + draws + (team.pointsAdjustment ?? 0),
         recentForm,
       };
     });

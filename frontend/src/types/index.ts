@@ -4,6 +4,7 @@ export interface Team {
   grade: number | null;
   classNumber: number | null;
   category?: string;
+  pointsAdjustment?: number;
 }
 
 export interface Match {

@@ -68,6 +68,13 @@ export async function deleteTeam(id: number): Promise<void> {
   await request<void>(`/api/teams/${id}`, { method: 'DELETE' });
 }
 
+export async function updateTeamPoints(id: number, pointsAdjustment: number): Promise<Team> {
+  return request<Team>(`/api/teams/${id}/points`, {
+    method: 'PUT',
+    body: JSON.stringify({ pointsAdjustment }),
+  });
+}
+
 // 오늘 날짜(YYYY-MM-DD, 로컬).
 function todayYmdLocal(): string {
   const d = new Date();
