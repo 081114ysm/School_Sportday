@@ -170,9 +170,6 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
                           >
                             {f.result === 'W' ? '승' : f.result === 'D' ? '무' : '패'}
                           </span>
-                          <span className={styles.formDetail}>
-                            vs {f.opponent}
-                          </span>
                         </div>
                       ))}
                     </div>
