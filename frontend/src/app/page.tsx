@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Calendar, Trophy, Radio, Tv, ArrowRight } from 'lucide-react';
 import styles from './home.module.css';
-import PhotoCarousel from '@/components/main/PhotoCarousel';
 import { fetchMatches, fetchTeams, fetchLiveMatches } from '@/services/api';
 
 export default function HomePage() {
@@ -71,7 +70,7 @@ export default function HomePage() {
           </dl>
         </div>
         <div className={styles.heroRight}>
-          <PhotoCarousel />
+          <AthleteIllustration />
         </div>
       </section>
 
