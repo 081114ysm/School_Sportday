@@ -223,10 +223,6 @@
   text-align: center;
   border-bottom: 1px solid var(--border);
   vertical-align: middle;
-  height: 64px;
-}
-.table tbody tr {
-  height: 64px;
 }
 .table tbody tr:hover {
   background: var(--bg);
@@ -258,19 +254,18 @@
 .teamCell {
   text-align: left !important;
   padding-left: 20px !important;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  justify-content: center;
-  min-height: 42px;
 }
 .teamName {
+  display: block;
   font-weight: 800;
   color: var(--text);
+  line-height: 1.3;
 }
 .teamGrade {
+  display: block;
   font-size: 11px;
   color: var(--text3);
+  line-height: 1.3;
 }
 .wColor {
   color: var(--green-dark);
