@@ -319,7 +319,6 @@ export function useAdminData() {
   };
 
   const handleDeleteMatch = async (id: number) => {
-    if (!confirm('이 경기를 삭제하시겠습니까?')) return;
     try {
       await deleteMatch(id);
       setMatches(prev => prev.filter(m => m.id !== id));

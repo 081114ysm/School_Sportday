@@ -123,15 +123,6 @@ export class SeedService implements OnModuleInit {
     // matchDate 누락 경기 백필 (기존 DB 보정).
     await this.backfillMatchDates();
 
-    // 토너먼트(탁구/피구/빅발리볼) 준결승 시드. 멱등.
-    try {
-      await this.ensureTournamentSeed('탁구', 3, 'MON');
-      await this.ensureTournamentSeed('피구', 2, 'TUE');
-      await this.ensureTournamentSeed('빅발리볼', 1, 'WED');
-    } catch (e) {
-      console.warn('ensureTournamentSeed failed', e);
-    }
-
     const teamCount = await this.teamRepo.count();
     if (teamCount > 2) return;
 
