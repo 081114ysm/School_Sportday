@@ -190,23 +190,109 @@
   min-width: 100px;
 }
 
-@media (max-width: 720px) {
+/* Hidden by default; shown only in mobile layout */
+.mobileConnector {
+  display: none;
+}
+
+@media (max-width: 640px) {
   .grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
   }
+
+  /* Hide desktop absolute-positioned connectors */
   .connector,
   .connectorFinal {
     display: none;
   }
-  .finalCol,
-  .championCol {
+
+  .semis {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Vertical connector between semi cards */
+  .semis > *:not(:last-child)::after {
+    content: '';
+    display: block;
+    width: 2px;
+    height: 20px;
+    background: #e5e7eb;
+    margin: 0 auto;
+  }
+
+  /* Mobile vertical connector divs injected between sections */
+  .mobileConnector {
+    display: block;
+    width: 2px;
+    height: 24px;
+    margin: 0 auto;
+    background: #e5e7eb;
+  }
+  .mobileConnector.green {
+    background: #2bbf7e;
+  }
+
+  .finalCol {
+    display: flex;
+    flex-direction: column;
     justify-content: stretch;
-  }
-  .championCol {
-    min-width: 0;
-  }
-  .champion {
     width: 100%;
+  }
+  .finalCol > * {
+    width: 100%;
+  }
+
+  .championCol {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+    min-width: 0;
+    width: 100%;
+  }
+  .champion,
+  .championPlaceholder {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 8px 10px;
+  }
+  .row {
+    font-size: 13px;
+  }
+  .teamName {
+    max-width: 160px;
+  }
+  .score {
+    font-size: 13px;
+    min-width: 22px;
+  }
+  .cardStage {
+    font-size: 9px;
+  }
+  .championName {
+    font-size: 13px;
+  }
+  .championTrophy {
+    font-size: 22px;
+  }
+  .title {
+    font-size: 16px;
+  }
+  .wrap {
+    padding: 16px 14px;
   }
 }

@@ -49,10 +49,18 @@ export default function Bracket({ title, sport, grade, matches }: BracketProps) 
         <span className={styles.titleBadge}>TOURNAMENT</span>
       </h2>
       <div className={styles.grid}>
+        {/* Desktop: semis column */}
         <div className={styles.semis}>
           <MatchCard match={semi1} stageLabel="준결승 1" />
+          {/* Mobile vertical connector between semi1 and semi2 */}
+          <div
+            className={`${styles.mobileConnector} ${
+              semi1Winner ? styles.green : ''
+            }`}
+          />
           <MatchCard match={semi2} stageLabel="준결승 2" />
         </div>
+        {/* Desktop bracket connector */}
         <div
           className={`${styles.connector} ${
             semi1Winner ? styles.topGreen : ''
@@ -61,11 +69,22 @@ export default function Bracket({ title, sport, grade, matches }: BracketProps) 
           <div className={styles.vbar} />
           <div className={styles.out} />
         </div>
+        {/* Mobile vertical connector between semis and final */}
+        <div
+          className={`${styles.mobileConnector} ${
+            semi1Winner && semi2Winner ? styles.green : ''
+          }`}
+        />
         <div className={styles.finalCol}>
           <MatchCard match={final} stageLabel="결승" />
         </div>
+        {/* Desktop connector final → champion */}
         <div
           className={`${styles.connectorFinal} ${champion ? styles.green : ''}`}
+        />
+        {/* Mobile vertical connector between final and champion */}
+        <div
+          className={`${styles.mobileConnector} ${champion ? styles.green : ''}`}
         />
         <div className={styles.championCol}>
           {champion ? (
