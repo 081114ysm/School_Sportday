@@ -128,6 +128,57 @@
   background: var(--bg);
   color: var(--text);
 }
+/* Mobile menu panel */
+.mobileMenu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  min-width: 160px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  padding: 6px;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+  z-index: 100;
+}
+.mobileMenuOpen {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.mobileNavItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--text2);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.12s;
+}
+.mobileNavItem:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Desktop: show inline nav + desktop right, hide mobile right */
+.rightDesktop {
+  display: flex;
+}
+.rightMobile {
+  display: none;
+  position: relative;
+  margin-left: auto;
+}
+
 @media (max-width: 960px) {
   .inner {
     flex-wrap: wrap;
@@ -148,8 +199,26 @@
     min-height: 40px;
   }
 }
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  /* Hide desktop nav and desktop right */
+  .nav {
+    display: none;
+  }
+  .rightDesktop {
+    display: none;
+  }
+  /* Show mobile right group */
+  .rightMobile {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  /* Show mobile menu panel as flex when open */
+  .mobileMenu {
+    display: flex;
+  }
   .inner {
+    flex-wrap: nowrap;
     gap: 8px;
     padding: 10px 12px;
   }
@@ -163,10 +232,8 @@
     width: 34px;
     height: 34px;
   }
-  .navItem {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
+}
+@media (max-width: 640px) {
   .userName {
     display: none;
   }
@@ -174,9 +241,5 @@
   .logoutBtn {
     padding: 8px 10px;
     font-size: 12px;
-  }
-  .right {
-    gap: 6px;
-    margin-left: 0;
   }
 }
