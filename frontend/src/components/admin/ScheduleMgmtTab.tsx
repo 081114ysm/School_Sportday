@@ -152,20 +152,28 @@ export function ScheduleMgmtTab({
                 <label className={styles.formLabel}>쿼터 수</label>
                 <input
                   className={styles.formInput}
-                  type="number"
-                  min={1}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={newMatch.quarterCount ?? 4}
-                  onChange={e => setNewMatch(prev => ({ ...prev, quarterCount: Number(e.target.value) || 4 }))}
+                  onChange={e => {
+                    const v = e.target.value.replace(/[^0-9]/g, '');
+                    setNewMatch(prev => ({ ...prev, quarterCount: v === '' ? 4 : Number(v) }));
+                  }}
                 />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>쿼터 시간(분)</label>
                 <input
                   className={styles.formInput}
-                  type="number"
-                  min={1}
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={newMatch.quarterMinutes ?? 10}
-                  onChange={e => setNewMatch(prev => ({ ...prev, quarterMinutes: Number(e.target.value) || 10 }))}
+                  onChange={e => {
+                    const v = e.target.value.replace(/[^0-9]/g, '');
+                    setNewMatch(prev => ({ ...prev, quarterMinutes: v === '' ? 10 : Number(v) }));
+                  }}
                 />
               </div>
             </>
