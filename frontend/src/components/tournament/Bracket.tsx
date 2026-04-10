@@ -40,6 +40,8 @@ export default function Bracket({ title, sport, grade, matches }: BracketProps) 
 
   const semi1Winner = matchWinner(semi1);
   const semi2Winner = matchWinner(semi2);
+  const semi1WinnerName = winningTeamName(semi1);
+  const semi2WinnerName = winningTeamName(semi2);
   const champion = winningTeamName(final);
 
   return (
@@ -76,7 +78,12 @@ export default function Bracket({ title, sport, grade, matches }: BracketProps) 
           }`}
         />
         <div className={styles.finalCol}>
-          <MatchCard match={final} stageLabel="결승" />
+          <MatchCard
+            match={final}
+            stageLabel="결승"
+            teamAName={semi1WinnerName ?? undefined}
+            teamBName={semi2WinnerName ?? undefined}
+          />
         </div>
         {/* Desktop connector final → champion */}
         <div
@@ -105,20 +112,28 @@ export default function Bracket({ title, sport, grade, matches }: BracketProps) 
 function MatchCard({
   match,
   stageLabel,
+  teamAName,
+  teamBName,
 }: {
   match: Match | undefined;
   stageLabel: string;
+  teamAName?: string;
+  teamBName?: string;
 }) {
   if (!match) {
     return (
       <div className={styles.card}>
         <div className={styles.cardStage}>{stageLabel}</div>
         <div className={styles.row}>
-          <span className={`${styles.teamName} ${styles.tbd}`}>미정</span>
+          <span className={`${styles.teamName} ${teamAName ? '' : styles.tbd}`}>
+            {teamAName ?? '미정'}
+          </span>
           <span className={`${styles.score} ${styles.loser}`}>-</span>
         </div>
         <div className={styles.row}>
-          <span className={`${styles.teamName} ${styles.tbd}`}>미정</span>
+          <span className={`${styles.teamName} ${teamBName ? '' : styles.tbd}`}>
+            {teamBName ?? '미정'}
+          </span>
           <span className={`${styles.score} ${styles.loser}`}>-</span>
         </div>
       </div>
@@ -136,7 +151,7 @@ function MatchCard({
       <div className={styles.cardStage}>{stageLabel}</div>
       <div className={styles.row}>
         <span className={`${styles.teamName} ${aLoser ? styles.loser : ''}`}>
-          {match.teamA?.name ?? '미정'}
+          {match.teamA?.name ?? teamAName ?? '미정'}
         </span>
         <span className={`${styles.score} ${aLoser ? styles.loser : ''}`}>
           {aScore}
@@ -144,7 +159,7 @@ function MatchCard({
       </div>
       <div className={styles.row}>
         <span className={`${styles.teamName} ${bLoser ? styles.loser : ''}`}>
-          {match.teamB?.name ?? '미정'}
+          {match.teamB?.name ?? teamBName ?? '미정'}
         </span>
         <span className={`${styles.score} ${bLoser ? styles.loser : ''}`}>
           {bScore}
