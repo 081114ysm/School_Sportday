@@ -46,7 +46,7 @@ export default function Bracket({ title, sport, grade, matches }: BracketProps) 
     <section className={styles.wrap}>
       <h2 className={styles.title}>
         {title}
-        <span className={styles.titleBadge}>TOURNAMENT</span>
+        <span className={styles.titleBadge}>토너먼트</span>
       </h2>
       <div className={styles.grid}>
         {/* Desktop: semis column */}
