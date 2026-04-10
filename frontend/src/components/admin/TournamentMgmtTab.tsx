@@ -5,7 +5,16 @@ import { Match, Team } from '@/types';
 import { filterTeamsForSport, slotLabel } from './adminUtils';
 import { TIME_SLOTS, TOURNAMENT_SPORTS, TOURNAMENT_GRADE, BRACKET_STAGES } from './adminConstants';
 import { StatusBadge } from './StatusBadge';
+import { getMatchScorePair } from '@/lib/matchScore';
 import styles from '@/app/admin/admin.module.css';
+
+function getSemiWinner(match: Match | undefined): Team | undefined {
+  if (!match || match.status !== 'DONE') return undefined;
+  const { a, b } = getMatchScorePair(match);
+  if (a > b) return match.teamA ?? undefined;
+  if (b > a) return match.teamB ?? undefined;
+  return undefined;
+}
 
 const TOURNAMENT_SPORTS_LIST = Array.from(TOURNAMENT_SPORTS);
 
@@ -58,9 +67,24 @@ export function TournamentMgmtTab({
 
   // 선택된 종목의 학년에 맞는 팀만
   const gradeForSport = TOURNAMENT_GRADE[draft.sport];
-  const selectable = filterTeamsForSport(teams, draft.sport).filter(
+  const allSelectable = filterTeamsForSport(teams, draft.sport).filter(
     t => t.grade === gradeForSport,
   );
+
+  // 결승(FINAL) 선택 시: 준결승 승자만 선택 가능
+  const semi1Match = matches.find(m => m.sport === draft.sport && m.bracketStage === 'SEMI1');
+  const semi2Match = matches.find(m => m.sport === draft.sport && m.bracketStage === 'SEMI2');
+  const semi1Winner = getSemiWinner(semi1Match);
+  const semi2Winner = getSemiWinner(semi2Match);
+  const semiWinners = [semi1Winner, semi2Winner].filter((t): t is Team => !!t);
+
+  const selectable = draft.bracketStage === 'FINAL' && semiWinners.length > 0
+    ? semiWinners
+    : allSelectable;
+
+  const finalHint = draft.bracketStage === 'FINAL' && semiWinners.length < 2
+    ? `준결승 결과가 아직 없습니다 (${semiWinners.length}/2 확정)`
+    : null;
 
   const renderOption = (t: Team) => (
     <option key={t.id} value={t.id}>
@@ -154,9 +178,16 @@ export function TournamentMgmtTab({
             </select>
           </div>
 
+          {finalHint && (
+            <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+              <div style={{ fontSize: 12, color: '#f59e0b', fontWeight: 600 }}>
+                ⚠ {finalHint}
+              </div>
+            </div>
+          )}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
-              팀 A ({gradeForSport}학년)
+              팀 A ({gradeForSport}학년{draft.bracketStage === 'FINAL' ? ' · 준결승 승자' : ''})
             </label>
             <select
               className={styles.formSelect}
@@ -170,7 +201,7 @@ export function TournamentMgmtTab({
 
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>
-              팀 B ({gradeForSport}학년)
+              팀 B ({gradeForSport}학년{draft.bracketStage === 'FINAL' ? ' · 준결승 승자' : ''})
             </label>
             <select
               className={styles.formSelect}
