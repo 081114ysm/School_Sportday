@@ -79,6 +79,20 @@
 .connector.botGreen::after {
   background: #2bbf7e;
 }
+/* 이긴 쪽 vbar 절반 + out을 결승선까지 초록 처리 */
+.connector.topGreen .vbar {
+  background: linear-gradient(to bottom, #2bbf7e 0 50%, #e5e7eb 50% 100%);
+}
+.connector.botGreen .vbar {
+  background: linear-gradient(to bottom, #e5e7eb 0 50%, #2bbf7e 50% 100%);
+}
+.connector.topGreen.botGreen .vbar {
+  background: #2bbf7e;
+}
+.connector.topGreen .out,
+.connector.botGreen .out {
+  background: #2bbf7e;
+}
 .connectorFinal {
   position: relative;
   height: 2px;
