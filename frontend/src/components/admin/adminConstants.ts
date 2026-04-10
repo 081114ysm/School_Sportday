@@ -64,7 +64,12 @@ export const TIME_SLOTS = [
   { value: 'DINNER', label: '저녁 (18:30)' },
 ] as const;
 
-export const CATEGORIES = ['예선', '본선', '결승', '3/4위전'];
+export const CATEGORIES = ['GRADE', 'CLUB', 'ALL_UNION'] as const;
+export const CATEGORY_LABELS: Record<string, string> = {
+  GRADE: '학년전',
+  CLUB: '팀전',
+  ALL_UNION: '연합전',
+};
 
 // 단일 점수 대신 3세트 스코어보드를 사용하는 종목.
 export const MULTI_SET_SPORTS = new Set(['빅발리볼', '배드민턴']);

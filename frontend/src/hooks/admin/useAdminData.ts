@@ -276,13 +276,17 @@ export function useAdminData() {
       alert('다른 팀을 선택해주세요.');
       return;
     }
+    if (!newMatch.matchDate) {
+      alert('날짜를 선택해주세요.');
+      return;
+    }
     try {
       setLoading(true);
-      const created = await createMatch({
+      await createMatch({
         ...newMatch,
+        bracketStage: newMatch.bracketStage ?? undefined,
         day: dayLabelFromDate(newMatch.matchDate),
       });
-      setMatches(prev => [...prev, created]);
       setNewMatch({
         sport: SPORTS[0],
         matchDate: todayYmd(),
@@ -294,6 +298,7 @@ export function useAdminData() {
         quarterMinutes: 10,
         bracketStage: null,
       });
+      await loadData();
     } catch (err) {
       console.error('Match creation failed:', err);
       alert('경기 생성에 실패했습니다.');

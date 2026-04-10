@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Match, Team } from '@/types';
 import { effectiveStatus, filterTeamsForSport, sportRestrictionLabel, slotLabel } from './adminUtils';
-import { getSports, TIME_SLOTS, CATEGORIES, QUARTER_SPORTS, TOURNAMENT_SPORTS, BRACKET_STAGES } from './adminConstants';
+import { getSports, TIME_SLOTS, CATEGORIES, CATEGORY_LABELS, QUARTER_SPORTS, TOURNAMENT_SPORTS, BRACKET_STAGES } from './adminConstants';
 import { StatusBadge } from './StatusBadge';
 import styles from '@/app/admin/admin.module.css';
 
@@ -122,7 +122,7 @@ export function ScheduleMgmtTab({
               onChange={e => setNewMatch(prev => ({ ...prev, category: e.target.value }))}
             >
               {CATEGORIES.map(c => (
-                <option key={c} value={c}>{c}</option>
+                <option key={c} value={c}>{CATEGORY_LABELS[c] ?? c}</option>
               ))}
             </select>
           </div>
