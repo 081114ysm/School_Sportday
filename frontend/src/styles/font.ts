@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 // 타이포그래피 프리셋. globals.css 의 Google Fonts 로드와 함께 사용한다.
 export const font = {
   display: {
-    fontFamily: "'Bebas Neue', 'Noto Sans KR', sans-serif",
+    fontFamily: "var(--font-bebas), var(--font-noto), sans-serif",
     fontWeight: 700,
     letterSpacing: '0.02em',
   } as CSSProperties,
@@ -13,7 +13,7 @@ export const font = {
   body: { fontSize: '1rem', fontWeight: 400, lineHeight: 1.5 } as CSSProperties,
   caption: { fontSize: '0.8125rem', fontWeight: 400, lineHeight: 1.4 } as CSSProperties,
   numeric: {
-    fontFamily: "'Black Ops One', 'Bebas Neue', monospace",
+    fontFamily: "var(--font-black-ops), var(--font-bebas), monospace",
     fontVariantNumeric: 'tabular-nums',
   } as CSSProperties,
 } as const;

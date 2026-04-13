@@ -138,7 +138,7 @@
 }
 
 .heroSubtitle {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-bebas), cursive;
   font-size: 14px;
   color: var(--green);
   letter-spacing: 4px;
@@ -147,7 +147,7 @@
 }
 
 .heroTitle {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-bebas), cursive;
   font-size: 56px;
   color: var(--white);
   letter-spacing: 3px;
@@ -172,7 +172,7 @@
 }
 
 .statNum {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-bebas), cursive;
   font-size: 36px;
   color: var(--green);
   line-height: 1;
@@ -413,7 +413,7 @@
 }
 
 .liveScore {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-bebas), cursive;
   font-size: 64px;
   color: var(--green);
   line-height: 1;
@@ -1046,7 +1046,7 @@
 }
 
 .modalTeamScoreNum {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-bebas), cursive;
   font-size: 48px;
   color: var(--green);
   line-height: 1;

@@ -244,7 +244,7 @@
 .bigScore {
   font-size: clamp(32px, 11vw, 56px);
   font-weight: 900;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas), sans-serif;
   color: var(--green-light);
   line-height: 1;
   flex-shrink: 0;

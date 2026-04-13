@@ -1,7 +1,29 @@
 import type { Metadata, Viewport } from 'next';
+import { Bebas_Neue, Black_Ops_One, Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-bebas',
+});
+
+const blackOpsOne = Black_Ops_One({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-black-ops',
+});
+
+const notoSansKR = Noto_Sans_KR({
+  weight: ['400', '700', '900'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-noto',
+});
 
 export const metadata: Metadata = {
   title: '경소마고 체육대회',
@@ -25,15 +47,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Black+Ops+One&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>
+      <head />
+      <body className={`${bebasNeue.variable} ${blackOpsOne.variable} ${notoSansKR.variable}`}>
         <Header />
         <main className="app-main">{children}</main>
         <Footer />

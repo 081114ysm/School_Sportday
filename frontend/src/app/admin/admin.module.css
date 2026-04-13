@@ -18,7 +18,7 @@
   background: var(--bg);
   min-height: 100vh;
   color: var(--text);
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: var(--font-noto), sans-serif;
 }
 
 /* ===== ADMIN HEADER ===== */
@@ -195,7 +195,7 @@
 }
 
 .scoreNum {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-bebas), cursive;
   font-size: 80px;
   color: var(--accent);
   line-height: 1;
@@ -417,7 +417,7 @@
 }
 
 .resultScore {
-  font-family: 'Bebas Neue', cursive;
+  font-family: var(--font-bebas), cursive;
   font-size: 32px;
   color: var(--accent);
   min-width: 40px;

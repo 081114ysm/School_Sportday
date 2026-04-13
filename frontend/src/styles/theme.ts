@@ -32,8 +32,8 @@ export const theme = {
     lg: '0 10px 30px rgba(0,0,0,0.12)',
   },
   font: {
-    sans: "'Noto Sans KR', system-ui, -apple-system, sans-serif",
-    display: "'Bebas Neue', 'Noto Sans KR', sans-serif",
+    sans: "var(--font-noto), system-ui, -apple-system, sans-serif",
+    display: "var(--font-bebas), var(--font-noto), sans-serif",
     mono: "'JetBrains Mono', ui-monospace, monospace",
   },
 } as const;

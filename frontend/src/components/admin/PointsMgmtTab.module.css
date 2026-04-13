@@ -81,7 +81,7 @@
 .valueNum {
   font-size: 22px;
   font-weight: 900;
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas), sans-serif;
   line-height: 1;
 }
 .valuePos { color: #16a34a; }

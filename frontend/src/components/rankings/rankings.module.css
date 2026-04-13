@@ -83,7 +83,7 @@
   font-size: 28px;
   font-weight: 900;
   color: var(--green-dark);
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas), sans-serif;
 }
 .podiumPtsLabel {
   font-size: 11px;
@@ -140,7 +140,7 @@
   font-size: 32px;
   font-weight: 900;
   color: var(--green-dark);
-  font-family: 'Bebas Neue', sans-serif;
+  font-family: var(--font-bebas), sans-serif;
 }
 .topPtsLabel {
   font-size: 11px;
