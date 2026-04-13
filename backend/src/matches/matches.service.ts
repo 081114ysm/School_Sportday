@@ -180,6 +180,16 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
         data.category,
       );
     }
+    // status=DONE 저장 시 result 자동 계산
+    if (next.status === 'DONE') {
+      const scoreA = next.scoreA ?? current.scoreA;
+      const scoreB = next.scoreB ?? current.scoreB;
+      const nameA = current.teamA?.name ?? 'Team A';
+      const nameB = current.teamB?.name ?? 'Team B';
+      if (scoreA > scoreB) next.result = `${nameA} 승`;
+      else if (scoreB > scoreA) next.result = `${nameB} 승`;
+      else next.result = '무승부';
+    }
     await this.matchRepo.update(id, next);
     const match = await this.findOneOrFail(id);
     this.gateway.emitMatchUpdate(match);

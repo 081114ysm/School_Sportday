@@ -1,8 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Star } from 'lucide-react';
 import type { RankingEntry } from '@/types';
+import { fetchRankings } from '@/services/api';
+import { getSocket } from '@/services/socket';
 import styles from './rankings.module.css';
 
 type TabKey = 'ALL' | 'G1' | 'G2' | 'G3' | 'CLUB';
@@ -16,23 +18,39 @@ const TABS: Array<{ key: TabKey; label: string }> = [
 ];
 
 export default function RankingsClient({ initial }: { initial: RankingEntry[] }) {
+  const [rankings, setRankings] = useState<RankingEntry[]>(initial);
   const [tab, setTab] = useState<TabKey>('ALL');
+
+  useEffect(() => {
+    const refresh = () => {
+      fetchRankings().then(setRankings).catch(() => {});
+    };
+    const socket = getSocket();
+    socket.on('matchUpdate', refresh);
+    socket.on('matchStatusChange', refresh);
+    socket.on('scoreUpdate', refresh);
+    return () => {
+      socket.off('matchUpdate', refresh);
+      socket.off('matchStatusChange', refresh);
+      socket.off('scoreUpdate', refresh);
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     const notClub = (r: RankingEntry) => r.team.category !== 'CLUB';
     switch (tab) {
       case 'G1':
-        return initial.filter((r) => r.team.grade === 1 && notClub(r));
+        return rankings.filter((r) => r.team.grade === 1 && notClub(r));
       case 'G2':
-        return initial.filter((r) => r.team.grade === 2 && notClub(r));
+        return rankings.filter((r) => r.team.grade === 2 && notClub(r));
       case 'G3':
-        return initial.filter((r) => r.team.grade === 3 && notClub(r));
+        return rankings.filter((r) => r.team.grade === 3 && notClub(r));
       case 'CLUB':
-        return initial.filter((r) => r.team.category === 'CLUB');
+        return rankings.filter((r) => r.team.category === 'CLUB');
       default:
-        return initial.filter(notClub);
+        return rankings.filter(notClub);
     }
-  }, [initial, tab]);
+  }, [rankings, tab]);
 
   const topThree = useMemo(() => filtered.slice(0, 3), [filtered]);
 
