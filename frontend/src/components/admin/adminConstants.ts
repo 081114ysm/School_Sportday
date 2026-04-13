@@ -51,7 +51,7 @@ export const SPORT_RULES: Record<string, SportRule> = {
   '농구':        { grades: [3], allowClub: true },   // 3학년 / 남자연합
   '탁구':        { grades: [3] },                    // 3학년 전용
   '피구':        { allowClub: true },                // 학년별 전원 + 여자연합
-  '빅발리볼':    { grades: [1], allowClub: true },   // 1학년 / 남자·여자연합
+  '빅발리볼':    { allowClub: true },                // 전 학년 / 남자·여자연합
   '줄다리기':    {},                                 // 학년별 전원
   '단체 줄넘기': {},                                 // 학년별 전원
   '축구':        { allowClub: true },                // 남자연합
