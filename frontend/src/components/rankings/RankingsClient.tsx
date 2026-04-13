@@ -93,9 +93,9 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
                 <th>승</th>
                 <th>무</th>
                 <th>패</th>
-                <th>득점</th>
-                <th>실점</th>
-                <th>득실차</th>
+                {/* <th>득점</th> */}
+                {/* <th>실점</th> */}
+                {/* <th>득실차</th> */}
                 <th>승점</th>
                 <th className={styles.alignLeft}>최근 5경기</th>
               </tr>
@@ -103,7 +103,7 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={11} className={styles.emptyRow}>
+                  <td colSpan={8} className={styles.emptyRow}>
                     데이터 없음
                   </td>
                 </tr>
@@ -137,9 +137,9 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
                   <td className={styles.wColor}>{r.wins}</td>
                   <td>{r.draws}</td>
                   <td className={styles.lColor}>{r.losses}</td>
-                  <td>{r.goalsFor}</td>
-                  <td>{r.goalsAgainst}</td>
-                  <td
+                  {/* <td>{r.goalsFor}</td> */}
+                  {/* <td>{r.goalsAgainst}</td> */}
+                  {/* <td
                     className={
                       r.goalDiff > 0
                         ? styles.diffPos
@@ -149,7 +149,7 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
                     }
                   >
                     {r.goalDiff > 0 ? `+${r.goalDiff}` : r.goalDiff}
-                  </td>
+                  </td> */}
                   <td className={styles.pts}>{r.points}</td>
                   <td>
                     <div className={styles.formCol}>
