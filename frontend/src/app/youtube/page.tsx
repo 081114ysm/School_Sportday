@@ -175,13 +175,13 @@ export default function YoutubePage() {
     };
   }, []);
 
-  const liveVideos = useMemo(
-    () =>
-      matches
-        .filter((m) => effectiveStatus(m) === 'LIVE')
-        .map(matchToVideo)
-        .filter((v): v is YtVideo => v !== null),
+  const liveMatches = useMemo(
+    () => matches.filter((m) => effectiveStatus(m) === 'LIVE'),
     [matches],
+  );
+  const liveVideos = useMemo(
+    () => liveMatches.map(matchToVideo).filter((v): v is YtVideo => v !== null),
+    [liveMatches],
   );
   const SLOT_ORDER: Record<string, number> = { LUNCH: 0, DINNER: 1 };
   const upcoming = useMemo(
@@ -279,6 +279,24 @@ export default function YoutubePage() {
                 })()}
               </div>
             </>
+          ) : liveMatches.length > 0 ? (
+            <div className={styles.noLive}>
+              <div className={styles.noLiveIcon}>🔴</div>
+              <div className={styles.noLiveTitle}>LIVE 경기가 진행 중입니다</div>
+              <div className={styles.noLiveSub}>
+                {liveMatches.map((m) => {
+                  const sport = SPORT_LABELS[m.sport] ?? m.sport;
+                  const teamA = m.teamA?.name ?? '미정';
+                  const teamB = m.teamB?.name ?? '미정';
+                  return (
+                    <div key={m.id} style={{ marginTop: 6, fontWeight: 700 }}>
+                      {sport} · {teamA} vs {teamB}
+                    </div>
+                  );
+                })}
+                <div style={{ marginTop: 8, opacity: 0.7 }}>중계 링크가 아직 등록되지 않았습니다.</div>
+              </div>
+            </div>
           ) : (
             <div className={styles.noLive}>
               <div className={styles.noLiveIcon}>📡</div>
