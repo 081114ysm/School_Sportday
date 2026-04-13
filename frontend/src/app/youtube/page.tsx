@@ -183,8 +183,17 @@ export default function YoutubePage() {
         .filter((v): v is YtVideo => v !== null),
     [matches],
   );
+  const SLOT_ORDER: Record<string, number> = { LUNCH: 0, DINNER: 1 };
   const upcoming = useMemo(
-    () => matches.filter((m) => effectiveStatus(m) === 'SCHEDULED').map(matchToCard),
+    () =>
+      matches
+        .filter((m) => effectiveStatus(m) === 'SCHEDULED')
+        .sort((a, b) => {
+          const dateDiff = (a.matchDate ?? a.day ?? '').localeCompare(b.matchDate ?? b.day ?? '');
+          if (dateDiff !== 0) return dateDiff;
+          return (SLOT_ORDER[a.timeSlot] ?? 99) - (SLOT_ORDER[b.timeSlot] ?? 99);
+        })
+        .map(matchToCard),
     [matches],
   );
   const past = useMemo(
