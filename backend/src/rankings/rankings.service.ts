@@ -12,14 +12,6 @@ export class RankingsService {
     private teamsService: TeamsService,
   ) {}
 
-  // 학년-반 → 클럽팀(A/B/C/D) 매핑
-  private readonly GRADE_CLASS_TO_CLUB: Record<string, string> = {
-    '1-4': 'A팀', '2-2': 'A팀', '3-3': 'A팀',
-    '1-1': 'B팀', '2-4': 'B팀', '3-4': 'B팀',
-    '1-2': 'C팀', '2-1': 'C팀', '3-1': 'C팀',
-    '1-3': 'D팀', '2-3': 'D팀', '3-2': 'D팀',
-  };
-
   async getRankings(grade?: number, category?: string) {
     // 여자연합 AC/BD는 순위표에서 제외되지만, 경기 결과는 구성 팀(A/C, B/D)에 귀속.
     const allTeams = await this.teamsService.findAll();
@@ -33,27 +25,8 @@ export class RankingsService {
     if (womensAC && A && C) unionMap.set(womensAC.id, [A.id, C.id]);
     if (womensBD && B && D) unionMap.set(womensBD.id, [B.id, D.id]);
     const unionIds = new Set(unionMap.keys());
-
-    // 학년반 팀 → 클럽팀 ID 매핑 구축
-    const classToClubMap = new Map<number, number>();
-    for (const team of allTeams) {
-      if (team.grade != null && team.classNumber != null) {
-        const key = `${team.grade}-${team.classNumber}`;
-        const clubName = this.GRADE_CLASS_TO_CLUB[key];
-        if (clubName) {
-          const clubTeam = allTeams.find((t) => t.name === clubName);
-          if (clubTeam) classToClubMap.set(team.id, clubTeam.id);
-        }
-      }
-    }
-
-    // 경기 팀ID → 실효 팀ID 목록: 여자연합 매핑 + 학년반→클럽팀 매핑 적용
-    const effectiveIds = (tid: number): number[] => {
-      const base = unionMap.get(tid) ?? [tid];
-      const clubId = classToClubMap.get(tid);
-      if (clubId != null && !base.includes(clubId)) return [...base, clubId];
-      return base;
-    };
+    const effectiveIds = (tid: number): number[] =>
+      unionMap.get(tid) ?? [tid];
 
     const requested = await this.teamsService.findAll(grade, category);
     // 연합팀은 결과 반영 용도로만 사용하므로 출력에서 제외.
