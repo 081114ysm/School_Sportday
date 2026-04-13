@@ -65,7 +65,7 @@ export default function ScheduleClient({ initial }: { initial: Match[] }) {
   const byDay = useMemo(() => {
     const map = new Map<string, Match[]>();
     DAYS.forEach((d) => map.set(d.key, []));
-    initial.forEach((m) => {
+    initial.filter((m) => m.status !== 'DONE').forEach((m) => {
       const arr = map.get(m.day);
       if (arr) arr.push(m);
     });
