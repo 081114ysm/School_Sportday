@@ -5,7 +5,7 @@ import { Trophy, Radio, Clock } from 'lucide-react';
 import { fetchMatches, fetchLiveMatches } from '@/services/api';
 import { getSocket, disconnectSocket } from '@/services/socket';
 import { displayScore, type Match } from '@/types';
-import { isQuarterSport } from '@/lib/matchScore';
+import { isQuarterSport, isSetBasedSport, isSetComplete } from '@/lib/matchScore';
 import { QuarterClock } from '@/components/QuarterClock';
 import styles from './today.module.css';
 
@@ -75,6 +75,16 @@ export default function TodayPage() {
       disconnectSocket();
     };
   }, []);
+
+  const liveSets = (() => {
+    if (!live || !isSetBasedSport(live.sport) || !live.setsJson) return [];
+    try {
+      const sets = JSON.parse(live.setsJson) as { a: number; b: number }[];
+      return sets.filter((s) => s.a > 0 || s.b > 0);
+    } catch {
+      return [];
+    }
+  })();
 
   const today = new Date();
   const dateLabel = `${today.getMonth() + 1}/${today.getDate()} (${DAY_KO[today.getDay()]})`;
@@ -169,6 +179,21 @@ export default function TodayPage() {
                 <div className={styles.teamName}>{live.teamB?.name ?? 'Team B'}</div>
                 <div className={styles.bigScore}>{displayScore(live).b}</div>
               </div>
+              {liveSets.length > 0 && (
+                <div className={styles.setsRow}>
+                  {liveSets.map((s, i) => {
+                    const done = isSetComplete(live.sport, s.a, s.b);
+                    return (
+                      <span
+                        key={i}
+                        className={`${styles.setChip} ${done ? styles.setChipDone : styles.setChipLive}`}
+                      >
+                        {i + 1}세트 {s.a}:{s.b}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               <div className={styles.metaRow}>
                 <span>{live.category === 'ALL_UNION' ? '연합전' : live.category === 'CLUB' ? '팀전' : '학년전'}</span>
                 <span>·</span>

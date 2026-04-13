@@ -265,6 +265,28 @@
   font-weight: 600;
 }
 
+.setsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+.setChip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.setChipDone {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.75);
+}
+.setChipLive {
+  background: var(--green-light, #5effa0);
+  color: #0e3d27;
+}
+
 .noLive {
   display: flex;
   flex-direction: column;
