@@ -70,9 +70,9 @@ export default function HomePage() {
             </div>
           </dl>
         </div>
-        <div className={styles.heroRight}>
+        {/* <div className={styles.heroRight}>
           <PhotoCarousel />
-        </div>
+        </div> */}
       </section>
 
       <nav className={styles.shortcuts} aria-label="바로가기">
