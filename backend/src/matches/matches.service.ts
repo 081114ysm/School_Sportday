@@ -190,6 +190,28 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
       else if (scoreB > scoreA) next.result = `${nameB} 승`;
       else next.result = '무승부';
     }
+    // 세트제 종목(빅발리볼·배드민턴)에서 scoreA/scoreB 직접 편집 시 setsJson 자동 동기화
+    if (
+      isMultiSetSport(current.sport) &&
+      (next.scoreA !== undefined || next.scoreB !== undefined)
+    ) {
+      const wA = Math.max(0, Math.round(next.scoreA ?? current.scoreA ?? 0));
+      const wB = Math.max(0, Math.round(next.scoreB ?? current.scoreB ?? 0));
+      const sets: { a: number; b: number }[] = [];
+      let ai = 0,
+        bi = 0;
+      while (ai < wA || bi < wB) {
+        if (ai < wA) {
+          sets.push({ a: 25, b: 20 });
+          ai++;
+        }
+        if (bi < wB) {
+          sets.push({ a: 20, b: 25 });
+          bi++;
+        }
+      }
+      next.setsJson = JSON.stringify(sets);
+    }
     await this.matchRepo.update(id, next);
     const match = await this.findOneOrFail(id);
     this.gateway.emitMatchUpdate(match);
