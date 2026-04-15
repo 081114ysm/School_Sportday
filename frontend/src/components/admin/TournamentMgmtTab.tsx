@@ -20,6 +20,7 @@ const TOURNAMENT_SPORTS_LIST = Array.from(TOURNAMENT_SPORTS);
 
 interface TournamentDraft {
   sport: string;
+  grade: number;
   matchDate: string;
   timeSlot: string;
   teamAId: number;
@@ -37,8 +38,11 @@ interface TournamentMgmtTabProps {
 
 function initialDraft(): TournamentDraft {
   const today = new Date().toISOString().slice(0, 10);
+  const sport = TOURNAMENT_SPORTS_LIST[0];
+  const fixedGrade = TOURNAMENT_GRADE[sport];
   return {
-    sport: TOURNAMENT_SPORTS_LIST[0],
+    sport,
+    grade: fixedGrade ?? 1,
     matchDate: today,
     timeSlot: TIME_SLOTS[0].value,
     teamAId: 0,
@@ -65,15 +69,25 @@ export function TournamentMgmtTab({
     items: tournamentMatches.filter(m => m.sport === sport),
   })).filter(g => g.items.length > 0);
 
-  // 선택된 종목의 학년에 맞는 팀만
-  const gradeForSport = TOURNAMENT_GRADE[draft.sport];
+  // 선택된 종목의 학년: 고정(탁구=3) 또는 draft에서 선택한 학년(피구/빅발리볼)
+  const fixedGrade = TOURNAMENT_GRADE[draft.sport];
+  const isAllGradeSport = fixedGrade === null;
+  const gradeForSport = fixedGrade ?? draft.grade;
   const allSelectable = filterTeamsForSport(teams, draft.sport).filter(
     t => t.grade === gradeForSport,
   );
 
-  // 결승(FINAL) 선택 시: 준결승 승자만 선택 가능
-  const semi1Match = matches.find(m => m.sport === draft.sport && m.bracketStage === 'SEMI1');
-  const semi2Match = matches.find(m => m.sport === draft.sport && m.bracketStage === 'SEMI2');
+  // 결승(FINAL) 선택 시: 준결승 승자만 선택 가능 (같은 학년 기준으로 필터)
+  const semi1Match = matches.find(m =>
+    m.sport === draft.sport &&
+    m.bracketStage === 'SEMI1' &&
+    (m.teamA?.grade === gradeForSport || m.teamB?.grade === gradeForSport),
+  );
+  const semi2Match = matches.find(m =>
+    m.sport === draft.sport &&
+    m.bracketStage === 'SEMI2' &&
+    (m.teamA?.grade === gradeForSport || m.teamB?.grade === gradeForSport),
+  );
   const semi1Winner = getSemiWinner(semi1Match);
   const semi2Winner = getSemiWinner(semi2Match);
   const semiWinners = [semi1Winner, semi2Winner].filter((t): t is Team => !!t);
@@ -127,20 +141,40 @@ export function TournamentMgmtTab({
             <select
               className={styles.formSelect}
               value={draft.sport}
-              onChange={e =>
+              onChange={e => {
+                const newSport = e.target.value;
+                const fg = TOURNAMENT_GRADE[newSport];
                 setDraft(prev => ({
                   ...prev,
-                  sport: e.target.value,
+                  sport: newSport,
+                  grade: fg ?? prev.grade,
                   teamAId: 0,
                   teamBId: 0,
-                }))
-              }
+                }));
+              }}
             >
               {TOURNAMENT_SPORTS_LIST.map(s => (
                 <option key={s} value={s}>{s}</option>
               ))}
             </select>
           </div>
+
+          {isAllGradeSport && (
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>학년</label>
+              <select
+                className={styles.formSelect}
+                value={draft.grade}
+                onChange={e =>
+                  setDraft(prev => ({ ...prev, grade: Number(e.target.value), teamAId: 0, teamBId: 0 }))
+                }
+              >
+                <option value={1}>1학년</option>
+                <option value={2}>2학년</option>
+                <option value={3}>3학년</option>
+              </select>
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>대진</label>

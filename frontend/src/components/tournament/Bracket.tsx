@@ -7,7 +7,8 @@ import styles from './Bracket.module.css';
 interface BracketProps {
   title: string;
   sport: string;
-  grade: number;
+  grade?: number;
+  clubGroup?: string; // 'A' | 'B' | 'C' | 'D' — 연합 모드
   matches: Match[];
 }
 
@@ -27,13 +28,23 @@ function winningTeamName(m: Match | undefined): string | null {
   return (w === 'A' ? m.teamA?.name : m.teamB?.name) ?? null;
 }
 
-export default function Bracket({ title, sport, grade, matches }: BracketProps) {
-  const pool = matches.filter(
-    (m) =>
-      m.sport === sport &&
-      m.category === 'GRADE' &&
-      (m.teamA?.grade === grade || m.teamB?.grade === grade),
-  );
+export default function Bracket({ title, sport, grade, clubGroup, matches }: BracketProps) {
+  const pool = clubGroup
+    ? matches.filter(
+        (m) =>
+          m.sport === sport &&
+          m.category === 'CLUB' &&
+          (
+            (m.teamA?.name ?? '').includes(clubGroup) ||
+            (m.teamB?.name ?? '').includes(clubGroup)
+          ),
+      )
+    : matches.filter(
+        (m) =>
+          m.sport === sport &&
+          m.category === 'GRADE' &&
+          (m.teamA?.grade === grade || m.teamB?.grade === grade),
+      );
   const semi1 = pool.find((m) => m.bracketStage === 'SEMI1');
   const semi2 = pool.find((m) => m.bracketStage === 'SEMI2');
   const final = pool.find((m) => m.bracketStage === 'FINAL');

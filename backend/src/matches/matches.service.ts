@@ -27,21 +27,15 @@ export function isMultiSetSport(sport: string): boolean {
 }
 // 세트 완료 판정: 듀스 규칙 포함.
 export function isSetComplete(sport: string, a: number, b: number): boolean {
-  if (isVolleyball(sport)) {
+  if (isVolleyball(sport) || isBadminton(sport)) {
     if (a >= 25 && a - b >= 2) return true;
     if (b >= 25 && b - a >= 2) return true;
-    return false;
-  }
-  if (isBadminton(sport)) {
-    if (a >= 30 || b >= 30) return true;
-    if (a >= 21 && a - b >= 2) return true;
-    if (b >= 21 && b - a >= 2) return true;
     return false;
   }
   return false;
 }
 function setsToWin(sport: string): number {
-  return isBadminton(sport) ? 2 : 2; // best-of-3 for both
+  return isBadminton(sport) ? 3 : 2; // 배드민턴 best-of-5(3선취), 배구 best-of-3(2선취)
 }
 
 function ymd(d: Date): string {
@@ -436,7 +430,8 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     } catch {
       sets = [];
     }
-    while (sets.length < 3) sets.push({ a: 0, b: 0 });
+    const maxSets = setsToWin(sport) * 2 - 1; // 배구=3, 배드민턴=5
+    while (sets.length < maxSets) sets.push({ a: 0, b: 0 });
 
     const setWinner = (s: { a: number; b: number }): 'A' | 'B' | null => {
       if (!isSetComplete(sport, s.a, s.b)) return null;

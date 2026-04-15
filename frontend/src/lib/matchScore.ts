@@ -27,9 +27,8 @@ export function isSetComplete(sport: string, a: number, b: number): boolean {
     return false;
   }
   if (isBadminton(sport)) {
-    if (a >= 30 || b >= 30) return true;
-    if (a >= 21 && a - b >= 2) return true;
-    if (b >= 21 && b - a >= 2) return true;
+    if (a >= 25 && a - b >= 2) return true;
+    if (b >= 25 && b - a >= 2) return true;
     return false;
   }
   return false;

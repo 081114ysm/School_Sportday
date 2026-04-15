@@ -383,6 +383,7 @@ export function useAdminData() {
 
   const handleCreateTournamentMatch = async (draft: {
     sport: string;
+    grade?: number;
     matchDate: string;
     timeSlot: string;
     teamAId: number;
