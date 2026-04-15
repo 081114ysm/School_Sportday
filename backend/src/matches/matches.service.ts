@@ -17,7 +17,8 @@ import { PushService } from '../notifications/push.service';
 
 // 종목 키 정규화: 프론트는 한국어('빅발리볼') 백엔드 시드는 영문 상수('BIG_VOLLEYBALL') 혼재.
 function isVolleyball(sport: string): boolean {
-  return sport === 'BIG_VOLLEYBALL' || sport === '빅발리볼';
+  return sport === 'BIG_VOLLEYBALL' || sport === '빅발리볼' ||
+    sport === '학년별 빅발리볼' || sport.endsWith('학년 빅발리볼');
 }
 function isBadminton(sport: string): boolean {
   return sport === 'BADMINTON' || sport === '배드민턴';

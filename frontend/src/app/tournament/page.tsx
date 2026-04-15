@@ -5,22 +5,16 @@ import type { Match } from '@/types';
 import { fetchMatches } from '@/services/api';
 import { getSocket } from '@/services/socket';
 import Bracket from '@/components/tournament/Bracket';
-import { CLUB_TOURNAMENT_SPORTS } from '@/components/admin/adminConstants';
-
-// 학년별 토너먼트 종목 정의
-const GRADE_SPORTS: { grade: number; label: string; sports: string[] }[] = [
-  { grade: 1, label: '1학년', sports: ['피구', '빅발리볼'] },
-  { grade: 2, label: '2학년', sports: ['피구', '빅발리볼'] },
-  { grade: 3, label: '3학년', sports: ['탁구', '피구', '빅발리볼'] },
-];
+import { CLUB_TOURNAMENT_SPORTS, TOURNAMENT_GRADE_SPORTS } from '@/components/admin/adminConstants';
 
 // 종목별 영문 키 매핑 (백엔드 시드값 대응)
 const SPORT_ALIASES: Record<string, string[]> = {
-  '탁구': ['탁구', 'TABLE_TENNIS'],
-  '피구': ['피구', 'DODGEBALL'],
-  '빅발리볼': ['빅발리볼', 'BIG_VOLLEYBALL'],
-  '배드민턴': ['배드민턴', 'BADMINTON'],
-  '농구': ['농구', 'BASKETBALL'],
+  '탁구':           ['탁구', 'TABLE_TENNIS'],
+  '피구':           ['피구', 'DODGEBALL'],
+  '빅발리볼':       ['빅발리볼', 'BIG_VOLLEYBALL'],
+  '1학년 빅발리볼': ['1학년 빅발리볼'],
+  '배드민턴':       ['배드민턴', 'BADMINTON'],
+  '농구':           ['농구', 'BASKETBALL'],
 };
 
 type MainTab = 'grade' | 'club';
@@ -44,13 +38,19 @@ const SPORT_BTN_BASE: React.CSSProperties = {
   transition: 'all 0.15s',
 };
 
+const GRADE_META = [
+  { grade: 1, label: '1학년' },
+  { grade: 2, label: '2학년' },
+  { grade: 3, label: '3학년' },
+];
+
 export default function TournamentPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [mainTab, setMainTab] = useState<MainTab>('grade');
 
   // 학년 탭 상태
   const [selectedGrade, setSelectedGrade] = useState(1);
-  const [selectedGradeSport, setSelectedGradeSport] = useState('피구');
+  const [selectedSportIdx, setSelectedSportIdx] = useState(0);
 
   // 연합 탭 상태
   const [selectedClubSport, setSelectedClubSport] = useState<string>(CLUB_TOURNAMENT_SPORTS[0]);
@@ -59,9 +59,7 @@ export default function TournamentPage() {
     let cancelled = false;
     const load = () => {
       fetchMatches()
-        .then((data) => {
-          if (!cancelled) setMatches(data);
-        })
+        .then((data) => { if (!cancelled) setMatches(data); })
         .catch(() => {});
     };
     load();
@@ -89,7 +87,6 @@ export default function TournamentPage() {
 
     const onFocus = () => load();
     window.addEventListener('focus', onFocus);
-
     return () => {
       cancelled = true;
       socket.off('matchUpdate', onUpdate);
@@ -99,15 +96,15 @@ export default function TournamentPage() {
     };
   }, []);
 
+  const gradeSports = TOURNAMENT_GRADE_SPORTS[selectedGrade] ?? [];
+  const currentEntry = gradeSports[selectedSportIdx] ?? gradeSports[0];
+  const gradeAliases = SPORT_ALIASES[currentEntry?.sport ?? ''] ?? [currentEntry?.sport ?? ''];
+  const clubSportAliases = SPORT_ALIASES[selectedClubSport] ?? [selectedClubSport];
+
   const handleGradeChange = (grade: number) => {
     setSelectedGrade(grade);
-    const g = GRADE_SPORTS.find((x) => x.grade === grade)!;
-    setSelectedGradeSport(g.sports[0]);
+    setSelectedSportIdx(0);
   };
-
-  const currentGrade = GRADE_SPORTS.find((g) => g.grade === selectedGrade)!;
-  const gradeSportAliases = SPORT_ALIASES[selectedGradeSport] ?? [selectedGradeSport];
-  const clubSportAliases = SPORT_ALIASES[selectedClubSport] ?? [selectedClubSport];
 
   return (
     <div
@@ -121,14 +118,7 @@ export default function TournamentPage() {
       }}
     >
       <header style={{ marginBottom: 4 }}>
-        <h1
-          style={{
-            fontSize: 28,
-            fontWeight: 900,
-            letterSpacing: '-0.03em',
-            marginBottom: 6,
-          }}
-        >
+        <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-0.03em', marginBottom: 6 }}>
           토너먼트 <span style={{ color: 'var(--green)' }}>대진표</span>
         </h1>
         <p style={{ fontSize: 13, color: 'var(--text2)' }}>
@@ -166,7 +156,7 @@ export default function TournamentPage() {
         <>
           {/* 학년 선택 */}
           <div style={{ display: 'flex', gap: 8 }}>
-            {GRADE_SPORTS.map((g) => (
+            {GRADE_META.map((g) => (
               <button
                 key={g.grade}
                 type="button"
@@ -184,30 +174,32 @@ export default function TournamentPage() {
 
           {/* 종목 버튼 */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {currentGrade.sports.map((sport) => (
+            {gradeSports.map((entry, idx) => (
               <button
-                key={sport}
+                key={entry.label}
                 type="button"
-                onClick={() => setSelectedGradeSport(sport)}
+                onClick={() => setSelectedSportIdx(idx)}
                 style={{
                   ...SPORT_BTN_BASE,
-                  border: `2px solid ${selectedGradeSport === sport ? 'var(--green)' : 'var(--border)'}`,
-                  background: selectedGradeSport === sport ? 'var(--green-subtle, rgba(34,197,94,0.12))' : 'transparent',
-                  color: selectedGradeSport === sport ? 'var(--green)' : 'var(--text2)',
+                  border: `2px solid ${selectedSportIdx === idx ? 'var(--green)' : 'var(--border)'}`,
+                  background: selectedSportIdx === idx ? 'var(--green-subtle, rgba(34,197,94,0.12))' : 'transparent',
+                  color: selectedSportIdx === idx ? 'var(--green)' : 'var(--text2)',
                 }}
               >
-                {sport}
+                {entry.label}
               </button>
             ))}
           </div>
 
-          <Bracket
-            key={`grade-${selectedGrade}-${selectedGradeSport}`}
-            title={`${selectedGrade}학년 ${selectedGradeSport}`}
-            sport={selectedGradeSport}
-            grade={selectedGrade}
-            matches={matches.filter((m) => gradeSportAliases.includes(m.sport))}
-          />
+          {currentEntry && (
+            <Bracket
+              key={`grade-${selectedGrade}-${currentEntry.sport}`}
+              title={`${selectedGrade}학년 ${currentEntry.label}`}
+              sport={currentEntry.sport}
+              grade={selectedGrade}
+              matches={matches.filter((m) => gradeAliases.includes(m.sport))}
+            />
+          )}
         </>
       )}
 

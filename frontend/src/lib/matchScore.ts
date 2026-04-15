@@ -2,7 +2,8 @@ import type { Match } from '@/types';
 
 // 종목 키 정규화: 프론트는 한국어, 시드는 영문 상수가 섞여 있다.
 function isVolleyball(sport: string): boolean {
-  return sport === 'BIG_VOLLEYBALL' || sport === '빅발리볼';
+  return sport === 'BIG_VOLLEYBALL' || sport === '빅발리볼' ||
+    sport === '학년별 빅발리볼' || sport.endsWith('학년 빅발리볼');
 }
 function isBadminton(sport: string): boolean {
   return sport === 'BADMINTON' || sport === '배드민턴';

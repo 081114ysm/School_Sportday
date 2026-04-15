@@ -72,24 +72,38 @@ export const CATEGORY_LABELS: Record<string, string> = {
 };
 
 // 단일 점수 대신 3세트 스코어보드를 사용하는 종목.
-export const MULTI_SET_SPORTS = new Set(['빅발리볼', '배드민턴']);
+export const MULTI_SET_SPORTS = new Set(['빅발리볼', '배드민턴', '1학년 빅발리볼']);
 
 // 쿼터제를 사용하는 종목.
 export const QUARTER_SPORTS = new Set(['농구', '풋살']);
 
-// 토너먼트(준결승+결승) 대진을 사용하는 종목.
-// 탁구=3학년 전용, 피구·빅발리볼=전학년(null → 어드민에서 학년 직접 선택).
-export const TOURNAMENT_SPORTS = new Set(['탁구', '피구', '빅발리볼']);
-export const TOURNAMENT_GRADE: Record<string, number | null> = {
-  '탁구': 3,
-  '피구': null,
-  '빅발리볼': null,
+// 토너먼트(준결승+결승) 대진을 사용하는 종목 (하위 호환).
+export const TOURNAMENT_SPORTS = new Set(['탁구', '피구', '빅발리볼', '1학년 빅발리볼']);
+
+// 학년별 토너먼트 종목 설정. label=표시명, sport=DB 저장명.
+export interface TournamentSportConfig {
+  label: string;
+  sport: string;
+}
+export const TOURNAMENT_GRADE_SPORTS: Record<number, TournamentSportConfig[]> = {
+  1: [
+    { label: '피구',            sport: '피구' },
+    { label: '학년별 빅발리볼', sport: '빅발리볼' },
+    { label: '1학년 빅발리볼', sport: '1학년 빅발리볼' },
+  ],
+  2: [
+    { label: '피구',            sport: '피구' },
+    { label: '학년별 빅발리볼', sport: '빅발리볼' },
+  ],
+  3: [
+    { label: '탁구',            sport: '탁구' },
+    { label: '피구',            sport: '피구' },
+    { label: '학년별 빅발리볼', sport: '빅발리볼' },
+  ],
 };
 
-// 연합(CLUB) 토너먼트 종목 및 조(그룹) 목록.
+// 연합(CLUB) 토너먼트 종목 목록.
 export const CLUB_TOURNAMENT_SPORTS = ['빅발리볼', '배드민턴', '농구'] as const;
-export const CLUB_GROUPS = ['A', 'B', 'C', 'D'] as const;
-export type ClubGroup = typeof CLUB_GROUPS[number];
 export const BRACKET_STAGES = [
   { value: 'SEMI1', label: '준결승 1' },
   { value: 'SEMI2', label: '준결승 2' },

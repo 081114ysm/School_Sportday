@@ -2,8 +2,12 @@
 
 import { useState } from 'react';
 import { Match, Team } from '@/types';
-import { filterTeamsForSport, slotLabel } from './adminUtils';
-import { TIME_SLOTS, TOURNAMENT_SPORTS, TOURNAMENT_GRADE, BRACKET_STAGES } from './adminConstants';
+import { slotLabel } from './adminUtils';
+import {
+  TIME_SLOTS,
+  BRACKET_STAGES,
+  TOURNAMENT_GRADE_SPORTS,
+} from './adminConstants';
 import { StatusBadge } from './StatusBadge';
 import { getMatchScorePair } from '@/lib/matchScore';
 import styles from '@/app/admin/admin.module.css';
@@ -16,11 +20,9 @@ function getSemiWinner(match: Match | undefined): Team | undefined {
   return undefined;
 }
 
-const TOURNAMENT_SPORTS_LIST = Array.from(TOURNAMENT_SPORTS);
-
-interface TournamentDraft {
+interface CreatePayload {
   sport: string;
-  grade: number;
+  grade?: number;
   matchDate: string;
   timeSlot: string;
   teamAId: number;
@@ -32,24 +34,42 @@ interface TournamentMgmtTabProps {
   matches: Match[];
   teams: Team[];
   loading: boolean;
-  onCreateTournamentMatch: (draft: TournamentDraft) => Promise<void>;
+  onCreateTournamentMatch: (draft: CreatePayload) => Promise<void>;
   onDeleteMatch: (id: number) => void;
 }
 
-function initialDraft(): TournamentDraft {
+interface TournamentForm {
+  grade: number;
+  sportIndex: number;   // index into TOURNAMENT_GRADE_SPORTS[grade]
+  batchSemis: boolean;  // true = SEMI1+SEMI2 일괄 추가
+  bracketStage: string; // single 모드 대진
+  matchDate: string;
+  timeSlot: string;
+  // SEMI1 (single 모드에서도 사용)
+  teamAId: number;
+  teamBId: number;
+  // SEMI2 batch 전용
+  semi2TeamAId: number;
+  semi2TeamBId: number;
+}
+
+function initialForm(): TournamentForm {
   const today = new Date().toISOString().slice(0, 10);
-  const sport = TOURNAMENT_SPORTS_LIST[0];
-  const fixedGrade = TOURNAMENT_GRADE[sport];
   return {
-    sport,
-    grade: fixedGrade ?? 1,
+    grade: 1,
+    sportIndex: 0,
+    batchSemis: false,
+    bracketStage: 'SEMI1',
     matchDate: today,
     timeSlot: TIME_SLOTS[0].value,
     teamAId: 0,
     teamBId: 0,
-    bracketStage: BRACKET_STAGES[0].value,
+    semi2TeamAId: 0,
+    semi2TeamBId: 0,
   };
 }
+
+const GRADE_LABELS: Record<number, string> = { 1: '1학년', 2: '2학년', 3: '3학년' };
 
 export function TournamentMgmtTab({
   matches,
@@ -58,144 +78,263 @@ export function TournamentMgmtTab({
   onCreateTournamentMatch,
   onDeleteMatch,
 }: TournamentMgmtTabProps) {
-  const [draft, setDraft] = useState<TournamentDraft>(initialDraft);
+  const [form, setForm] = useState<TournamentForm>(initialForm);
 
-  // 토너먼트 경기만 (bracketStage != null)
-  const tournamentMatches = matches.filter(m => m.bracketStage != null);
+  const sportConfigs = TOURNAMENT_GRADE_SPORTS[form.grade] ?? [];
+  const currentSport = sportConfigs[form.sportIndex] ?? sportConfigs[0];
 
-  // 종목별 그룹
-  const grouped = TOURNAMENT_SPORTS_LIST.map(sport => ({
-    sport,
-    items: tournamentMatches.filter(m => m.sport === sport),
-  })).filter(g => g.items.length > 0);
-
-  // 선택된 종목의 학년: 고정(탁구=3) 또는 draft에서 선택한 학년(피구/빅발리볼)
-  const fixedGrade = TOURNAMENT_GRADE[draft.sport];
-  const isAllGradeSport = fixedGrade === null;
-  const gradeForSport = fixedGrade ?? draft.grade;
-  const allSelectable = filterTeamsForSport(teams, draft.sport).filter(
-    t => t.grade === gradeForSport,
+  // 선택된 학년의 학년전 팀만
+  const gradeTeams = teams.filter(
+    t => t.grade === form.grade && t.category !== 'CLUB',
   );
 
-  // 결승(FINAL) 선택 시: 준결승 승자만 선택 가능 (같은 학년 기준으로 필터)
-  const semi1Match = matches.find(m =>
-    m.sport === draft.sport &&
-    m.bracketStage === 'SEMI1' &&
-    (m.teamA?.grade === gradeForSport || m.teamB?.grade === gradeForSport),
+  // 결승 시 준결승 승자만 선택 가능
+  const semi1Match = matches.find(
+    m =>
+      m.sport === currentSport?.sport &&
+      m.bracketStage === 'SEMI1' &&
+      (m.teamA?.grade === form.grade || m.teamB?.grade === form.grade),
   );
-  const semi2Match = matches.find(m =>
-    m.sport === draft.sport &&
-    m.bracketStage === 'SEMI2' &&
-    (m.teamA?.grade === gradeForSport || m.teamB?.grade === gradeForSport),
+  const semi2Match = matches.find(
+    m =>
+      m.sport === currentSport?.sport &&
+      m.bracketStage === 'SEMI2' &&
+      (m.teamA?.grade === form.grade || m.teamB?.grade === form.grade),
   );
   const semi1Winner = getSemiWinner(semi1Match);
   const semi2Winner = getSemiWinner(semi2Match);
   const semiWinners = [semi1Winner, semi2Winner].filter((t): t is Team => !!t);
 
-  const selectable = draft.bracketStage === 'FINAL' && semiWinners.length > 0
-    ? semiWinners
-    : allSelectable;
+  const isFinal = !form.batchSemis && form.bracketStage === 'FINAL';
+  const selectableTeams =
+    isFinal && semiWinners.length > 0 ? semiWinners : gradeTeams;
 
-  const finalHint = draft.bracketStage === 'FINAL' && semiWinners.length < 2
-    ? `준결승 결과가 아직 없습니다 (${semiWinners.length}/2 확정)`
-    : null;
-
-  const renderOption = (t: Team) => (
-    <option key={t.id} value={t.id}>
-      {t.name}
-      {t.grade != null ? ` (${t.grade}-${t.classNumber})` : ' (연합)'}
-    </option>
-  );
+  const finalHint =
+    isFinal && semiWinners.length < 2
+      ? `준결승 결과 대기 중 (${semiWinners.length}/2 확정)`
+      : null;
 
   const stageLabelMap = Object.fromEntries(
     BRACKET_STAGES.map(s => [s.value, s.label]),
   );
 
+  // 토너먼트 경기 목록 (bracketStage 있는 것만)
+  const tournamentMatches = matches.filter(m => m.bracketStage != null);
+  const allSports = Array.from(new Set(tournamentMatches.map(m => m.sport)));
+  const grouped = allSports
+    .map(sport => ({
+      sport,
+      items: tournamentMatches.filter(m => m.sport === sport),
+    }))
+    .filter(g => g.items.length > 0);
+
+  const renderOption = (t: Team) => (
+    <option key={t.id} value={t.id}>
+      {t.name} ({t.grade}-{t.classNumber})
+    </option>
+  );
+
   const handleSubmit = async () => {
-    if (!draft.teamAId || !draft.teamBId) {
-      alert('양 팀을 선택해주세요.');
+    if (!currentSport) {
+      alert('종목을 선택해주세요.');
       return;
     }
-    if (draft.teamAId === draft.teamBId) {
-      alert('다른 팀을 선택해주세요.');
-      return;
+
+    if (form.batchSemis) {
+      // 준결승 일괄 추가 검증
+      if (!form.teamAId || !form.teamBId) {
+        alert('준결승 1 양 팀을 선택해주세요.');
+        return;
+      }
+      if (form.teamAId === form.teamBId) {
+        alert('준결승 1: 다른 팀을 선택해주세요.');
+        return;
+      }
+      if (!form.semi2TeamAId || !form.semi2TeamBId) {
+        alert('준결승 2 양 팀을 선택해주세요.');
+        return;
+      }
+      if (form.semi2TeamAId === form.semi2TeamBId) {
+        alert('준결승 2: 다른 팀을 선택해주세요.');
+        return;
+      }
+      await onCreateTournamentMatch({
+        sport: currentSport.sport,
+        grade: form.grade,
+        matchDate: form.matchDate,
+        timeSlot: form.timeSlot,
+        teamAId: form.teamAId,
+        teamBId: form.teamBId,
+        bracketStage: 'SEMI1',
+      });
+      await onCreateTournamentMatch({
+        sport: currentSport.sport,
+        grade: form.grade,
+        matchDate: form.matchDate,
+        timeSlot: form.timeSlot,
+        teamAId: form.semi2TeamAId,
+        teamBId: form.semi2TeamBId,
+        bracketStage: 'SEMI2',
+      });
+    } else {
+      if (!form.teamAId || !form.teamBId) {
+        alert('양 팀을 선택해주세요.');
+        return;
+      }
+      if (form.teamAId === form.teamBId) {
+        alert('다른 팀을 선택해주세요.');
+        return;
+      }
+      await onCreateTournamentMatch({
+        sport: currentSport.sport,
+        grade: form.grade,
+        matchDate: form.matchDate,
+        timeSlot: form.timeSlot,
+        teamAId: form.teamAId,
+        teamBId: form.teamBId,
+        bracketStage: form.bracketStage,
+      });
     }
-    if (!draft.bracketStage) {
-      alert('대진을 선택해주세요.');
-      return;
-    }
-    await onCreateTournamentMatch(draft);
-    setDraft(initialDraft());
+
+    setForm(initialForm());
   };
 
   return (
     <div>
-      <h2 className={styles.adminSectionTitle}>{'\uD83C\uDFC6'} 토너먼트 일정</h2>
+      <h2 className={styles.adminSectionTitle}>🏆 토너먼트 일정</h2>
 
       {/* 경기 생성 폼 */}
       <div className={styles.formCard}>
         <div className={styles.formTitle}>토너먼트 경기 추가</div>
         <div className={styles.formGrid}>
+
+          {/* 학년 선택 */}
+          <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+            <label className={styles.formLabel}>학년</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {([1, 2, 3] as const).map(g => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() =>
+                    setForm(prev => ({
+                      ...prev,
+                      grade: g,
+                      sportIndex: 0,
+                      teamAId: 0,
+                      teamBId: 0,
+                      semi2TeamAId: 0,
+                      semi2TeamBId: 0,
+                    }))
+                  }
+                  style={{
+                    padding: '6px 16px',
+                    borderRadius: 6,
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                    fontSize: 13,
+                    background: form.grade === g ? 'var(--green)' : 'var(--card2, var(--card))',
+                    color: form.grade === g ? '#fff' : 'var(--text)',
+                  }}
+                >
+                  {GRADE_LABELS[g]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 종목 선택 (선택 학년에 해당하는 종목만) */}
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>종목</label>
             <select
               className={styles.formSelect}
-              value={draft.sport}
-              onChange={e => {
-                const newSport = e.target.value;
-                const fg = TOURNAMENT_GRADE[newSport];
-                setDraft(prev => ({
+              value={form.sportIndex}
+              onChange={e =>
+                setForm(prev => ({
                   ...prev,
-                  sport: newSport,
-                  grade: fg ?? prev.grade,
+                  sportIndex: Number(e.target.value),
                   teamAId: 0,
                   teamBId: 0,
-                }));
-              }}
+                  semi2TeamAId: 0,
+                  semi2TeamBId: 0,
+                }))
+              }
             >
-              {TOURNAMENT_SPORTS_LIST.map(s => (
-                <option key={s} value={s}>{s}</option>
+              {sportConfigs.map((cfg, idx) => (
+                <option key={idx} value={idx}>
+                  {cfg.label}
+                </option>
               ))}
             </select>
           </div>
 
-          {isAllGradeSport && (
+          {/* 추가 방식: 단일 / 준결승 일괄 */}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>추가 방식</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => setForm(prev => ({ ...prev, batchSemis: false, teamAId: 0, teamBId: 0 }))}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 6,
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: 12,
+                  background: !form.batchSemis ? 'var(--green)' : 'var(--card2, var(--card))',
+                  color: !form.batchSemis ? '#fff' : 'var(--text)',
+                }}
+              >
+                단일 추가
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm(prev => ({ ...prev, batchSemis: true, teamAId: 0, teamBId: 0, semi2TeamAId: 0, semi2TeamBId: 0 }))}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 6,
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 700,
+                  fontSize: 12,
+                  background: form.batchSemis ? 'var(--green)' : 'var(--card2, var(--card))',
+                  color: form.batchSemis ? '#fff' : 'var(--text)',
+                }}
+              >
+                준결승 일괄
+              </button>
+            </div>
+          </div>
+
+          {/* 단일 모드: 대진 선택 */}
+          {!form.batchSemis && (
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>학년</label>
+              <label className={styles.formLabel}>대진</label>
               <select
                 className={styles.formSelect}
-                value={draft.grade}
+                value={form.bracketStage}
                 onChange={e =>
-                  setDraft(prev => ({ ...prev, grade: Number(e.target.value), teamAId: 0, teamBId: 0 }))
+                  setForm(prev => ({ ...prev, bracketStage: e.target.value, teamAId: 0, teamBId: 0 }))
                 }
               >
-                <option value={1}>1학년</option>
-                <option value={2}>2학년</option>
-                <option value={3}>3학년</option>
+                {BRACKET_STAGES.map(s => (
+                  <option key={s.value} value={s.value}>
+                    {s.label}
+                  </option>
+                ))}
               </select>
             </div>
           )}
-
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>대진</label>
-            <select
-              className={styles.formSelect}
-              value={draft.bracketStage}
-              onChange={e => setDraft(prev => ({ ...prev, bracketStage: e.target.value }))}
-            >
-              {BRACKET_STAGES.map(s => (
-                <option key={s.value} value={s.value}>{s.label}</option>
-              ))}
-            </select>
-          </div>
 
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>날짜</label>
             <input
               className={styles.formInput}
               type="date"
-              value={draft.matchDate}
-              onChange={e => setDraft(prev => ({ ...prev, matchDate: e.target.value }))}
+              value={form.matchDate}
+              onChange={e => setForm(prev => ({ ...prev, matchDate: e.target.value }))}
             />
           </div>
 
@@ -203,11 +342,13 @@ export function TournamentMgmtTab({
             <label className={styles.formLabel}>시간</label>
             <select
               className={styles.formSelect}
-              value={draft.timeSlot}
-              onChange={e => setDraft(prev => ({ ...prev, timeSlot: e.target.value }))}
+              value={form.timeSlot}
+              onChange={e => setForm(prev => ({ ...prev, timeSlot: e.target.value }))}
             >
               {TIME_SLOTS.map(t => (
-                <option key={t.value} value={t.value}>{t.label}</option>
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
               ))}
             </select>
           </div>
@@ -219,33 +360,89 @@ export function TournamentMgmtTab({
               </div>
             </div>
           )}
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              팀 A ({gradeForSport}학년{draft.bracketStage === 'FINAL' ? ' · 준결승 승자' : ''})
-            </label>
-            <select
-              className={styles.formSelect}
-              value={draft.teamAId}
-              onChange={e => setDraft(prev => ({ ...prev, teamAId: Number(e.target.value) }))}
-            >
-              <option value={0}>팀 선택</option>
-              {selectable.map(renderOption)}
-            </select>
-          </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>
-              팀 B ({gradeForSport}학년{draft.bracketStage === 'FINAL' ? ' · 준결승 승자' : ''})
-            </label>
-            <select
-              className={styles.formSelect}
-              value={draft.teamBId}
-              onChange={e => setDraft(prev => ({ ...prev, teamBId: Number(e.target.value) }))}
-            >
-              <option value={0}>팀 선택</option>
-              {selectable.map(renderOption)}
-            </select>
-          </div>
+          {/* 팀 선택 */}
+          {form.batchSemis ? (
+            <>
+              {/* 준결승 1 */}
+              <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <div style={{ fontWeight: 700, fontSize: 12, color: 'var(--text2)', marginBottom: 6 }}>
+                  준결승 1
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <select
+                    className={styles.formSelect}
+                    value={form.teamAId}
+                    onChange={e => setForm(prev => ({ ...prev, teamAId: Number(e.target.value) }))}
+                  >
+                    <option value={0}>팀 A 선택</option>
+                    {gradeTeams.map(renderOption)}
+                  </select>
+                  <select
+                    className={styles.formSelect}
+                    value={form.teamBId}
+                    onChange={e => setForm(prev => ({ ...prev, teamBId: Number(e.target.value) }))}
+                  >
+                    <option value={0}>팀 B 선택</option>
+                    {gradeTeams.map(renderOption)}
+                  </select>
+                </div>
+              </div>
+              {/* 준결승 2 */}
+              <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                <div style={{ fontWeight: 700, fontSize: 12, color: 'var(--text2)', marginBottom: 6 }}>
+                  준결승 2
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <select
+                    className={styles.formSelect}
+                    value={form.semi2TeamAId}
+                    onChange={e => setForm(prev => ({ ...prev, semi2TeamAId: Number(e.target.value) }))}
+                  >
+                    <option value={0}>팀 A 선택</option>
+                    {gradeTeams.map(renderOption)}
+                  </select>
+                  <select
+                    className={styles.formSelect}
+                    value={form.semi2TeamBId}
+                    onChange={e => setForm(prev => ({ ...prev, semi2TeamBId: Number(e.target.value) }))}
+                  >
+                    <option value={0}>팀 B 선택</option>
+                    {gradeTeams.map(renderOption)}
+                  </select>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>
+                  팀 A{isFinal ? ' (준결승 승자)' : ''}
+                </label>
+                <select
+                  className={styles.formSelect}
+                  value={form.teamAId}
+                  onChange={e => setForm(prev => ({ ...prev, teamAId: Number(e.target.value) }))}
+                >
+                  <option value={0}>팀 선택</option>
+                  {selectableTeams.map(renderOption)}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>
+                  팀 B{isFinal ? ' (준결승 승자)' : ''}
+                </label>
+                <select
+                  className={styles.formSelect}
+                  value={form.teamBId}
+                  onChange={e => setForm(prev => ({ ...prev, teamBId: Number(e.target.value) }))}
+                >
+                  <option value={0}>팀 선택</option>
+                  {selectableTeams.map(renderOption)}
+                </select>
+              </div>
+            </>
+          )}
         </div>
 
         <button
@@ -253,7 +450,11 @@ export function TournamentMgmtTab({
           onClick={handleSubmit}
           disabled={loading}
         >
-          {loading ? '생성 중...' : '+ 토너먼트 경기 추가'}
+          {loading
+            ? '생성 중...'
+            : form.batchSemis
+            ? '+ 준결승 1·2 일괄 추가'
+            : '+ 토너먼트 경기 추가'}
         </button>
       </div>
 
