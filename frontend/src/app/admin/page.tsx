@@ -15,7 +15,7 @@ import { YoutubeMgmtTab } from '@/components/admin/YoutubeMgmtTab';
 import { SportMgmtTab } from '@/components/admin/SportMgmtTab';
 import { TournamentMgmtTab } from '@/components/admin/TournamentMgmtTab';
 import { PointsMgmtTab } from '@/components/admin/PointsMgmtTab';
-import { deleteAllMatches } from '@/services/api';
+import { deleteAllMatches, deleteLastWeekMatches } from '@/services/api';
 
 export default function AdminPage() {
   const {
@@ -206,11 +206,10 @@ export default function AdminPage() {
           <button
             className={styles.adminHomeLink}
             onClick={async () => {
-              if (!confirm('정말 모든 경기를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
-              if (!confirm('한 번 더 확인합니다. 모든 경기 결과와 일정이 사라집니다.')) return;
+              if (!confirm('저번주 이전 경기를 모두 삭제합니다. 이번 주 경기는 유지됩니다. 계속하시겠습니까?')) return;
               try {
-                const res = await deleteAllMatches();
-                alert(`${res.deleted}개의 경기가 삭제되었습니다.`);
+                const res = await deleteLastWeekMatches();
+                alert(`${res.deleted}개의 경기가 삭제되었습니다. (${res.before} 이전 경기)`);
                 await loadData();
               } catch (err) {
                 alert('삭제 실패: ' + (err as Error).message);
@@ -218,7 +217,7 @@ export default function AdminPage() {
             }}
             style={{ cursor: 'pointer', color: '#dc2626', borderColor: '#dc2626' }}
           >
-            🗑 전체 삭제
+            🗑 저번주 삭제
           </button>
           <button
             className={styles.adminHomeLink}

@@ -319,6 +319,33 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     return { deleted: res.affected ?? 0 };
   }
 
+  // 이번 주 월요일(YYYY-MM-DD) 계산. 일요일이면 -6일, 아니면 -(요일-1)일.
+  private thisWeekMonday(): string {
+    const today = new Date();
+    const day = today.getDay(); // 0=일, 1=월 ... 6=토
+    const diff = day === 0 ? -6 : 1 - day;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+    const m = String(monday.getMonth() + 1).padStart(2, '0');
+    const d = String(monday.getDate()).padStart(2, '0');
+    return `${monday.getFullYear()}-${m}-${d}`;
+  }
+
+  // 이번 주 이전(저번주 이하) 경기만 삭제. matchDate가 null인 경기는 보존.
+  async removeLastWeek(): Promise<{ deleted: number; before: string }> {
+    const before = this.thisWeekMonday();
+    const targets = await this.matchRepo.find({
+      where: { matchDate: LessThan(before) as any },
+    });
+    if (targets.length === 0) return { deleted: 0, before };
+    for (const m of targets) {
+      await this.logRepo.delete({ matchId: m.id });
+      await this.matchRepo.delete(m.id);
+    }
+    this.logger.log(`Removed ${targets.length} last-week match(es) before ${before}`);
+    return { deleted: targets.length, before };
+  }
+
   async updateScore(id: number, team: string, delta: number): Promise<Match> {
     const match = await this.findOneOrFail(id);
 

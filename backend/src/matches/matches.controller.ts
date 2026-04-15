@@ -53,6 +53,12 @@ export class MatchesController {
   }
 
   @UseGuards(AdminGuard)
+  @Delete('last-week')
+  removeLastWeek() {
+    return this.matchesService.removeLastWeek();
+  }
+
+  @UseGuards(AdminGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.matchesService.remove(parseInt(id));

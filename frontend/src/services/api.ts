@@ -72,6 +72,10 @@ export async function deleteAllMatches(): Promise<{ deleted: number }> {
   return request<{ deleted: number }>(`/api/matches/all`, { method: 'DELETE' });
 }
 
+export async function deleteLastWeekMatches(): Promise<{ deleted: number; before: string }> {
+  return request<{ deleted: number; before: string }>(`/api/matches/last-week`, { method: 'DELETE' });
+}
+
 export async function updateTeamPoints(id: number, pointsAdjustment: number): Promise<Team> {
   return request<Team>(`/api/teams/${id}/points`, {
     method: 'PUT',
