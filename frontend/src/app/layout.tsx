@@ -3,6 +3,7 @@ import { Bebas_Neue, Black_Ops_One, Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { Analytics } from '@vercel/analytics/react';
 
 const bebasNeue = Bebas_Neue({
   weight: '400',
@@ -42,9 +43,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ko">
       <head />
@@ -52,6 +53,7 @@ export default function RootLayout({
         <Header />
         <main className="app-main">{children}</main>
         <Footer />
+        <Analytics />
         <script
           dangerouslySetInnerHTML={{
             __html: `if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}`,

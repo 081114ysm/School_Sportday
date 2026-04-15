@@ -384,6 +384,7 @@ export function useAdminData() {
   const handleCreateTournamentMatch = async (draft: {
     sport: string;
     grade?: number;
+    category?: string;
     matchDate: string;
     timeSlot: string;
     teamAId: number;
@@ -394,7 +395,7 @@ export function useAdminData() {
       setLoading(true);
       const created = await createMatch({
         ...draft,
-        category: 'GRADE',
+        category: draft.category ?? 'GRADE',
         day: dayLabelFromDate(draft.matchDate),
       });
       setMatches(prev => [...prev, created]);
