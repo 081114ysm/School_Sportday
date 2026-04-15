@@ -7,6 +7,7 @@ import {
   TIME_SLOTS,
   BRACKET_STAGES,
   TOURNAMENT_GRADE_SPORTS,
+  CLUB_TOURNAMENT_SPORTS,
 } from './adminConstants';
 import { StatusBadge } from './StatusBadge';
 import { getMatchScorePair } from '@/lib/matchScore';
@@ -23,6 +24,7 @@ function getSemiWinner(match: Match | undefined): Team | undefined {
 interface CreatePayload {
   sport: string;
   grade?: number;
+  category?: string;
   matchDate: string;
   timeSlot: string;
   teamAId: number;
@@ -39,8 +41,10 @@ interface TournamentMgmtTabProps {
 }
 
 interface TournamentForm {
+  tournamentMode: 'grade' | 'club'; // 학년전 / 연합전
   grade: number;
-  sportIndex: number;   // index into TOURNAMENT_GRADE_SPORTS[grade]
+  sportIndex: number;   // index into TOURNAMENT_GRADE_SPORTS[grade] (grade 모드)
+  clubSport: string;    // 연합 모드 종목
   batchSemis: boolean;  // true = SEMI1+SEMI2 일괄 추가
   bracketStage: string; // single 모드 대진
   matchDate: string;
@@ -56,8 +60,10 @@ interface TournamentForm {
 function initialForm(): TournamentForm {
   const today = new Date().toISOString().slice(0, 10);
   return {
+    tournamentMode: 'grade',
     grade: 1,
     sportIndex: 0,
+    clubSport: CLUB_TOURNAMENT_SPORTS[0],
     batchSemis: false,
     bracketStage: 'SEMI1',
     matchDate: today,
@@ -80,34 +86,40 @@ export function TournamentMgmtTab({
 }: TournamentMgmtTabProps) {
   const [form, setForm] = useState<TournamentForm>(initialForm);
 
+  const isClubMode = form.tournamentMode === 'club';
+
+  // 학년전 모드
   const sportConfigs = TOURNAMENT_GRADE_SPORTS[form.grade] ?? [];
   const currentSport = sportConfigs[form.sportIndex] ?? sportConfigs[0];
+  const activeSportName = isClubMode ? form.clubSport : (currentSport?.sport ?? '');
 
-  // 선택된 학년의 학년전 팀만
+  // 팀 목록: 학년전=해당 학년 팀, 연합전=CLUB 팀
   const gradeTeams = teams.filter(
     t => t.grade === form.grade && t.category !== 'CLUB',
   );
+  const clubTeams = teams.filter(t => t.category === 'CLUB');
+  const activeTeams = isClubMode ? clubTeams : gradeTeams;
 
-  // 결승 시 준결승 승자만 선택 가능
-  const semi1Match = matches.find(
+  // 결승 시 준결승 승자만 선택 가능 (학년전 전용)
+  const semi1Match = !isClubMode ? matches.find(
     m =>
-      m.sport === currentSport?.sport &&
+      m.sport === activeSportName &&
       m.bracketStage === 'SEMI1' &&
       (m.teamA?.grade === form.grade || m.teamB?.grade === form.grade),
-  );
-  const semi2Match = matches.find(
+  ) : undefined;
+  const semi2Match = !isClubMode ? matches.find(
     m =>
-      m.sport === currentSport?.sport &&
+      m.sport === activeSportName &&
       m.bracketStage === 'SEMI2' &&
       (m.teamA?.grade === form.grade || m.teamB?.grade === form.grade),
-  );
+  ) : undefined;
   const semi1Winner = getSemiWinner(semi1Match);
   const semi2Winner = getSemiWinner(semi2Match);
   const semiWinners = [semi1Winner, semi2Winner].filter((t): t is Team => !!t);
 
   const isFinal = !form.batchSemis && form.bracketStage === 'FINAL';
   const selectableTeams =
-    isFinal && semiWinners.length > 0 ? semiWinners : gradeTeams;
+    !isClubMode && isFinal && semiWinners.length > 0 ? semiWinners : activeTeams;
 
   const finalHint =
     isFinal && semiWinners.length < 2
@@ -140,8 +152,10 @@ export function TournamentMgmtTab({
       return;
     }
 
+    const category = isClubMode ? 'CLUB' : 'GRADE';
+    const grade = isClubMode ? undefined : form.grade;
+
     if (form.batchSemis) {
-      // 준결승 일괄 추가 검증
       if (!form.teamAId || !form.teamBId) {
         alert('준결승 1 양 팀을 선택해주세요.');
         return;
@@ -159,8 +173,9 @@ export function TournamentMgmtTab({
         return;
       }
       await onCreateTournamentMatch({
-        sport: currentSport.sport,
-        grade: form.grade,
+        sport: activeSportName,
+        grade,
+        category,
         matchDate: form.matchDate,
         timeSlot: form.timeSlot,
         teamAId: form.teamAId,
@@ -168,8 +183,9 @@ export function TournamentMgmtTab({
         bracketStage: 'SEMI1',
       });
       await onCreateTournamentMatch({
-        sport: currentSport.sport,
-        grade: form.grade,
+        sport: activeSportName,
+        grade,
+        category,
         matchDate: form.matchDate,
         timeSlot: form.timeSlot,
         teamAId: form.semi2TeamAId,
@@ -186,8 +202,9 @@ export function TournamentMgmtTab({
         return;
       }
       await onCreateTournamentMatch({
-        sport: currentSport.sport,
-        grade: form.grade,
+        sport: activeSportName,
+        grade,
+        category,
         matchDate: form.matchDate,
         timeSlot: form.timeSlot,
         teamAId: form.teamAId,
@@ -208,19 +225,18 @@ export function TournamentMgmtTab({
         <div className={styles.formTitle}>토너먼트 경기 추가</div>
         <div className={styles.formGrid}>
 
-          {/* 학년 선택 */}
+          {/* 학년전 / 연합전 모드 선택 */}
           <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-            <label className={styles.formLabel}>학년</label>
+            <label className={styles.formLabel}>모드</label>
             <div style={{ display: 'flex', gap: 8 }}>
-              {([1, 2, 3] as const).map(g => (
+              {(['grade', 'club'] as const).map(mode => (
                 <button
-                  key={g}
+                  key={mode}
                   type="button"
                   onClick={() =>
                     setForm(prev => ({
                       ...prev,
-                      grade: g,
-                      sportIndex: 0,
+                      tournamentMode: mode,
                       teamAId: 0,
                       teamBId: 0,
                       semi2TeamAId: 0,
@@ -234,40 +250,107 @@ export function TournamentMgmtTab({
                     cursor: 'pointer',
                     fontWeight: 700,
                     fontSize: 13,
-                    background: form.grade === g ? 'var(--green)' : 'var(--card2, var(--card))',
-                    color: form.grade === g ? '#fff' : 'var(--text)',
+                    background: form.tournamentMode === mode ? 'var(--accent)' : 'var(--card2, var(--card))',
+                    color: form.tournamentMode === mode ? '#fff' : 'var(--text)',
                   }}
                 >
-                  {GRADE_LABELS[g]}
+                  {mode === 'grade' ? '🎓 학년전' : '🤝 연합전'}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* 종목 선택 (선택 학년에 해당하는 종목만) */}
-          <div className={styles.formGroup}>
-            <label className={styles.formLabel}>종목</label>
-            <select
-              className={styles.formSelect}
-              value={form.sportIndex}
-              onChange={e =>
-                setForm(prev => ({
-                  ...prev,
-                  sportIndex: Number(e.target.value),
-                  teamAId: 0,
-                  teamBId: 0,
-                  semi2TeamAId: 0,
-                  semi2TeamBId: 0,
-                }))
-              }
-            >
-              {sportConfigs.map((cfg, idx) => (
-                <option key={idx} value={idx}>
-                  {cfg.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* 학년전: 학년 선택 */}
+          {!isClubMode && (
+            <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+              <label className={styles.formLabel}>학년</label>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {([1, 2, 3] as const).map(g => (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() =>
+                      setForm(prev => ({
+                        ...prev,
+                        grade: g,
+                        sportIndex: 0,
+                        teamAId: 0,
+                        teamBId: 0,
+                        semi2TeamAId: 0,
+                        semi2TeamBId: 0,
+                      }))
+                    }
+                    style={{
+                      padding: '6px 16px',
+                      borderRadius: 6,
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      background: form.grade === g ? 'var(--green)' : 'var(--card2, var(--card))',
+                      color: form.grade === g ? '#fff' : 'var(--text)',
+                    }}
+                  >
+                    {GRADE_LABELS[g]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 학년전: 종목 선택 (선택 학년에 해당하는 종목만) */}
+          {!isClubMode && (
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>종목</label>
+              <select
+                className={styles.formSelect}
+                value={form.sportIndex}
+                onChange={e =>
+                  setForm(prev => ({
+                    ...prev,
+                    sportIndex: Number(e.target.value),
+                    teamAId: 0,
+                    teamBId: 0,
+                    semi2TeamAId: 0,
+                    semi2TeamBId: 0,
+                  }))
+                }
+              >
+                {sportConfigs.map((cfg, idx) => (
+                  <option key={idx} value={idx}>
+                    {cfg.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* 연합전: 종목 선택 */}
+          {isClubMode && (
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>종목</label>
+              <select
+                className={styles.formSelect}
+                value={form.clubSport}
+                onChange={e =>
+                  setForm(prev => ({
+                    ...prev,
+                    clubSport: e.target.value,
+                    teamAId: 0,
+                    teamBId: 0,
+                    semi2TeamAId: 0,
+                    semi2TeamBId: 0,
+                  }))
+                }
+              >
+                {CLUB_TOURNAMENT_SPORTS.map(s => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* 추가 방식: 단일 / 준결승 일괄 */}
           <div className={styles.formGroup}>
@@ -376,7 +459,7 @@ export function TournamentMgmtTab({
                     onChange={e => setForm(prev => ({ ...prev, teamAId: Number(e.target.value) }))}
                   >
                     <option value={0}>팀 A 선택</option>
-                    {gradeTeams.map(renderOption)}
+                    {activeTeams.map(renderOption)}
                   </select>
                   <select
                     className={styles.formSelect}
@@ -384,7 +467,7 @@ export function TournamentMgmtTab({
                     onChange={e => setForm(prev => ({ ...prev, teamBId: Number(e.target.value) }))}
                   >
                     <option value={0}>팀 B 선택</option>
-                    {gradeTeams.map(renderOption)}
+                    {activeTeams.map(renderOption)}
                   </select>
                 </div>
               </div>
@@ -400,7 +483,7 @@ export function TournamentMgmtTab({
                     onChange={e => setForm(prev => ({ ...prev, semi2TeamAId: Number(e.target.value) }))}
                   >
                     <option value={0}>팀 A 선택</option>
-                    {gradeTeams.map(renderOption)}
+                    {activeTeams.map(renderOption)}
                   </select>
                   <select
                     className={styles.formSelect}
@@ -408,7 +491,7 @@ export function TournamentMgmtTab({
                     onChange={e => setForm(prev => ({ ...prev, semi2TeamBId: Number(e.target.value) }))}
                   >
                     <option value={0}>팀 B 선택</option>
-                    {gradeTeams.map(renderOption)}
+                    {activeTeams.map(renderOption)}
                   </select>
                 </div>
               </div>
