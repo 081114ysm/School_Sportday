@@ -5,8 +5,7 @@ import type { Match } from '@/types';
 import { fetchMatches } from '@/services/api';
 import { getSocket } from '@/services/socket';
 import Bracket from '@/components/tournament/Bracket';
-import { CLUB_TOURNAMENT_SPORTS, CLUB_GROUPS } from '@/components/admin/adminConstants';
-import type { ClubGroup } from '@/components/admin/adminConstants';
+import { CLUB_TOURNAMENT_SPORTS } from '@/components/admin/adminConstants';
 
 // 학년별 토너먼트 종목 정의
 const GRADE_SPORTS: { grade: number; label: string; sports: string[] }[] = [
@@ -54,7 +53,6 @@ export default function TournamentPage() {
   const [selectedGradeSport, setSelectedGradeSport] = useState('피구');
 
   // 연합 탭 상태
-  const [selectedGroup, setSelectedGroup] = useState<ClubGroup>('A');
   const [selectedClubSport, setSelectedClubSport] = useState<string>(CLUB_TOURNAMENT_SPORTS[0]);
 
   useEffect(() => {
@@ -215,24 +213,6 @@ export default function TournamentPage() {
 
       {mainTab === 'club' && (
         <>
-          {/* 조 선택 */}
-          <div style={{ display: 'flex', gap: 8 }}>
-            {CLUB_GROUPS.map((group) => (
-              <button
-                key={group}
-                type="button"
-                onClick={() => setSelectedGroup(group)}
-                style={{
-                  ...TAB_STYLE_BASE,
-                  background: selectedGroup === group ? 'var(--green)' : 'var(--card)',
-                  color: selectedGroup === group ? '#fff' : 'var(--text)',
-                }}
-              >
-                {group}조
-              </button>
-            ))}
-          </div>
-
           {/* 종목 버튼 */}
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {CLUB_TOURNAMENT_SPORTS.map((sport) => (
@@ -253,10 +233,10 @@ export default function TournamentPage() {
           </div>
 
           <Bracket
-            key={`club-${selectedGroup}-${selectedClubSport}`}
-            title={`연합 ${selectedGroup}조 ${selectedClubSport}`}
+            key={`club-${selectedClubSport}`}
+            title={`연합 ${selectedClubSport}`}
             sport={selectedClubSport}
-            clubGroup={selectedGroup}
+            clubGroup=""
             matches={matches.filter((m) => clubSportAliases.includes(m.sport))}
           />
         </>

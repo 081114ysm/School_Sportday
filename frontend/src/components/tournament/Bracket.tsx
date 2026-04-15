@@ -29,12 +29,13 @@ function winningTeamName(m: Match | undefined): string | null {
 }
 
 export default function Bracket({ title, sport, grade, clubGroup, matches }: BracketProps) {
-  const pool = clubGroup
+  const pool = clubGroup !== undefined
     ? matches.filter(
         (m) =>
           m.sport === sport &&
           m.category === 'CLUB' &&
           (
+            !clubGroup ||
             (m.teamA?.name ?? '').includes(clubGroup) ||
             (m.teamB?.name ?? '').includes(clubGroup)
           ),
