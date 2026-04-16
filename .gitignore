@@ -48,3 +48,9 @@ Thumbs.db
 **/.omc/
 .claude/
 **/.claude/
+
+# Claude Code / AI 전용 설정 파일
+CLAUDE.md
+**/CLAUDE.md
+AGENTS.md
+**/AGENTS.md
