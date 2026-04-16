@@ -4,7 +4,6 @@ import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Analytics } from '@vercel/analytics/react';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 const bebasNeue = Bebas_Neue({
   weight: '400',
@@ -55,7 +54,6 @@ export default function RootLayout({
         <main className="app-main">{children}</main>
         <Footer />
         <Analytics />
-        <GoogleAnalytics />
         <script
           dangerouslySetInnerHTML={{
             __html: `if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}`,
