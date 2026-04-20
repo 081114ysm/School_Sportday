@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = 'https://schoolsportday-production.up.railway.app';
+const SOCKET_URL = 'http://43.203.204.90';
 
 let socket: Socket | null = null;
 
