@@ -12,16 +12,19 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 // FRONTEND_URL 환경변수: 콤마로 구분된 다중 origin 허용 (Railway → Vercel CORS)
+// 프로덕션 도메인은 환경변수 유무와 관계없이 항상 포함한다.
 function getAllowedOrigins(): string[] {
-  const envVal = process.env.FRONTEND_URL;
-  if (envVal) {
-    return envVal.split(',').map((u) => u.trim()).filter(Boolean);
-  }
-  return [
+  const defaults = [
     'http://localhost:3000',
     'http://localhost:3001',
     'https://sports.gbsw.hs.kr',
   ];
+  const envVal = process.env.FRONTEND_URL;
+  if (envVal) {
+    const fromEnv = envVal.split(',').map((u) => u.trim()).filter(Boolean);
+    return Array.from(new Set([...fromEnv, ...defaults]));
+  }
+  return defaults;
 }
 
 async function bootstrap() {
