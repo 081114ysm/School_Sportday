@@ -43,6 +43,7 @@ export default function AdminPage() {
     setNewMatch,
     handleCreateMatch,
     handleDeleteMatch,
+    handleUpdateMatch,
     handleEditResult,
     newTeam,
     setNewTeam,
@@ -108,8 +109,8 @@ export default function AdminPage() {
               padding: 28,
             }}
           >
-            <h2 style={{ fontSize: 18, fontWeight: 900, marginBottom: 6 }}>
-              🔒 관리자 인증
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>
+              관리자 인증
             </h2>
             <p style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 20 }}>
               관리자 비밀번호를 입력하세요. 한 번 입력하면 이 기기에서 기억됩니다.
@@ -145,14 +146,14 @@ export default function AdminPage() {
   }
 
   const TABS: { key: AdminTab; label: string }[] = [
-    { key: 'live-input', label: '🎮 실시간 입력' },
-    { key: 'results', label: '📋 결과 입력' },
-    { key: 'schedule-mgmt', label: '📅 일정 관리' },
-    { key: 'team-mgmt', label: '👥 팀 관리' },
-    { key: 'youtube-mgmt', label: '📺 유튜브 관리' },
-    { key: 'sport-mgmt', label: '🏅 종목 관리' },
-    { key: 'tournament-mgmt', label: '🏆 토너먼트 일정' },
-    { key: 'points-mgmt', label: '🎯 승점 관리' },
+    { key: 'live-input', label: '실시간 입력' },
+    { key: 'results', label: '결과 입력' },
+    { key: 'schedule-mgmt', label: '일정 관리' },
+    { key: 'team-mgmt', label: '팀 관리' },
+    { key: 'youtube-mgmt', label: '유튜브' },
+    { key: 'sport-mgmt', label: '종목 관리' },
+    { key: 'tournament-mgmt', label: '토너먼트' },
+    { key: 'points-mgmt', label: '승점 관리' },
   ];
 
   return (
@@ -191,8 +192,8 @@ export default function AdminPage() {
       {/* 헤더 */}
       <header className={styles.adminHeader}>
         <div className={styles.adminLogo}>
-          <div className={styles.adminLogoIcon}>{'\u2699'}</div>
-          <span className={styles.adminLogoText}>ADMIN PANEL</span>
+          <div className={styles.adminLogoIcon}>A</div>
+          <span className={styles.adminLogoText}>관리자</span>
         </div>
         <div className={styles.adminHeaderRight}>
           {/* 햄버거 버튼 (모바일 전용) */}
@@ -217,17 +218,17 @@ export default function AdminPage() {
             }}
             style={{ cursor: 'pointer', color: '#dc2626', borderColor: '#dc2626' }}
           >
-            🗑 저번주 삭제
+            저번주 삭제
           </button>
           <button
             className={styles.adminHomeLink}
             onClick={handleLogout}
             style={{ cursor: 'pointer' }}
           >
-            🔓 로그아웃
+            로그아웃
           </button>
           <Link href="/" className={styles.adminHomeLink}>
-            {'\u2190'} 메인으로
+            ← 메인으로
           </Link>
         </div>
       </header>
@@ -286,6 +287,7 @@ export default function AdminPage() {
             setNewMatch={setNewMatch}
             onCreateMatch={handleCreateMatch}
             onDeleteMatch={handleDeleteMatch}
+            onUpdateMatch={handleUpdateMatch}
             scheduleSportFilter={scheduleSportFilter}
             setScheduleSportFilter={setScheduleSportFilter}
             scheduleDateFilter={scheduleDateFilter}

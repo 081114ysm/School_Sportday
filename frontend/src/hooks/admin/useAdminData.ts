@@ -307,6 +307,19 @@ export function useAdminData() {
     }
   };
 
+  const handleUpdateMatch = async (id: number, data: Partial<Match>) => {
+    try {
+      setLoading(true);
+      const updated = await updateMatch(id, data);
+      setMatches(prev => prev.map(m => m.id === updated.id ? updated : m));
+    } catch (err) {
+      console.error('Match update failed:', err);
+      alert('경기 수정에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEditResult = async (
     id: number,
     data: { scoreA: number; scoreB: number; status: 'SCHEDULED' | 'LIVE' | 'DONE' },
@@ -453,6 +466,7 @@ export function useAdminData() {
     setNewMatch,
     handleCreateMatch,
     handleDeleteMatch,
+    handleUpdateMatch,
     handleEditResult,
     // 팀 관리
     newTeam,

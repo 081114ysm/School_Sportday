@@ -19,6 +19,16 @@ interface NewMatchForm {
   bracketStage?: string | null;
 }
 
+interface EditForm {
+  sport: string;
+  matchDate: string;
+  timeSlot: string;
+  teamAId: number;
+  teamBId: number;
+  category: string;
+  bracketStage: string | null;
+}
+
 interface ScheduleMgmtTabProps {
   scheduleMatches: Match[];
   matches: Match[];
@@ -28,6 +38,7 @@ interface ScheduleMgmtTabProps {
   setNewMatch: (updater: (prev: NewMatchForm) => NewMatchForm) => void;
   onCreateMatch: () => void;
   onDeleteMatch: (id: number) => void;
+  onUpdateMatch: (id: number, data: Partial<Match>) => Promise<void>;
   scheduleSportFilter: string;
   setScheduleSportFilter: (s: string) => void;
   scheduleDateFilter: string;
@@ -43,18 +54,23 @@ export function ScheduleMgmtTab({
   setNewMatch,
   onCreateMatch,
   onDeleteMatch,
+  onUpdateMatch,
   scheduleSportFilter,
   setScheduleSportFilter,
   scheduleDateFilter,
   setScheduleDateFilter,
 }: ScheduleMgmtTabProps) {
   const [sports, setSports] = useState<string[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<EditForm | null>(null);
+
   useEffect(() => {
     setSports(getSports());
     const onChange = () => setSports(getSports());
     window.addEventListener('sportday:customSportsChanged', onChange);
     return () => window.removeEventListener('sportday:customSportsChanged', onChange);
   }, []);
+
   const selectable = filterTeamsForSport(teams, newMatch.sport);
   const label = sportRestrictionLabel(newMatch.sport);
   const suffix = label ? ` (${label})` : '';
@@ -65,9 +81,45 @@ export function ScheduleMgmtTab({
     </option>
   );
 
+  const startEdit = (match: Match) => {
+    setEditingId(match.id);
+    setEditForm({
+      sport: match.sport,
+      matchDate: match.matchDate ?? '',
+      timeSlot: match.timeSlot ?? TIME_SLOTS[0].value,
+      teamAId: match.teamA?.id ?? 0,
+      teamBId: match.teamB?.id ?? 0,
+      category: match.category ?? CATEGORIES[0],
+      bracketStage: match.bracketStage ?? null,
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditForm(null);
+  };
+
+  const saveEdit = async (matchId: number) => {
+    if (!editForm) return;
+    await onUpdateMatch(matchId, {
+      sport: editForm.sport,
+      matchDate: editForm.matchDate,
+      timeSlot: editForm.timeSlot,
+      teamAId: editForm.teamAId,
+      teamBId: editForm.teamBId,
+      category: editForm.category,
+      bracketStage: editForm.bracketStage,
+    } as Partial<Match>);
+    cancelEdit();
+  };
+
+  const editSelectable = editForm ? filterTeamsForSport(teams, editForm.sport) : [];
+  const editLabel = editForm ? sportRestrictionLabel(editForm.sport) : '';
+  const editSuffix = editLabel ? ` (${editLabel})` : '';
+
   return (
     <div>
-      <h2 className={styles.adminSectionTitle}>{'\uD83D\uDCC5'} 일정 관리</h2>
+      <h2 className={styles.adminSectionTitle}>일정 관리</h2>
 
       {/* 경기 생성 폼 */}
       <div className={styles.formCard}>
@@ -82,7 +134,6 @@ export function ScheduleMgmtTab({
                 setNewMatch(prev => ({
                   ...prev,
                   sport: e.target.value,
-                  // 종목이 바뀌면 학년 제한이 달라질 수 있으므로 팀 선택 리셋
                   teamAId: 0,
                   teamBId: 0,
                 }))
@@ -206,7 +257,7 @@ export function ScheduleMgmtTab({
           onClick={onCreateMatch}
           disabled={loading}
         >
-          {loading ? '생성 중...' : '+ 경기 추가'}
+          {loading ? '생성 중...' : '경기 추가'}
         </button>
       </div>
 
@@ -216,7 +267,7 @@ export function ScheduleMgmtTab({
           className={`${styles.filterBtn} ${scheduleSportFilter === '' ? styles.filterBtnActive : ''}`}
           onClick={() => setScheduleSportFilter('')}
         >
-          전체 종목
+          전체
         </button>
         {sports.map(s => (
           <button
@@ -241,14 +292,14 @@ export function ScheduleMgmtTab({
             className={styles.filterBtn}
             onClick={() => setScheduleDateFilter('')}
           >
-            날짜 초기화
+            초기화
           </button>
         )}
       </div>
 
-      {/* 날짜별 경기 목록 */}
+      {/* 경기 목록 */}
       <div className={styles.formTitle}>
-        등록된 경기 ({scheduleMatches.length}{scheduleMatches.length !== matches.length ? ` / ${matches.length}` : ''})
+        경기 목록 ({scheduleMatches.length}{scheduleMatches.length !== matches.length ? ` / ${matches.length}` : ''})
       </div>
       <div className={styles.matchList}>
         {scheduleMatches.length === 0 ? (
@@ -257,32 +308,156 @@ export function ScheduleMgmtTab({
           (['LIVE', 'SCHEDULED'] as const).map(group => {
             const items = scheduleMatches.filter(m => effectiveStatus(m) === group);
             if (items.length === 0) return null;
-            const groupLabel = group === 'LIVE' ? '🔴 진행 중' : '⏳ 예정';
+            const groupLabel = group === 'LIVE' ? '진행 중' : '예정';
             return (
               <div key={group} className={styles.dateGroup}>
-                <div className={styles.dateGroupHeader}>
+                <div className={`${styles.dateGroupHeader} ${group === 'LIVE' ? styles.dateGroupHeaderLive : ''}`}>
                   {groupLabel} · {items.length}경기
                 </div>
                 {items.map(match => (
-                  <div key={match.id} className={styles.matchListItem}>
-                    <div className={styles.matchListLeft}>
-                      <StatusBadge match={match} />
-                      <span className={styles.matchListSport}>{match.sport}</span>
-                      <span className={styles.matchListTeams}>
-                        {match.teamA?.name || 'Team A'} vs {match.teamB?.name || 'Team B'}
-                      </span>
-                      <span className={styles.matchListTime}>
-                        {match.matchDate ?? '날짜미정'} · {slotLabel(match.timeSlot)} · {match.category}
-                      </span>
+                  <div key={match.id}>
+                    <div className={`${styles.matchListItem} ${editingId === match.id ? styles.matchListItemEditing : ''}`}>
+                      <div className={styles.matchListLeft}>
+                        <StatusBadge match={match} />
+                        <span className={styles.matchListSport}>{match.sport}</span>
+                        <span className={styles.matchListTeams}>
+                          {match.teamA?.name || 'Team A'} vs {match.teamB?.name || 'Team B'}
+                        </span>
+                        <span className={styles.matchListTime}>
+                          {match.matchDate ?? '날짜미정'} · {slotLabel(match.timeSlot)} · {match.category}
+                        </span>
+                      </div>
+                      <div className={styles.matchListActions}>
+                        {editingId === match.id ? (
+                          <>
+                            <button
+                              className={styles.saveBtn}
+                              onClick={() => saveEdit(match.id)}
+                              disabled={loading}
+                            >
+                              저장
+                            </button>
+                            <button
+                              className={styles.cancelBtn}
+                              onClick={cancelEdit}
+                            >
+                              취소
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              className={styles.editBtn}
+                              onClick={() => startEdit(match)}
+                            >
+                              수정
+                            </button>
+                            <button
+                              className={styles.deleteBtn}
+                              onClick={() => onDeleteMatch(match.id)}
+                            >
+                              삭제
+                            </button>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div className={styles.matchListActions}>
-                      <button
-                        className={styles.deleteBtn}
-                        onClick={() => onDeleteMatch(match.id)}
-                      >
-                        삭제
-                      </button>
-                    </div>
+                    {editingId === match.id && editForm && (
+                      <div className={styles.inlineEditForm}>
+                        <div className={styles.formGrid}>
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>종목</label>
+                            <select
+                              className={styles.formSelect}
+                              value={editForm.sport}
+                              onChange={e => setEditForm(prev => prev ? {
+                                ...prev,
+                                sport: e.target.value,
+                                teamAId: 0,
+                                teamBId: 0,
+                              } : null)}
+                            >
+                              {sports.map(s => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>날짜</label>
+                            <input
+                              className={styles.formInput}
+                              type="date"
+                              value={editForm.matchDate}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, matchDate: e.target.value } : null)}
+                            />
+                          </div>
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>시간</label>
+                            <select
+                              className={styles.formSelect}
+                              value={editForm.timeSlot}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, timeSlot: e.target.value } : null)}
+                            >
+                              {TIME_SLOTS.map(t => (
+                                <option key={t.value} value={t.value}>{t.label}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>카테고리</label>
+                            <select
+                              className={styles.formSelect}
+                              value={editForm.category}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, category: e.target.value } : null)}
+                            >
+                              {CATEGORIES.map(c => (
+                                <option key={c} value={c}>{CATEGORY_LABELS[c] ?? c}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {TOURNAMENT_SPORTS.has(editForm.sport) && (
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>대진</label>
+                              <select
+                                className={styles.formSelect}
+                                value={editForm.bracketStage ?? ''}
+                                onChange={e => setEditForm(prev => prev ? {
+                                  ...prev,
+                                  bracketStage: e.target.value || null,
+                                } : null)}
+                              >
+                                <option value="">(없음)</option>
+                                {BRACKET_STAGES.map(s => (
+                                  <option key={s.value} value={s.value}>{s.label}</option>
+                                ))}
+                              </select>
+                            </div>
+                          )}
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>팀 A{editSuffix}</label>
+                            <select
+                              className={styles.formSelect}
+                              value={editForm.teamAId}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, teamAId: Number(e.target.value) } : null)}
+                            >
+                              <option value={0}>팀 선택</option>
+                              {editSelectable.map(renderOption)}
+                            </select>
+                          </div>
+                          <div className={styles.formGroup}>
+                            <label className={styles.formLabel}>팀 B{editSuffix}</label>
+                            <select
+                              className={styles.formSelect}
+                              value={editForm.teamBId}
+                              onChange={e => setEditForm(prev => prev ? { ...prev, teamBId: Number(e.target.value) } : null)}
+                            >
+                              <option value={0}>팀 선택</option>
+                              {editSelectable.map(renderOption)}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
