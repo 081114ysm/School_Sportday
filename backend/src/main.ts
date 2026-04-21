@@ -17,7 +17,11 @@ function getAllowedOrigins(): string[] {
   if (envVal) {
     return envVal.split(',').map((u) => u.trim()).filter(Boolean);
   }
-  return ['http://localhost:3000', 'http://localhost:3001'];
+  return [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'https://sports.gbsw.hs.kr',
+  ];
 }
 
 async function bootstrap() {
