@@ -2,8 +2,8 @@
 
 학교 공식 체육대회 실시간 스코어보드.
 - Frontend: Next.js (Vercel)
-- Backend: NestJS + Socket.IO (Railway)
-- DB: Postgres (Railway) / SQLite (로컬 개발)
+- Backend: NestJS + Socket.IO (AWS EC2)
+- DB: Postgres (AWS RDS) / SQLite (로컬 개발)
 
 ## 로컬 개발
 
@@ -17,24 +17,14 @@ cd frontend && npm install && npm run dev
 
 환경변수는 각각 `backend/.env.example`, `frontend/.env.example` 참고.
 
-## 배포 가이드 (Vercel + Railway)
+## 배포 가이드 (Vercel + AWS)
 
-### 1. Railway — Postgres DB 생성
-1. [railway.app](https://railway.app) 에서 새 프로젝트 생성
-2. **Add Service → Database → PostgreSQL** 선택
-3. 생성된 서비스의 **Variables** 탭에서 `DATABASE_URL` 값 확인 (자동 제공됨)
-
-### 2. Railway — 백엔드 서비스 연결
-1. 같은 프로젝트에 **Add Service → GitHub Repo** 선택
-2. 저장소 연결 후 **Settings → Source → Root Directory** 를 `backend` 로 설정
-3. Railway가 `railway.json` 을 감지해 자동 빌드/배포
-
-### 3. Railway 백엔드 환경변수 입력
-**Variables** 탭에서 아래 항목 추가:
+### 1. AWS — 백엔드 환경변수 설정
+EC2 인스턴스의 `.env` 또는 환경변수에 아래 항목 설정:
 
 | 변수명 | 값 |
 |---|---|
-| `DATABASE_URL` | (Postgres 서비스에서 자동 주입됨) |
+| `DATABASE_URL` | Postgres 연결 URL |
 | `FRONTEND_URL` | `https://your-app.vercel.app` (Vercel 배포 후 추가) |
 | `ADMIN_TOKEN` | 임의의 강력한 비밀값 |
 | `VAPID_PUBLIC_KEY` | (로컬에서 생성한 VAPID 공개키) |
@@ -43,23 +33,18 @@ cd frontend && npm install && npm run dev
 
 > VAPID 키 생성: `node -e "const wp=require('web-push'); const k=wp.generateVAPIDKeys(); console.log(JSON.stringify(k,null,2))"`
 
-### 4. Railway Public URL 확인
-백엔드 서비스 **Settings → Networking → Public Domain** 에서 URL 복사
-(예: `https://backend-production-xxxx.up.railway.app`)
-
-### 5. Vercel — 프론트엔드 연결
+### 2. Vercel — 프론트엔드 연결
 1. [vercel.com](https://vercel.com) 에서 **Add New Project → GitHub Repo** 선택
 2. **Root Directory** 를 `frontend` 로 설정
 3. Vercel이 `vercel.json` 을 감지해 Next.js 자동 빌드
 
-### 6. Vercel 환경변수 입력
+### 3. Vercel 환경변수 입력
 | 변수명 | 값 |
 |---|---|
-| `NEXT_PUBLIC_BACKEND_URL` | `https://<4번에서 복사한 Railway URL>` |
+| `NEXT_PUBLIC_BACKEND_URL` | `https://<AWS 백엔드 도메인>` |
 
-### 7. CORS 마무리
-Vercel 배포 완료 후 Vercel URL을 확인하고,
-Railway 백엔드의 `FRONTEND_URL` 에 Vercel URL 추가:
+### 4. CORS 마무리
+Vercel 배포 완료 후 백엔드의 `FRONTEND_URL` 에 Vercel URL 추가:
 ```
 FRONTEND_URL=https://your-app.vercel.app
 ```
@@ -69,6 +54,5 @@ FRONTEND_URL=https://your-app.vercel.app,https://custom-domain.com
 ```
 
 ### Socket.IO 주의사항
-- Vercel은 서버리스라 Socket.IO 서버를 호스팅할 수 없음 → Socket.IO 서버는 Railway 백엔드에서만 실행
-- 프론트엔드 클라이언트가 `NEXT_PUBLIC_BACKEND_URL` 로 WebSocket 연결하므로 Railway URL을 정확히 입력할 것
-- Railway 무료 플랜은 슬립 정책이 있음 — 첫 요청 시 콜드스타트 발생 가능
+- Vercel은 서버리스라 Socket.IO 서버를 호스팅할 수 없음 → Socket.IO 서버는 AWS 백엔드에서만 실행
+- 프론트엔드 클라이언트가 `NEXT_PUBLIC_BACKEND_URL` 로 WebSocket 연결하므로 AWS 도메인을 정확히 입력할 것

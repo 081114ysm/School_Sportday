@@ -11,7 +11,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
-// FRONTEND_URL 환경변수: 콤마로 구분된 다중 origin 허용 (Railway → Vercel CORS)
+// FRONTEND_URL 환경변수: 콤마로 구분된 다중 origin 허용
 // 프로덕션 도메인은 환경변수 유무와 관계없이 항상 포함한다.
 function getAllowedOrigins(): string[] {
   const defaults = [

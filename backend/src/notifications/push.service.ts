@@ -42,7 +42,7 @@ export class PushService implements OnModuleInit {
   }
 
   private loadOrGenerateVapid() {
-    // Railway 등 환경변수로 VAPID 키를 주입한 경우 우선 사용
+    // 환경변수로 VAPID 키를 주입한 경우 우선 사용
     if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
       this.publicKey = process.env.VAPID_PUBLIC_KEY;
       this.privateKey = process.env.VAPID_PRIVATE_KEY;
