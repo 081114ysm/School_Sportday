@@ -29,6 +29,8 @@ out/
 **/*.sqlite
 **/*.sqlite-shm
 **/*.sqlite-wal
+*.sql
+**/*.sql
 
 # logs
 *.log
