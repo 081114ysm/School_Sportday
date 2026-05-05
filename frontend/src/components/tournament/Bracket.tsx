@@ -28,6 +28,12 @@ function winningTeamName(m: Match | undefined): string | null {
   return (w === 'A' ? m.teamA?.name : m.teamB?.name) ?? null;
 }
 
+function losingTeamName(m: Match | undefined): string | null {
+  const w = matchWinner(m);
+  if (!w || !m) return null;
+  return (w === 'A' ? m.teamB?.name : m.teamA?.name) ?? null;
+}
+
 export default function Bracket({ title, sport, grade, clubGroup, matches }: BracketProps) {
   const pool = clubGroup !== undefined
     ? matches.filter(
@@ -49,12 +55,16 @@ export default function Bracket({ title, sport, grade, clubGroup, matches }: Bra
   const semi1 = pool.find((m) => m.bracketStage === 'SEMI1');
   const semi2 = pool.find((m) => m.bracketStage === 'SEMI2');
   const final = pool.find((m) => m.bracketStage === 'FINAL');
+  const thirdPlace = pool.find((m) => m.bracketStage === 'THIRD_PLACE');
 
   const semi1Winner = matchWinner(semi1);
   const semi2Winner = matchWinner(semi2);
   const semi1WinnerName = winningTeamName(semi1);
   const semi2WinnerName = winningTeamName(semi2);
   const champion = winningTeamName(final);
+  const semi1LoserName = losingTeamName(semi1);
+  const semi2LoserName = losingTeamName(semi2);
+  const thirdPlaceWinner = winningTeamName(thirdPlace);
 
   return (
     <section className={styles.wrap}>
@@ -117,6 +127,30 @@ export default function Bracket({ title, sport, grade, clubGroup, matches }: Bra
           )}
         </div>
       </div>
+
+      {thirdPlace !== undefined && (
+        <div className={styles.thirdSection}>
+          <div className={styles.thirdRow}>
+            <MatchCard
+              match={thirdPlace}
+              stageLabel="3위전"
+              teamAName={semi1LoserName ?? undefined}
+              teamBName={semi2LoserName ?? undefined}
+            />
+            <div className={`${styles.connectorThird} ${thirdPlaceWinner ? styles.green : ''}`} />
+            <div className={styles.thirdResultCol}>
+              {thirdPlaceWinner ? (
+                <div className={styles.thirdResult}>
+                  <div className={styles.thirdResultLabel}>🥉 3위</div>
+                  <div className={styles.thirdResultName}>{thirdPlaceWinner}</div>
+                </div>
+              ) : (
+                <div className={styles.thirdResultPlaceholder}>3위 대기</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

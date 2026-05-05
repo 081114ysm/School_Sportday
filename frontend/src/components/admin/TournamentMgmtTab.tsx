@@ -21,6 +21,14 @@ function getSemiWinner(match: Match | undefined): Team | undefined {
   return undefined;
 }
 
+function getSemiLoser(match: Match | undefined): Team | undefined {
+  if (!match || match.status !== 'DONE') return undefined;
+  const { a, b } = getMatchScorePair(match);
+  if (a > b) return match.teamB ?? undefined;
+  if (b > a) return match.teamA ?? undefined;
+  return undefined;
+}
+
 interface CreatePayload {
   sport: string;
   grade?: number;
@@ -117,13 +125,25 @@ export function TournamentMgmtTab({
   const semi2Winner = getSemiWinner(semi2Match);
   const semiWinners = [semi1Winner, semi2Winner].filter((t): t is Team => !!t);
 
+  const semi1Loser = getSemiLoser(semi1Match);
+  const semi2Loser = getSemiLoser(semi2Match);
+  const semiLosers = [semi1Loser, semi2Loser].filter((t): t is Team => !!t);
+
   const isFinal = !form.batchSemis && form.bracketStage === 'FINAL';
+  const isThirdPlace = !form.batchSemis && form.bracketStage === 'THIRD_PLACE';
   const selectableTeams =
-    !isClubMode && isFinal && semiWinners.length > 0 ? semiWinners : activeTeams;
+    !isClubMode && isFinal && semiWinners.length > 0 ? semiWinners :
+    !isClubMode && isThirdPlace && semiLosers.length > 0 ? semiLosers :
+    activeTeams;
 
   const finalHint =
     isFinal && semiWinners.length < 2
       ? `준결승 결과 대기 중 (${semiWinners.length}/2 확정)`
+      : null;
+
+  const thirdPlaceHint =
+    isThirdPlace && semiLosers.length < 2
+      ? `준결승 결과 대기 중 (${semiLosers.length}/2 확정)`
       : null;
 
   const stageLabelMap = Object.fromEntries(
@@ -436,10 +456,10 @@ export function TournamentMgmtTab({
             </select>
           </div>
 
-          {finalHint && (
+          {(finalHint ?? thirdPlaceHint) && (
             <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
               <div style={{ fontSize: 12, color: '#f59e0b', fontWeight: 600 }}>
-                ⚠ {finalHint}
+                ⚠ {finalHint ?? thirdPlaceHint}
               </div>
             </div>
           )}
@@ -500,7 +520,7 @@ export function TournamentMgmtTab({
             <>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>
-                  팀 A{isFinal ? ' (준결승 승자)' : ''}
+                  팀 A{isFinal ? ' (준결승 승자)' : isThirdPlace ? ' (준결승 패자)' : ''}
                 </label>
                 <select
                   className={styles.formSelect}
@@ -513,7 +533,7 @@ export function TournamentMgmtTab({
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>
-                  팀 B{isFinal ? ' (준결승 승자)' : ''}
+                  팀 B{isFinal ? ' (준결승 승자)' : isThirdPlace ? ' (준결승 패자)' : ''}
                 </label>
                 <select
                   className={styles.formSelect}

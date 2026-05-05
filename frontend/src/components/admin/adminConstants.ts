@@ -107,6 +107,7 @@ export const CLUB_TOURNAMENT_SPORTS = ['빅발리볼', '배드민턴', '농구']
 export const BRACKET_STAGES = [
   { value: 'SEMI1', label: '준결승 1' },
   { value: 'SEMI2', label: '준결승 2' },
+  { value: 'THIRD_PLACE', label: '3위전' },
   { value: 'FINAL', label: '결승' },
 ] as const;
 
