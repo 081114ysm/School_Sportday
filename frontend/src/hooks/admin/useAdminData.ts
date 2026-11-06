@@ -171,7 +171,7 @@ export function useAdminData() {
     };
     const idx = sets.findIndex(s => !done(s.a, s.b));
     setActiveSet(idx === -1 ? 2 : idx);
-  }, [selectedMatch?.id, selectedMatch?.setsJson]);
+  }, [selectedMatch]);
 
   const handleScoreUpdate = async (team: 'A' | 'B', delta: number) => {
     if (!selectedMatchId) return;

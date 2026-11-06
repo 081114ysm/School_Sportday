@@ -46,7 +46,7 @@ export interface RankingEntry {
 
 // 빅발리볼·배드민턴은 점수 합계 대신 세트 스코어로 표시한다.
 // 공용 구현은 lib/matchScore.ts. 여기서는 하위호환 래퍼만 유지한다.
-export interface Match_ForDisplay extends Match {}
+export type Match_ForDisplay = Match;
 export function displayScore(m: Match): { a: number; b: number } {
   // 동적 임포트 대신 로컬 복사로 순환 참조를 피한다.
   const sport = m.sport;

@@ -15,7 +15,7 @@ import { YoutubeMgmtTab } from '@/components/admin/YoutubeMgmtTab';
 import { SportMgmtTab } from '@/components/admin/SportMgmtTab';
 import { TournamentMgmtTab } from '@/components/admin/TournamentMgmtTab';
 import { PointsMgmtTab } from '@/components/admin/PointsMgmtTab';
-import { deleteAllMatches, deleteLastWeekMatches } from '@/services/api';
+import { deleteLastWeekMatches } from '@/services/api';
 
 export default function AdminPage() {
   const {

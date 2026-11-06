@@ -9,11 +9,10 @@ import {
 } from './adminConstants';
 
 export function SportMgmtTab() {
-  const [custom, setCustom] = useState<string[]>([]);
+  const [custom, setCustom] = useState<string[]>(() => getCustomSports());
   const [input, setInput] = useState('');
 
   useEffect(() => {
-    setCustom(getCustomSports());
     const onChange = () => setCustom(getCustomSports());
     window.addEventListener('sportday:customSportsChanged', onChange);
     return () => window.removeEventListener('sportday:customSportsChanged', onChange);

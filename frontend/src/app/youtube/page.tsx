@@ -48,6 +48,8 @@ const SLOT_TIME: Record<string, string> = {
   DINNER: '18:30',
 };
 
+const SLOT_ORDER: Record<string, number> = { LUNCH: 0, DINNER: 1 };
+
 const NOTIF_KEY = 'sportday:matchNotifs';
 
 function loadNotifs(): Set<number> {
@@ -125,11 +127,9 @@ function matchToCard(m: Match): YtVideo {
 export default function YoutubePage() {
   const [active, setActive] = useState<YtVideo | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
-  const [notifs, setNotifs] = useState<Set<number>>(new Set());
+  const [notifs, setNotifs] = useState<Set<number>>(() => loadNotifs());
 
   useEffect(() => {
-    const initial = loadNotifs();
-    setNotifs(initial);
     const loadMatches = () => {
       fetchMatches()
         .then(setMatches)
@@ -188,7 +188,6 @@ export default function YoutubePage() {
     () => liveMatches.map(matchToVideo).filter((v): v is YtVideo => v !== null),
     [liveMatches],
   );
-  const SLOT_ORDER: Record<string, number> = { LUNCH: 0, DINNER: 1 };
   const upcoming = useMemo(
     () =>
       matches
@@ -209,6 +208,9 @@ export default function YoutubePage() {
   // 초기 로드 시 첫 번째 LIVE 경기를 플레이어에 표시한다.
   // 이후에는 라이브 경기가 없어질 때만 null로 초기화한다.
   useEffect(() => {
+    // 라이브 경기 목록이 외부 이벤트로 바뀔 때 선택된 플레이어를 보정한다.
+    // 이 상태 동기화는 해당 Effect의 목적이므로 규칙을 한 줄만 예외 처리한다.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActive((cur) => {
       if (cur == null) return liveVideos[0] ?? null;
       if (cur.badge === 'LIVE' && !liveVideos.some((v) => v.matchId === cur.matchId)) {

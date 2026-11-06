@@ -3,7 +3,7 @@
 // when the page is closed. Also keeps the legacy in-page postMessage path so
 // foreground "show notification" calls still work.
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
@@ -16,7 +16,7 @@ self.addEventListener('push', (event) => {
   let data = {};
   try {
     data = event.data ? event.data.json() : {};
-  } catch (_) {
+  } catch {
     data = { title: '경소마고 체육대회', body: event.data ? event.data.text() : '' };
   }
   const title = data.title || '경소마고 체육대회';

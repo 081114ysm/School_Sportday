@@ -29,7 +29,7 @@ export function ResultsTab({
   onEditResult,
   onDeleteResult,
 }: ResultsTabProps) {
-  const [sports, setSports] = useState<string[]>([]);
+  const [sports, setSports] = useState<string[]>(() => getSports());
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editDraft, setEditDraft] = useState<{
     scoreA: number;
@@ -40,7 +40,6 @@ export function ResultsTab({
   const [olderPage, setOlderPage] = useState(0);
 
   useEffect(() => {
-    setSports(getSports());
     const onChange = () => setSports(getSports());
     window.addEventListener('sportday:customSportsChanged', onChange);
     return () => window.removeEventListener('sportday:customSportsChanged', onChange);
@@ -48,6 +47,8 @@ export function ResultsTab({
 
   // Reset pagination when filters change
   useEffect(() => {
+    // 필터가 바뀌면 이전 페이지를 유지할 수 없으므로 페이지를 초기화한다.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setOlderPage(0);
   }, [filteredMatches.length, sportFilter, resultsStatusFilter]);
 

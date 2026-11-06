@@ -146,11 +146,11 @@ export default function NotificationsPage() {
           }}
         >
           <li>
-            위 <strong>"알림 켜기"</strong> 버튼을 누르고 브라우저 권한 팝업에서{' '}
+            위 <strong>&quot;알림 켜기&quot;</strong> 버튼을 누르고 브라우저 권한 팝업에서{' '}
             <strong>허용</strong>을 선택하세요.
           </li>
           <li>
-            옆의 <strong>"테스트 전송"</strong> 버튼으로 알림이 정상적으로 뜨는지 바로
+            옆의 <strong>&quot;테스트 전송&quot;</strong> 버튼으로 알림이 정상적으로 뜨는지 바로
             확인할 수 있습니다.
           </li>
           <li>
@@ -163,12 +163,12 @@ export default function NotificationsPage() {
           </li>
           <li>
             <strong>📱 아이폰 (iOS 16.4 이상)</strong> — Safari로 접속한 뒤 하단{' '}
-            <strong>공유</strong> 버튼 → <strong>"홈 화면에 추가"</strong>로 앱을 설치해
-            주세요. 홈 화면에서 앱을 열고 "알림 켜기"를 눌러야 푸시가 작동합니다.
+            <strong>공유</strong> 버튼 → <strong>&quot;홈 화면에 추가&quot;</strong>로 앱을 설치해
+            주세요. 홈 화면에서 앱을 열고 &quot;알림 켜기&quot;를 눌러야 푸시가 작동합니다.
           </li>
           <li>
             <strong>📱 안드로이드</strong> — Chrome으로 접속 후 주소창 우측의{' '}
-            <strong>"앱 설치"</strong> 또는 메뉴 → <strong>"홈 화면에 추가"</strong>를
+            <strong>&quot;앱 설치&quot;</strong> 또는 메뉴 → <strong>&quot;홈 화면에 추가&quot;</strong>를
             누르면 앱처럼 사용할 수 있습니다. 일반 브라우저에서도 알림은 정상
             동작합니다.
           </li>
@@ -177,7 +177,7 @@ export default function NotificationsPage() {
             닫아도 OS 알림 센터로 전달됩니다.
           </li>
           <li>
-            더 이상 알림을 받고 싶지 않다면 <strong>"알림 끄기"</strong>로 언제든 해제할
+            더 이상 알림을 받고 싶지 않다면 <strong>&quot;알림 끄기&quot;</strong>로 언제든 해제할
             수 있습니다.
           </li>
         </ol>

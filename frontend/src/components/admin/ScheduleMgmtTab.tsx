@@ -60,12 +60,11 @@ export function ScheduleMgmtTab({
   scheduleDateFilter,
   setScheduleDateFilter,
 }: ScheduleMgmtTabProps) {
-  const [sports, setSports] = useState<string[]>([]);
+  const [sports, setSports] = useState<string[]>(() => getSports());
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<EditForm | null>(null);
 
   useEffect(() => {
-    setSports(getSports());
     const onChange = () => setSports(getSports());
     window.addEventListener('sportday:customSportsChanged', onChange);
     return () => window.removeEventListener('sportday:customSportsChanged', onChange);

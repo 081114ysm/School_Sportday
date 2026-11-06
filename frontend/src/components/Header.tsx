@@ -34,6 +34,8 @@ export default function Header() {
 
   // Close menu on route change
   useEffect(() => {
+    // 라우트 변경은 메뉴가 열린 상태를 무효화하므로 상태를 동기화한다.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMenuOpen(false);
   }, [pathname]);
 
