@@ -11,6 +11,7 @@ export class MatchesGateway {
       matchId: match.id,
       scoreA: match.scoreA,
       scoreB: match.scoreB,
+      emittedAt: Date.now(),
       match,
     });
   }

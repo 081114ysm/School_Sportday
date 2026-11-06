@@ -130,9 +130,12 @@ export default function YoutubePage() {
   useEffect(() => {
     const initial = loadNotifs();
     setNotifs(initial);
-    fetchMatches()
-      .then(setMatches)
-      .catch(() => setMatches([]));
+    const loadMatches = () => {
+      fetchMatches()
+        .then(setMatches)
+        .catch(() => {});
+    };
+    loadMatches();
 
     if (typeof window !== 'undefined' && 'Notification' in window) {
       if (Notification.permission === 'default') {
@@ -141,6 +144,7 @@ export default function YoutubePage() {
     }
 
     const socket = getSocket();
+    socket.on('connect', loadMatches);
     const showNotif = (title: string, body: string) => {
       if (typeof window === 'undefined' || !('Notification' in window)) return;
       if (Notification.permission !== 'granted') return;
@@ -168,6 +172,7 @@ export default function YoutubePage() {
     });
 
     return () => {
+      socket.off('connect', loadMatches);
       socket.off('match:live');
       socket.off('match:ended');
       socket.off('matchStatusChange');

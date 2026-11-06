@@ -46,15 +46,54 @@ export default function TodayPage() {
   const [live, setLive] = useState<Match | null>(null);
 
   useEffect(() => {
-    fetchMatches({ matchDate: TODAY_DATE })
-      .then((arr) => setTodayMatches(sortBySlot(arr)))
-      .catch(() => {});
-    fetchLiveMatches()
-      .then((arr) => setLive(sortBySlot(arr)[0] ?? null))
-      .catch(() => {});
+    const loadData = () => {
+      const matchesStartedAt = performance.now();
+      fetchMatches({ matchDate: TODAY_DATE })
+        .then((arr) => {
+          const metrics = {
+            endpoint: '/api/matches?matchDate=' + TODAY_DATE,
+            durationMs: Number((performance.now() - matchesStartedAt).toFixed(2)),
+            recordCount: arr.length,
+            measuredAt: new Date().toISOString(),
+          };
+          console.info('[Sportday REST] matches sync metrics:', metrics);
+          console.info('[Sportday REST] matches sync metrics JSON:', JSON.stringify(metrics));
+          setTodayMatches(sortBySlot(arr));
+        })
+        .catch(() => {});
+
+      const liveStartedAt = performance.now();
+      fetchLiveMatches()
+        .then((arr) => {
+          const metrics = {
+            endpoint: '/api/matches/live',
+            durationMs: Number((performance.now() - liveStartedAt).toFixed(2)),
+            recordCount: arr.length,
+            measuredAt: new Date().toISOString(),
+          };
+          console.info('[Sportday REST] live matches sync metrics:', metrics);
+          console.info('[Sportday REST] live matches sync metrics JSON:', JSON.stringify(metrics));
+          setLive(sortBySlot(arr)[0] ?? null);
+        })
+        .catch(() => {});
+    };
+
+    loadData();
 
     const socket = getSocket();
+    const onConnect = () => loadData();
+    socket.on('connect', onConnect);
     socket.on('scoreUpdate', (data: { matchId: number; scoreA: number; scoreB: number; match?: Match }) => {
+      const emittedAt = (data as typeof data & { emittedAt?: number }).emittedAt;
+      const metrics = {
+        matchId: data.matchId,
+        deliveryMs: typeof emittedAt === 'number' ? Date.now() - emittedAt : null,
+        emittedAt: typeof emittedAt === 'number' ? new Date(emittedAt).toISOString() : null,
+        receivedAt: new Date().toISOString(),
+        transport: 'Socket.IO',
+      };
+      console.info('[Sportday realtime] scoreUpdate delivery metrics:', metrics);
+      console.info('[Sportday realtime] scoreUpdate delivery metrics JSON:', JSON.stringify(metrics));
       const patch = data.match
         ? { scoreA: data.match.scoreA, scoreB: data.match.scoreB, setsJson: data.match.setsJson, status: data.match.status }
         : { scoreA: data.scoreA, scoreB: data.scoreB };
@@ -70,6 +109,7 @@ export default function TodayPage() {
       if (m.status === 'LIVE') setLive(m);
     });
     return () => {
+      socket.off('connect', onConnect);
       socket.off('scoreUpdate');
       socket.off('matchUpdate');
       disconnectSocket();

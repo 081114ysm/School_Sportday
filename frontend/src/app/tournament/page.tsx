@@ -65,6 +65,7 @@ export default function TournamentPage() {
     load();
 
     const socket = getSocket();
+    const onConnect = () => load();
     const onUpdate = (m: Match) => {
       setMatches((prev) =>
         prev.some((x) => x.id === m.id)
@@ -84,6 +85,7 @@ export default function TournamentPage() {
     socket.on('matchUpdate', onUpdate);
     socket.on('scoreUpdate', onScore);
     socket.on('matchCreated', onUpdate);
+    socket.on('connect', onConnect);
 
     const onFocus = () => load();
     window.addEventListener('focus', onFocus);
@@ -92,6 +94,7 @@ export default function TournamentPage() {
       socket.off('matchUpdate', onUpdate);
       socket.off('scoreUpdate', onScore);
       socket.off('matchCreated', onUpdate);
+      socket.off('connect', onConnect);
       window.removeEventListener('focus', onFocus);
     };
   }, []);

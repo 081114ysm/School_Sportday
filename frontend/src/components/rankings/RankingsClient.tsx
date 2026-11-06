@@ -26,10 +26,12 @@ export default function RankingsClient({ initial }: { initial: RankingEntry[] })
       fetchRankings().then(setRankings).catch(() => {});
     };
     const socket = getSocket();
+    socket.on('connect', refresh);
     socket.on('matchUpdate', refresh);
     socket.on('matchStatusChange', refresh);
     socket.on('scoreUpdate', refresh);
     return () => {
+      socket.off('connect', refresh);
       socket.off('matchUpdate', refresh);
       socket.off('matchStatusChange', refresh);
       socket.off('scoreUpdate', refresh);

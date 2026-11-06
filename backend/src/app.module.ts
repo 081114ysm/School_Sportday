@@ -12,8 +12,15 @@ import { AdminController } from './common/admin.controller';
   imports: [
     // DATABASE_URL 환경변수가 있으면 Postgres, 없으면 로컬 SQLite 사용
     TypeOrmModule.forRootAsync({
-      useFactory: () =>
-        process.env.DATABASE_URL
+      useFactory: () => {
+        const adapter = process.env.DATABASE_URL ? 'postgresql' : 'sqlite';
+        console.info('[Sportday database] adapter metrics:', {
+          adapter,
+          hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+          synchronize: true,
+          measuredAt: new Date().toISOString(),
+        });
+        return process.env.DATABASE_URL
           ? {
               type: 'postgres' as const,
               url: process.env.DATABASE_URL,
@@ -26,7 +33,8 @@ import { AdminController } from './common/admin.controller';
               database: 'database.sqlite',
               autoLoadEntities: true,
               synchronize: true,
-            },
+          };
+      },
     }),
     TeamsModule,
     MatchesModule,

@@ -111,11 +111,20 @@ export function useAdminData() {
   }, [loadData, authorized]);
 
   useEffect(() => {
+    if (!authorized) return;
+
     const socket = getSocket();
+    const handleConnect = () => {
+      // Socket.IO는 연결이 끊긴 동안 발생한 이벤트를 재전송하지 않는다.
+      // 재연결 직후 REST를 기준 상태로 다시 조회해 누락된 점수·상태 변경을 보정한다.
+      void loadData();
+    };
 
     socket.on('matchUpdate', (updatedMatch: Match) => {
       setMatches(prev => prev.map(m => m.id === updatedMatch.id ? updatedMatch : m));
     });
+
+    socket.on('connect', handleConnect);
 
     socket.on('scoreUpdate', (data: { matchId: number; scoreA: number; scoreB: number }) => {
       setMatches(prev =>
@@ -132,13 +141,14 @@ export function useAdminData() {
     });
 
     return () => {
+      socket.off('connect', handleConnect);
       socket.off('matchUpdate');
       socket.off('scoreUpdate');
       socket.off('matchCreated');
       socket.off('matchDeleted');
       disconnectSocket();
     };
-  }, []);
+  }, [authorized, loadData]);
 
   // 실시간 점수 입력 상태
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);

@@ -42,7 +42,7 @@ export class Match {
   status: string;
 
   @Column({ nullable: true })
-  result: string;
+  result: string | null;
 
   @Column({ default: 'GRADE' })
   category: string;

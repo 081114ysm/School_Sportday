@@ -1,5 +1,6 @@
 import { Team, Match, RankingEntry } from '@/types';
 import { BASE_URL } from './config';
+import { MOCK_MATCHES, MOCK_RANKINGS, MOCK_TEAMS } from './mockData';
 
 // 서버·클라이언트 컴포넌트 모두에서 동작한다. Next의 fetch 캐시를 비활성화해
 // SSR이 항상 최신 데이터를 조회하도록 한다 — 실시간 기능에 필수.
@@ -54,7 +55,11 @@ export async function verifyAdminToken(token: string): Promise<boolean> {
 // 팀
 export async function fetchTeams(grade?: number): Promise<Team[]> {
   const query = grade ? `?grade=${grade}` : '';
-  return request<Team[]>(`/api/teams${query}`);
+  try {
+    return await request<Team[]>(`/api/teams${query}`);
+  } catch {
+    return grade ? MOCK_TEAMS.filter((team) => team.grade === grade) : MOCK_TEAMS;
+  }
 }
 
 export async function createTeam(data: { name: string; grade: number; classNumber: number }): Promise<Team> {
@@ -118,12 +123,26 @@ export async function fetchMatches(filters?: {
     });
   }
   const query = params.toString() ? `?${params.toString()}` : '';
-  const list = await request<Match[]>(`/api/matches${query}`);
-  return normalizePastStatus(list);
+  try {
+    const list = await request<Match[]>(`/api/matches${query}`);
+    return normalizePastStatus(list);
+  } catch {
+    let list = MOCK_MATCHES;
+    if (filters?.sport) list = list.filter((item) => item.sport === filters.sport);
+    if (filters?.day) list = list.filter((item) => item.day === filters.day);
+    if (filters?.matchDate) list = list.filter((item) => item.matchDate === filters.matchDate);
+    if (filters?.status) list = list.filter((item) => item.status === filters.status);
+    if (filters?.category) list = list.filter((item) => item.category === filters.category);
+    return list;
+  }
 }
 
 export async function fetchLiveMatches(): Promise<Match[]> {
-  return request<Match[]>('/api/matches/live');
+  try {
+    return await request<Match[]>('/api/matches/live');
+  } catch {
+    return MOCK_MATCHES.filter((item) => item.status === 'LIVE');
+  }
 }
 
 export async function createMatch(data: {
@@ -226,5 +245,9 @@ export async function setMatchYoutube(id: number, youtubeUrl: string | null): Pr
 // 랭킹
 export async function fetchRankings(grade?: number): Promise<RankingEntry[]> {
   const query = grade ? `?grade=${grade}` : '';
-  return request<RankingEntry[]>(`/api/rankings${query}`);
+  try {
+    return await request<RankingEntry[]>(`/api/rankings${query}`);
+  } catch {
+    return grade ? MOCK_RANKINGS.filter((entry) => entry.team.grade === grade) : MOCK_RANKINGS;
+  }
 }

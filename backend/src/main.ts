@@ -17,6 +17,8 @@ function getAllowedOrigins(): string[] {
   const defaults = [
     'http://localhost:3000',
     'http://localhost:3001',
+    'http://localhost:3100',
+    'http://127.0.0.1:3100',
     'https://sports.gbsw.hs.kr',
   ];
   const envVal = process.env.FRONTEND_URL;

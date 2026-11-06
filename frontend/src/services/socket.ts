@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
+import { BASE_URL } from './config';
 
-const SOCKET_URL = 'http://43.203.204.90';
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || BASE_URL;
 
 let socket: Socket | null = null;
 

@@ -347,26 +347,49 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
   }
 
   async updateScore(id: number, team: string, delta: number): Promise<Match> {
-    const match = await this.findOneOrFail(id);
+    const startedAt = Date.now();
+    await this.matchRepo.manager.transaction(async (manager) => {
+      const match = await manager.findOne(Match, { where: { id } });
+      if (!match) throw new NotFoundException('Match not found');
 
-    if (team === 'A') {
-      match.scoreA = Math.max(0, match.scoreA + delta);
-    } else {
-      match.scoreB = Math.max(0, match.scoreB + delta);
-    }
-    await this.matchRepo.save(match);
+      const previousScoreA = match.scoreA;
+      const previousScoreB = match.scoreB;
+      const previousSetsJson = match.setsJson;
+      const previousStatus = match.status;
+      const previousResult = match.result;
 
-    const log = this.logRepo.create({
-      matchId: id,
-      team,
-      delta,
-      scoreA: match.scoreA,
-      scoreB: match.scoreB,
+      if (team === 'A') {
+        match.scoreA = Math.max(0, match.scoreA + delta);
+      } else {
+        match.scoreB = Math.max(0, match.scoreB + delta);
+      }
+      await manager.save(Match, match);
+
+      const log = manager.create(ScoreLog, {
+        matchId: id,
+        team,
+        delta,
+        scoreA: match.scoreA,
+        scoreB: match.scoreB,
+        previousScoreA,
+        previousScoreB,
+        previousSetsJson,
+        previousStatus,
+        previousResult,
+      });
+      await manager.save(ScoreLog, log);
     });
-    await this.logRepo.save(log);
 
     const updated = await this.findOneOrFail(id);
     this.gateway.emitScoreUpdate(updated);
+    this.logger.log({
+      label: '[Sportday backend] score update metrics',
+      matchId: id,
+      durationMs: Date.now() - startedAt,
+      databaseWrites: 2,
+      emittedEvents: 1,
+      measuredAt: new Date().toISOString(),
+    });
     return updated;
   }
 
@@ -449,74 +472,92 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
     team: 'A' | 'B',
     delta: number,
   ): Promise<Match> {
-    const match = await this.findOneOrFail(id);
-    const sport = match.sport;
-    const SETS_TO_WIN = setsToWin(sport);
-    let sets: Array<{ a: number; b: number }> = [];
-    try {
-      sets = match.setsJson ? JSON.parse(match.setsJson) : [];
-    } catch {
-      sets = [];
-    }
-    const maxSets = setsToWin(sport) * 2 - 1; // 배구=3, 배드민턴=5
-    while (sets.length < maxSets) sets.push({ a: 0, b: 0 });
+    await this.matchRepo.manager.transaction(async (manager) => {
+      const match = await manager.findOne(Match, {
+        where: { id },
+        relations: ['teamA', 'teamB'],
+      });
+      if (!match) throw new NotFoundException('Match not found');
 
-    const setWinner = (s: { a: number; b: number }): 'A' | 'B' | null => {
-      if (!isSetComplete(sport, s.a, s.b)) return null;
-      return s.a > s.b ? 'A' : 'B';
-    };
-    const countWins = () => {
-      let aw = 0,
-        bw = 0;
-      for (const s of sets) {
-        const w = setWinner(s);
-        if (w === 'A') aw++;
-        else if (w === 'B') bw++;
+      const previousScoreA = match.scoreA;
+      const previousScoreB = match.scoreB;
+      const previousSetsJson = match.setsJson;
+      const previousStatus = match.status;
+      const previousResult = match.result;
+
+      const sport = match.sport;
+      const SETS_TO_WIN = setsToWin(sport);
+      let sets: Array<{ a: number; b: number }> = [];
+      try {
+        sets = match.setsJson ? JSON.parse(match.setsJson) : [];
+      } catch {
+        sets = [];
       }
-      return { aw, bw };
-    };
+      const maxSets = setsToWin(sport) * 2 - 1; // 배구=3, 배드민턴=5
+      while (sets.length < maxSets) sets.push({ a: 0, b: 0 });
 
-    const winsBefore = countWins();
-    const matchAlreadyDone =
-      winsBefore.aw >= SETS_TO_WIN || winsBefore.bw >= SETS_TO_WIN;
+      const setWinner = (s: { a: number; b: number }): 'A' | 'B' | null => {
+        if (!isSetComplete(sport, s.a, s.b)) return null;
+        return s.a > s.b ? 'A' : 'B';
+      };
+      const countWins = () => {
+        let aw = 0,
+          bw = 0;
+        for (const s of sets) {
+          const w = setWinner(s);
+          if (w === 'A') aw++;
+          else if (w === 'B') bw++;
+        }
+        return { aw, bw };
+      };
 
-    if (!matchAlreadyDone) {
-      // 첫 번째 미완료 세트를 찾아 현재 세트로 적용한다.
-      let active = sets.findIndex((s) => setWinner(s) === null);
-      if (active === -1) active = sets.length - 1;
+      const winsBefore = countWins();
+      const matchAlreadyDone =
+        winsBefore.aw >= SETS_TO_WIN || winsBefore.bw >= SETS_TO_WIN;
 
-      if (team === 'A') sets[active].a = Math.max(0, sets[active].a + delta);
-      else sets[active].b = Math.max(0, sets[active].b + delta);
-    }
+      if (!matchAlreadyDone) {
+        // 첫 번째 미완료 세트를 찾아 현재 세트로 적용한다.
+        let active = sets.findIndex((s) => setWinner(s) === null);
+        if (active === -1) active = sets.length - 1;
 
-    match.setsJson = JSON.stringify(sets);
-    // 요약 뷰가 정상 동작하도록 합계를 scoreA/scoreB에 반영한다.
-    match.scoreA = sets.reduce((s, x) => s + x.a, 0);
-    match.scoreB = sets.reduce((s, x) => s + x.b, 0);
-
-    // 한 팀이 2세트를 획득하면 경기를 종료 처리한다.
-    const winsAfter = countWins();
-    if (
-      (winsAfter.aw >= SETS_TO_WIN || winsAfter.bw >= SETS_TO_WIN) &&
-      match.status !== 'DONE'
-    ) {
-      match.status = 'DONE';
-      if (winsAfter.aw > winsAfter.bw) {
-        match.result = (match.teamA?.name ?? 'Team A') + ' 승';
-      } else {
-        match.result = (match.teamB?.name ?? 'Team B') + ' 승';
+        if (team === 'A') sets[active].a = Math.max(0, sets[active].a + delta);
+        else sets[active].b = Math.max(0, sets[active].b + delta);
       }
-    }
-    await this.matchRepo.save(match);
 
-    const log = this.logRepo.create({
-      matchId: id,
-      team: `${team}`,
-      delta,
-      scoreA: match.scoreA,
-      scoreB: match.scoreB,
+      match.setsJson = JSON.stringify(sets);
+      // 요약 뷰가 정상 동작하도록 합계를 scoreA/scoreB에 반영한다.
+      match.scoreA = sets.reduce((s, x) => s + x.a, 0);
+      match.scoreB = sets.reduce((s, x) => s + x.b, 0);
+
+      // 한 팀이 목표 세트를 획득하면 경기를 종료 처리한다.
+      const winsAfter = countWins();
+      if (
+        (winsAfter.aw >= SETS_TO_WIN || winsAfter.bw >= SETS_TO_WIN) &&
+        match.status !== 'DONE'
+      ) {
+        match.status = 'DONE';
+        if (winsAfter.aw > winsAfter.bw) {
+          match.result = (match.teamA?.name ?? 'Team A') + ' 승';
+        } else {
+          match.result = (match.teamB?.name ?? 'Team B') + ' 승';
+        }
+      }
+      await manager.save(Match, match);
+
+      const log = manager.create(ScoreLog, {
+        matchId: id,
+        team: `${team}`,
+        delta,
+        scoreA: match.scoreA,
+        scoreB: match.scoreB,
+        previousScoreA,
+        previousScoreB,
+        previousSetsJson,
+        previousStatus,
+        previousResult,
+      });
+      await manager.save(ScoreLog, log);
     });
-    await this.logRepo.save(log);
 
     const updated = await this.findOneOrFail(id);
     this.gateway.emitScoreUpdate(updated);
@@ -542,23 +583,43 @@ export class MatchesService implements OnModuleInit, OnModuleDestroy {
   }
 
   async undoScore(id: number): Promise<Match> {
-    const lastLog = await this.logRepo.findOne({
-      where: { matchId: id },
-      order: { id: 'DESC' },
-    });
-    if (!lastLog) throw new NotFoundException('No score history');
+    let statusChanged = false;
+    await this.matchRepo.manager.transaction(async (manager) => {
+      const lastLog = await manager.findOne(ScoreLog, {
+        where: { matchId: id },
+        order: { id: 'DESC' },
+      });
+      if (!lastLog) throw new NotFoundException('No score history');
 
-    const match = await this.findOneOrFail(id);
-    if (lastLog.team === 'A') {
-      match.scoreA = Math.max(0, match.scoreA - lastLog.delta);
-    } else {
-      match.scoreB = Math.max(0, match.scoreB - lastLog.delta);
-    }
-    await this.matchRepo.save(match);
-    await this.logRepo.delete(lastLog.id);
+      const match = await manager.findOne(Match, { where: { id } });
+      if (!match) throw new NotFoundException('Match not found');
+
+      const hasSnapshot =
+        lastLog.previousScoreA !== null &&
+        lastLog.previousScoreA !== undefined &&
+        lastLog.previousScoreB !== null &&
+        lastLog.previousScoreB !== undefined;
+
+      if (hasSnapshot) {
+        statusChanged = match.status !== lastLog.previousStatus;
+        match.scoreA = lastLog.previousScoreA!;
+        match.scoreB = lastLog.previousScoreB!;
+        match.setsJson = lastLog.previousSetsJson ?? null;
+        match.status = lastLog.previousStatus ?? match.status;
+        match.result = lastLog.previousResult ?? null;
+      } else if (lastLog.team === 'A') {
+        // 이전 버전에서 생성된 로그와의 하위 호환을 위한 fallback.
+        match.scoreA = Math.max(0, match.scoreA - lastLog.delta);
+      } else {
+        match.scoreB = Math.max(0, match.scoreB - lastLog.delta);
+      }
+      await manager.save(Match, match);
+      await manager.delete(ScoreLog, lastLog.id);
+    });
 
     const updated = await this.findOneOrFail(id);
     this.gateway.emitScoreUpdate(updated);
+    if (statusChanged) this.gateway.emitMatchStatusChange(updated);
     return updated;
   }
 }
