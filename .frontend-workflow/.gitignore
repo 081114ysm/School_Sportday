@@ -1,0 +1,4 @@
+# frontend-workflow: private runtime files
+.lock/
+**/*.log
+install-*/

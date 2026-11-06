@@ -1,0 +1,19 @@
+{
+  "method": "self",
+  "reviewer": "Codex self-review",
+  "scope": "merge-base d505fffd 기준 backend/src/matches/matches.service.ts와 matches.service.spec.ts의 Q05 트랜잭션 diff, MatchesController의 score API 계약, 테스트 mock을 확인함",
+  "findings": [
+    {
+      "severity": "medium",
+      "status": "accepted",
+      "detail": "현재 rollback 검증은 Jest에서 transaction manager와 ScoreLog 저장 실패를 모의한 단위 테스트다. 실제 PostgreSQL 또는 SQLite 연결을 사용한 통합 rollback 테스트는 실행하지 않았다.",
+      "reason": "Q05의 정상·실패 경로를 재현하는 단위 검증까지 수행했으며, 실제 DB 연결 환경은 이번 작업 범위에 포함하지 않았다. 통합 테스트는 별도 환경에서 추가할 항목으로 남긴다."
+    },
+    {
+      "severity": "medium",
+      "status": "accepted",
+      "detail": "DB transaction은 Match와 ScoreLog의 원자성은 보장하지만, 두 관리자가 같은 Match를 동시에 수정할 때의 lost update까지 해결하지 않는다.",
+      "reason": "Q05-5에서 별도 동시성 문제로 명시했으며, 다음 단계에서 pessimistic row lock 또는 optimistic version 검사를 적용해야 한다."
+    }
+  ]
+}

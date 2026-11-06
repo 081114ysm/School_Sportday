@@ -1,0 +1,211 @@
+{
+  "schemaVersion": 1,
+  "id": "q05-score-transaction",
+  "issue": null,
+  "stage": "qa",
+  "branch": "codex/q05-score-transaction",
+  "baseSha": "d505fffd5681101f52a83c1b6e5af633d0037cfe",
+  "createdAt": "2026-11-06T12:36:52.890Z",
+  "updatedAt": "2026-11-06T12:40:52.783Z",
+  "plan": ".frontend-workflow/features/q05-score-transaction/plan.md",
+  "approvals": {
+    "plan": {
+      "at": "2026-11-06T12:37:33.029Z",
+      "by": "user",
+      "file": ".frontend-workflow/features/q05-score-transaction/evidence/user-request.md",
+      "fileHash": "13b4b4e4bcf5dee67752b397043e7d38c191a6abc8557f243575bdeab008a596",
+      "planHash": "6be6237439aea15660f9dd2e72f34bb55e840016b58b1c4c2861d1f92a495af0",
+      "configHash": "814d50caf8129620d5bd8abcc547aa5a75b7503f2a639b1076657aae529f279b",
+      "fingerprint": "430033ded7e1943a7169611c49b6d1237430e5b9934fa3fdac4a83f16c490d10"
+    }
+  },
+  "checks": {
+    "typecheck": {
+      "at": "2026-11-06T12:40:13.408Z",
+      "startedAt": "2026-11-06T12:40:12.350Z",
+      "argv": [
+        "npx",
+        "tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "backend",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "passed": true,
+      "sourceChanged": false,
+      "fingerprint": "eac0c60a875c2435f9ca35bedf033cb8c185b6dc4a87db508776dbd632d705e3",
+      "planHash": "6be6237439aea15660f9dd2e72f34bb55e840016b58b1c4c2861d1f92a495af0",
+      "configHash": "814d50caf8129620d5bd8abcc547aa5a75b7503f2a639b1076657aae529f279b",
+      "files": [
+        {
+          "path": ".frontend-workflow/features/q05-score-transaction/evidence/check-typecheck.json",
+          "hash": "37885321240788de3439a0c220813eef386ac442f9d9732aabbd021c3074fde1"
+        }
+      ]
+    },
+    "test": {
+      "at": "2026-11-06T12:40:14.461Z",
+      "startedAt": "2026-11-06T12:40:13.489Z",
+      "argv": [
+        "npm",
+        "test",
+        "--",
+        "--runInBand"
+      ],
+      "cwd": "backend",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "passed": true,
+      "sourceChanged": false,
+      "fingerprint": "eac0c60a875c2435f9ca35bedf033cb8c185b6dc4a87db508776dbd632d705e3",
+      "planHash": "6be6237439aea15660f9dd2e72f34bb55e840016b58b1c4c2861d1f92a495af0",
+      "configHash": "814d50caf8129620d5bd8abcc547aa5a75b7503f2a639b1076657aae529f279b",
+      "files": [
+        {
+          "path": ".frontend-workflow/features/q05-score-transaction/evidence/check-test.json",
+          "hash": "d286c299af7fdc79c86064d5e4fa225f941337bb5a141d21715019f659eab2cc"
+        }
+      ]
+    },
+    "build": {
+      "at": "2026-11-06T12:40:16.217Z",
+      "startedAt": "2026-11-06T12:40:14.542Z",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "backend",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "passed": true,
+      "sourceChanged": false,
+      "fingerprint": "eac0c60a875c2435f9ca35bedf033cb8c185b6dc4a87db508776dbd632d705e3",
+      "planHash": "6be6237439aea15660f9dd2e72f34bb55e840016b58b1c4c2861d1f92a495af0",
+      "configHash": "814d50caf8129620d5bd8abcc547aa5a75b7503f2a639b1076657aae529f279b",
+      "files": [
+        {
+          "path": ".frontend-workflow/features/q05-score-transaction/evidence/check-build.json",
+          "hash": "fbff604188db6965e2b1adf291b564029ab09e2be3b74992563483cd2facd937"
+        }
+      ]
+    }
+  },
+  "evidence": {
+    "review": {
+      "at": "2026-11-06T12:40:48.711Z",
+      "fingerprint": "eac0c60a875c2435f9ca35bedf033cb8c185b6dc4a87db508776dbd632d705e3",
+      "planHash": "6be6237439aea15660f9dd2e72f34bb55e840016b58b1c4c2861d1f92a495af0",
+      "configHash": "814d50caf8129620d5bd8abcc547aa5a75b7503f2a639b1076657aae529f279b",
+      "files": [
+        {
+          "path": ".frontend-workflow/features/q05-score-transaction/evidence/review.json",
+          "hash": "857cde284f67ee02a7eeca8e7bad9e9a42fc92fa2049a4e71ba7b199d503368e"
+        }
+      ],
+      "summary": {
+        "method": "self",
+        "reviewer": "Codex self-review",
+        "scope": "merge-base d505fffd 기준 backend/src/matches/matches.service.ts와 matches.service.spec.ts의 Q05 트랜잭션 diff, MatchesController의 score API 계약, 테스트 mock을 확인함",
+        "findings": [
+          {
+            "severity": "medium",
+            "status": "accepted",
+            "detail": "현재 rollback 검증은 Jest에서 transaction manager와 ScoreLog 저장 실패를 모의한 단위 테스트다. 실제 PostgreSQL 또는 SQLite 연결을 사용한 통합 rollback 테스트는 실행하지 않았다.",
+            "reason": "Q05의 정상·실패 경로를 재현하는 단위 검증까지 수행했으며, 실제 DB 연결 환경은 이번 작업 범위에 포함하지 않았다. 통합 테스트는 별도 환경에서 추가할 항목으로 남긴다."
+          },
+          {
+            "severity": "medium",
+            "status": "accepted",
+            "detail": "DB transaction은 Match와 ScoreLog의 원자성은 보장하지만, 두 관리자가 같은 Match를 동시에 수정할 때의 lost update까지 해결하지 않는다.",
+            "reason": "Q05-5에서 별도 동시성 문제로 명시했으며, 다음 단계에서 pessimistic row lock 또는 optimistic version 검사를 적용해야 한다."
+          }
+        ]
+      }
+    }
+  },
+  "history": [
+    {
+      "at": "2026-11-06T12:36:52.891Z",
+      "action": "start",
+      "stage": "plan",
+      "branch": "codex/q05-score-transaction",
+      "baseSha": "d505fffd5681101f52a83c1b6e5af633d0037cfe"
+    },
+    {
+      "at": "2026-11-06T12:37:33.066Z",
+      "action": "approve",
+      "stage": "plan",
+      "gate": "plan",
+      "by": "user"
+    },
+    {
+      "at": "2026-11-06T12:37:35.566Z",
+      "action": "advance",
+      "stage": "implement"
+    },
+    {
+      "at": "2026-11-06T12:39:43.711Z",
+      "action": "run",
+      "stage": "implement",
+      "name": "typecheck",
+      "passed": true
+    },
+    {
+      "at": "2026-11-06T12:39:44.435Z",
+      "action": "run",
+      "stage": "implement",
+      "name": "test",
+      "passed": true
+    },
+    {
+      "at": "2026-11-06T12:39:46.436Z",
+      "action": "run",
+      "stage": "implement",
+      "name": "build",
+      "passed": true
+    },
+    {
+      "at": "2026-11-06T12:40:13.409Z",
+      "action": "run",
+      "stage": "implement",
+      "name": "typecheck",
+      "passed": true
+    },
+    {
+      "at": "2026-11-06T12:40:14.461Z",
+      "action": "run",
+      "stage": "implement",
+      "name": "test",
+      "passed": true
+    },
+    {
+      "at": "2026-11-06T12:40:16.218Z",
+      "action": "run",
+      "stage": "implement",
+      "name": "build",
+      "passed": true
+    },
+    {
+      "at": "2026-11-06T12:40:45.673Z",
+      "action": "advance",
+      "stage": "review"
+    },
+    {
+      "at": "2026-11-06T12:40:48.729Z",
+      "action": "record",
+      "stage": "review",
+      "kind": "review"
+    },
+    {
+      "at": "2026-11-06T12:40:52.783Z",
+      "action": "advance",
+      "stage": "qa"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "project": "School_Sportday Q05 score transaction",
+  "configured": true,
+  "integrationBranch": "main",
+  "defaultBranch": "main",
+  "branchPrefix": "codex/",
+  "reviewMode": "self",
+  "requireLiveApi": false,
+  "requireCi": true,
+  "github": {
+    "enabled": true,
+    "repository": "081114ysm/School_Sportday"
+  },
+  "codeRabbit": {
+    "required": false
+  },
+  "approval": {
+    "plan": true,
+    "pr": true
+  },
+  "checks": {
+    "typecheck": {
+      "argv": [
+        "npx",
+        "tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "backend",
+      "timeoutMs": 120000
+    },
+    "test": {
+      "argv": [
+        "npm",
+        "test",
+        "--",
+        "--runInBand"
+      ],
+      "cwd": "backend",
+      "timeoutMs": 120000
+    },
+    "build": {
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "backend",
+      "timeoutMs": 180000
+    }
+  },
+  "notApplicable": {
+    "lint": "backend의 기존 lint 스크립트가 --fix를 포함하고 있어 이번 작업에서는 자동 수정 명령을 실행하지 않음",
+    "browser": "이번 변경 범위는 DB 트랜잭션과 백엔드 단위 테스트이며 화면 코드는 변경하지 않음"
+  },
+  "context": {
+    "framework": "NestJS + TypeORM",
+    "packageManager": "npm (backend/package-lock.json)",
+    "designSource": "none - backend transaction change",
+    "apiSource": "backend/src/matches/matches.controller.ts",
+    "supportedBrowsers": [
+      "backend-only change"
+    ],
+    "viewports": [
+      320,
+      768,
+      1280
+    ]
+  }
+}

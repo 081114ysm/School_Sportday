@@ -1,0 +1,19 @@
+{
+  "at": "2026-11-06T12:40:16.217Z",
+  "startedAt": "2026-11-06T12:40:14.542Z",
+  "argv": [
+    "npm",
+    "run",
+    "build"
+  ],
+  "cwd": "backend",
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "passed": true,
+  "sourceChanged": false,
+  "fingerprint": "eac0c60a875c2435f9ca35bedf033cb8c185b6dc4a87db508776dbd632d705e3",
+  "planHash": "6be6237439aea15660f9dd2e72f34bb55e840016b58b1c4c2861d1f92a495af0",
+  "configHash": "814d50caf8129620d5bd8abcc547aa5a75b7503f2a639b1076657aae529f279b",
+  "files": []
+}
